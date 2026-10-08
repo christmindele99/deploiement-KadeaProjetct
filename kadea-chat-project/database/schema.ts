@@ -26,7 +26,7 @@ export class GroupSchema extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare description: string
+  declare description: string | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -36,14 +36,14 @@ export class GroupSchema extends BaseModel {
 }
 
 export class MembershipSchema extends BaseModel {
-  static $columns = ['joinedAt', 'roleId', 'userConversation', 'userId'] as const
+  static $columns = ['conversationId', 'joinedAt', 'roleId', 'userId'] as const
   $columns = MembershipSchema.$columns
+  @column()
+  declare conversationId: number
   @column.dateTime()
   declare joinedAt: DateTime
   @column()
   declare roleId: number
-  @column()
-  declare userConversation: number
   @column({ isPrimary: true })
   declare userId: number
 }
@@ -54,7 +54,7 @@ export class MessageSchema extends BaseModel {
   @column()
   declare authorId: number
   @column()
-  declare content: string
+  declare content: string | null
   @column()
   declare conversationId: number
   @column.dateTime({ autoCreate: true })
@@ -75,26 +75,26 @@ export class RoleSchema extends BaseModel {
 }
 
 export class UserTokenSchema extends BaseModel {
-  static $columns = ['createdAt', 'expiresAt', 'fk', 'id', 'tokenHash', 'type', 'usedAt'] as const
+  static $columns = ['createdAt', 'expiresAt', 'id', 'tokenHash', 'type', 'usedAt', 'userId'] as const
   $columns = UserTokenSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column.dateTime()
-  declare expiresAt: DateTime | null
-  @column()
-  declare fk: number | null
+  declare expiresAt: DateTime
   @column({ isPrimary: true })
   declare id: number
   @column()
-  declare tokenHash: string | null
+  declare tokenHash: string
   @column()
-  declare type: string | null
+  declare type: string
   @column.dateTime()
   declare usedAt: DateTime | null
+  @column()
+  declare userId: number
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatar', 'bio', 'createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'password', 'updatedAt', 'userName'] as const
+  static $columns = ['avatar', 'bio', 'createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'password', 'updatedAt', 'username'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatar: string | null
@@ -107,13 +107,13 @@ export class UserSchema extends BaseModel {
   @column.dateTime()
   declare emailVerifiedAt: DateTime | null
   @column()
-  declare fullName: string | null
+  declare fullName: string
   @column({ isPrimary: true })
   declare id: number
   @column({ serializeAs: null })
   declare password: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
+  declare updatedAt: DateTime
   @column()
-  declare userName: string | null
+  declare username: string
 }
