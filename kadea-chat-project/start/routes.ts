@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import transmit from '@adonisjs/transmit/services/main'
+import { middleware } from '#start/kernel'
 
 transmit.registerRoutes()
 
@@ -79,7 +80,7 @@ router.get('/chat', async ({ view, session }) => {
   return view.render('pages/chat/index', {
     currentUserId: session.get('userId') ?? null,
   })
-}).as('chat.index')
+}).use(middleware.sessionAuth()).as('chat.index')
 
   router.get('/explorer', async ({ view }) => {
   return view.render('pages/chat/explorer')
@@ -103,25 +104,26 @@ router
 // Lister les conversations
 router
   .get('/conversations', [ConversationsController, 'index'])
-  .as('conversations.index')
+  .use(middleware.sessionAuth()).as('conversations.index')
 
 // Afficher une conversation
 router
   .get('/conversations/:id', [ConversationsController, 'show'])
-  .as('conversations.show')
+  .use(middleware.sessionAuth()).as('conversations.show')
 
 // Créer une conversation
 router
   .post('/conversations', [ConversationsController, 'store'])
-  .as('conversations.store')
+  .use(middleware.sessionAuth()).as('conversations.store')
 
 // Supprimer une conversation
 router
   .delete('/conversations/:id', [ConversationsController, 'destroy'])
   .as('conversations.destroy')
 
-router.post('/messages', [MessagesController, 'store']).as('messages.store')
-router.get('/conversations/:id/messages', [MessagesController, 'index'])
+router.post('/messages', [MessagesController, 'store']).use(middleware.sessionAuth())
+.as('messages.store')
+router.get('/conversations/:id/messages', [MessagesController, 'index']).use(middleware.sessionAuth())
 router.post('/conversations/:id/messages', [MessagesController, 'store']).as('conversations.messages.store')
-router.patch('/messages/:id', [MessagesController, 'update'])
-router.delete('/messages/:id', [MessagesController, 'destroy'])
+router.patch('/messages/:id', [MessagesController, 'update']).use(middleware.sessionAuth())
+router.delete('/messages/:id', [MessagesController, 'destroy']).use(middleware.sessionAuth())
