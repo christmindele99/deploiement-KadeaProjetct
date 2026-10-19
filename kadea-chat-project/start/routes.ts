@@ -4,6 +4,10 @@ import { middleware } from '#start/kernel'
 
 transmit.registerRoutes()
 
+router.get('/', ({ response }) => {
+  return response.redirect().toRoute('register.show')
+})
+
 const ConversationsController = () => import('#controllers/conversations_controller')
 const RegistersController = () => import('#controllers/registers_controller')
 const VerifyEmailController = () => import('#controllers/verify_emails_controller')
