@@ -1,3 +1,4 @@
+
 import { defineConfig } from 'vite'
 import adonisjs from '@adonisjs/vite/client'
 import tailwindcss from '@tailwindcss/vite'
@@ -6,10 +7,16 @@ export default defineConfig({
   plugins: [
     adonisjs({
       /**
-       * Entrypoints of your application. Each entrypoint will
-       * result in a separate bundle.
+       * Entrypoints of your application.
+       * Each entrypoint will result in a separate bundle.
        */
-      entryPoints: ['resources/css/app.css', 'resources/js/app.js'],
+      entryPoints: [
+        'resources/css/app.css',
+        'resources/js/app.js',
+        'resources/js/auth/register.js',
+        'resources/js/auth/reset_password.js',
+        'resources/js/chat/index.js',
+      ],
 
       /**
        * Paths to watch and reload the browser on file change
