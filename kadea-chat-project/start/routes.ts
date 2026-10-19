@@ -1,31 +1,127 @@
-/*
-|--------------------------------------------------------------------------
-| Routes file
-|--------------------------------------------------------------------------
-|
-| The routes file is used for defining the HTTP routes.
-|
-*/
-
-import { middleware } from '#start/kernel'
-import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
+import transmit from '@adonisjs/transmit/services/main'
 
-router.on('/').render('pages/home').as('home')
+transmit.registerRoutes()
+
+const ConversationsController = () => import('#controllers/conversations_controller')
+const RegistersController = () => import('#controllers/registers_controller')
+const VerifyEmailController = () => import('#controllers/verify_emails_controller')
+const LoginsController = () => import('#controllers/logins_controller')
+const ForgotPasswordsController = () => import('#controllers/forgot_passwords_controller')
+const ResetPasswordsController = () => import('#controllers/reset_passwords_controller')
+const UsersController = () => import('#controllers/users_controller')
+const MessagesController = () => import('#controllers/messages_controller')
+
+
+// Afficher le formulaire d'inscription
+router
+  .get('/register', [RegistersController, 'show'])
+  .as('register.show')
+
+// Traiter l'inscription
+router
+  .post('/register', [RegistersController, 'store'])
+  .as('register.store')
+
+// Vérifier si l'adresse e-mail existe déjà
+router
+  .get('/auth/check-email', [RegistersController, 'checkEmail'])
+  .as('auth.checkEmail')
+
+// Afficher l'écran d'attente de vérification
+router
+  .get('/verify-email', [VerifyEmailController, 'show'])
+  .as('verify-email.show')
+
+// Renvoyer un nouveau lien de confirmation
+router
+  .post('/verify-email/resend', [VerifyEmailController, 'resend'])
+  .as('verify-email.resend')
+
+
+// Confirmer l'adresse e-mail à partir du token reçu
+router
+  .get('/verify-email/:token', [VerifyEmailController, 'confirm'])
+  .as('verify-email.confirm')
+
+// Afficher le formulaire de connexion
+router
+  .get('/login', [LoginsController, 'show'])
+  .as('login.show')
+
+// Traiter la connexion
+router
+  .post('/login', [LoginsController, 'store'])
+  .as('login.store')
+
+  // Afficher le formulaire "Mot de passe oublié"
+router
+  .get('/forgot-password', [ForgotPasswordsController, 'show'])
+  .as('forgot-password.show')
+
+// Envoyer le lien de réinitialisation par e-mail
+router
+  .post('/forgot-password', [ForgotPasswordsController, 'store'])
+  .as('forgot-password.store')
+
+// Afficher le formulaire de nouveau mot de passe
+router
+  .get('/reset-password/:token', [ResetPasswordsController, 'show'])
+  .as('reset-password.show')
+
+// Enregistrer le nouveau mot de passe
+router
+  .post('/reset-password/:token', [ResetPasswordsController, 'store'])
+  .as('reset-password.store')
+
+// Afficher l'interface de chat
+router.get('/chat', async ({ view, session }) => {
+  return view.render('pages/chat/index', {
+    currentUserId: session.get('userId') ?? null,
+  })
+}).as('chat.index')
+
+  router.get('/explorer', async ({ view }) => {
+  return view.render('pages/chat/explorer')
+}).as('explorer')
+
+
+router.get('/settings', async ({ view }) => {
+  return view.render('pages/chat/setting')
+})
+
+router.get('/actus', async ({ view }) => {
+  return view.render('pages/chat/actus')
+}).as('actus')
+
 
 router
-  .group(() => {
-    router.get('signup', [controllers.NewAccount, 'create'])
-    router.post('signup', [controllers.NewAccount, 'store'])
+  .get('/users', [UsersController, 'index'])
+  .as('users.index')
 
-    router.get('login', [controllers.Session, 'create'])
-    router.post('login', [controllers.Session, 'store'])
-  })
-  .use(middleware.guest())
 
+// Lister les conversations
 router
-  .group(() => {
-    router.on('/dashboard').render('pages/dashboard').as('dashboard')
-    router.post('logout', [controllers.Session, 'destroy'])
-  })
-  .use(middleware.auth())
+  .get('/conversations', [ConversationsController, 'index'])
+  .as('conversations.index')
+
+// Afficher une conversation
+router
+  .get('/conversations/:id', [ConversationsController, 'show'])
+  .as('conversations.show')
+
+// Créer une conversation
+router
+  .post('/conversations', [ConversationsController, 'store'])
+  .as('conversations.store')
+
+// Supprimer une conversation
+router
+  .delete('/conversations/:id', [ConversationsController, 'destroy'])
+  .as('conversations.destroy')
+
+router.post('/messages', [MessagesController, 'store']).as('messages.store')
+router.get('/conversations/:id/messages', [MessagesController, 'index'])
+router.post('/conversations/:id/messages', [MessagesController, 'store']).as('conversations.messages.store')
+router.patch('/messages/:id', [MessagesController, 'update'])
+router.delete('/messages/:id', [MessagesController, 'destroy'])

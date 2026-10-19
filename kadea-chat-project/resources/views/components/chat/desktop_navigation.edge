@@ -1,0 +1,84 @@
+{{-- NAVIGATION DESKTOP KADEA CHAT --}}
+<aside
+  class="app-panel hidden w-20 shrink-0 flex-col items-center justify-between border-r border-slate-200 bg-white py-6 md:flex"
+>
+  {{-- Logo et navigation principale --}}
+  <div class="flex w-full flex-col items-center gap-9">
+
+    {{-- Logo --}}
+    <div class="flex w-full justify-center">
+      <img
+        src="/kadea-logo.png"
+        alt="Logo Kadea Chat"
+        class="h-15 w-15 scale-150 object-contain"
+      >
+    </div>
+
+    {{-- Liens de navigation --}}
+    <nav
+      class="flex w-full flex-col items-center gap-5"
+      aria-label="Navigation principale"
+    >
+      <a
+        href="/chat"
+        data-section="chats"
+        title="Chats"
+        aria-label="Chats"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue' : '' }}"
+      >
+        <i class="fa-solid fa-comment-dots text-lg"></i>
+      </a>
+
+      <a
+        href="/explorer"
+        data-section="explorer"
+        title="Explorer"
+        aria-label="Explorer"
+        id="explorerButton"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/explorer' ? 'bg-brand-accent text-brand-blue' : '' }}"
+      >
+        <i class="fa-regular fa-compass text-lg"></i>
+      </a>
+
+      <a
+        href="/actus"
+        data-section="actus"
+        title="Actus"
+        aria-label="Actus"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/actus' ? 'bg-brand-accent text-brand-blue' : '' }}"
+      >
+        <i class="fa-solid fa-circle-notch text-lg"></i>
+      </a>
+    </nav>
+  </div>
+
+  {{-- Paramètres et profil --}}
+  <div class="flex flex-col items-center gap-5">
+
+    <a
+      href="/settings"
+      data-section="settings"
+      title="Paramètres"
+      aria-label="Paramètres"
+      id="settingsButton"
+      class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/settings' ? 'bg-brand-accent text-brand-blue' : '' }}"
+    >
+      <i class="fa-solid fa-gear text-lg"></i>
+    </a>
+
+    <a
+      href="/profile"
+      data-section="profile"
+      title="Mon profil"
+      aria-label="Mon profil"
+      class="nav-item flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/profile' ? 'bg-brand-accent text-brand-blue' : '' }}"
+    >
+      <img
+        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100"
+        alt="Votre profil"
+        class="h-10 w-10 rounded-full border-2 border-brand-accent object-cover"
+      >
+    </a>
+
+  </div>
+</aside>

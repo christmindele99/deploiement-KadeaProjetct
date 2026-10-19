@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrfToken }}">
+    <meta name="theme-color" content="#075e8d">
+    <title>Kadea Chat</title>
+    @include('components/link')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @include('components/scripts_tailwind')
+    @include('components/style')
+  </head>
+  <body class="h-full overflow-hidden bg-white font-sans text-brand-blue antialiased">
+    <div id="app" class="app-surface flex h-full w-full overflow-hidden bg-white">
+      @include('components/chat/desktop_navigation')
+      @include('components/chat/conversation_list')
+      {{-- ZONE PRINCIPALE --}}
+      <main id="mainPanel"
+        class="app-surface relative hidden h-full min-w-0 w-full flex-1 flex-col bg-white">
+        @include('components/chat/interface_message_info')
+        {{-- CONVERSATION --}}
+        <div id="chatContent" class="hidden min-h-0 flex-1 flex-col">
+          @include('components/chat/header_message')        
+          @include('components/chat/message_list')
+          @include('components/chat/saisie_message')
+        </div>
+        <section id="sectionContent"
+          class="hidden min-h-0 flex-1 overflow-y-auto p-5 pb-[105px] sm:p-8 md:pb-8">
+        </section>
+      </main>
+      @include('components/chat/mobile_navigation')
+      @include('components/chat/modal_new_conversation')
+      {{-- NOTIFICATION TEMPORAIRE --}}
+      <div id="toast" role="status" aria-live="polite"
+        class="fixed bottom-24 left-1/2 z-[60] hidden -translate-x-1/2 rounded-xl bg-brand-blue px-4 py-3 text-sm text-white shadow-lg md:bottom-5">
+      </div>
+    </div>
+    <script>
+      window.currentUserId = {{ currentUserId ?? 'null' }};
+    </script>
+    @vite(['resources/js/chat/index.js'])
+  </body>
+</html>

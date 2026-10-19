@@ -1,0 +1,79 @@
+<main
+    class="w-full max-w-md bg-brand-blue/95 backdrop-blur-md border border-white/20 p-6 sm:p-8 rounded-3xl shadow-2xl">
+    <div class="flex justify-center mb-6">
+    <div
+        class="w-20 h-20 rounded-full bg-brand-accent/10 border border-brand-accent/30 flex items-center justify-center"
+    >
+        <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        class="w-10 h-10 text-brand-accent"
+        >
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 8.25l8.36 5.57a1.15 1.15 0 001.28 0L21 8.25M4.5 19.5h15A1.5 1.5 0 0021 18V6a1.5 1.5 0 00-1.5-1.5h-15A1.5 1.5 0 003 6v12a1.5 1.5 0 001.5 1.5z"
+        />
+        </svg>
+    </div>
+    </div>
+    <div class="text-center space-y-3">
+    <h2
+        class="text-2xl sm:text-3xl font-semibold text-brand-white"
+    >
+        Vérifiez votre adresse email
+    </h2>
+    <p class="text-sm sm:text-base text-white/80 leading-relaxed">
+        Un lien de confirmation vous a été envoyé par e-mail.
+    </p>
+    </div>
+    <div
+    class="mt-6 px-4 py-3 rounded-2xl bg-white/10 border border-white/20 text-center"
+    >
+    <p class="text-xs text-white/60 mb-1">
+        Adresse email
+    </p>
+    <p
+        class="text-sm sm:text-base font-medium text-brand-accent break-all"
+    >
+        {{ email ?? '' }}
+    </p>
+    </div>
+    <div class="mt-6 space-y-3 text-sm text-white/75 leading-relaxed text-center">
+    <p>
+        Consultez votre boîte de réception et cliquez sur le bouton
+        <span class="font-semibold text-brand-white">
+        « Confirmer mon adresse email »
+        </span>
+        présent dans le message que nous vous avons envoyé.
+    </p>
+
+    <p>
+        Si vous ne trouvez pas le message, vérifiez également votre dossier
+        de courriers indésirables.
+    </p>
+    </div>
+    @include('partials/flash/email/message_succes')
+    @include('partials/flash/email/message_error')
+    <form
+    method="POST" action="{{ route('verify-email.resend') }}" class="mt-8">
+    {{ csrfField() }}
+    <button
+        type="submit"
+        id="resendVerification"
+        class="w-full bg-brand-accent text-brand-dark font-semibold py-3 px-5 rounded-xl hover:opacity-90 transition duration-200 focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2 focus:ring-offset-brand-blue"
+    >
+        Renvoyer le lien de confirmation
+    </button>
+    </form>
+    <div class="mt-5 text-center">
+    <a
+        href="{{ route('register.show') }}"
+        class="text-sm text-white/70 hover:text-brand-accent transition duration-200">
+        Retour à l'inscription
+    </a>
+    </div>
+</main>

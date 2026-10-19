@@ -1,0 +1,201 @@
+{{-- resources/views/actus.edge --}}
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kadea Chat - Actus</title>
+
+  {{-- Google Fonts : Roboto --}}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  {{-- FontAwesome Icons --}}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  {{-- Style pour charger la police Artega & Scrollbar --}}
+  <style>
+    @font-face {
+      font-family: 'Artega';
+      src: url('/fonts/Artega.woff2') format('woff2'),
+           url('/fonts/Artega.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    .font-artega {
+      font-family: 'Artega', sans-serif;
+    }
+    
+    /* Scrollbar personnalisée */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #29ff9d;
+    }
+  </style>
+
+  {{-- Tailwind CSS CDN --}}
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  {{-- Configuration Tailwind : Polices & Couleurs --}}
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              blue: '#075e8d',
+              accent: '#29ff9d',
+              dark: '#000000',
+              white: '#ffffff',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full bg-white font-sans text-brand-blue antialiased flex flex-row overflow-hidden relative">
+
+  @include('components/chat/desktop_navigation')
+  <section id="actusList"
+    class="app-panel flex min-h-0 w-full shrink-0 flex-col border-r-0 border-slate-200 bg-white md:w-80 md:border-r lg:w-96">
+    <div class="space-y-4 p-4 pb-3 sm:p-5">
+      <div class="flex items-center justify-between gap-3">
+        <h1 class="font-artega text-2xl font-bold tracking-wide text-brand-blue">
+          Statuts
+        </h1>
+        <div class="flex items-center gap-2">
+          <button type="button" id="addTextStatus"
+            aria-label="Ajouter un statut texte"
+            title="Statut texte"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-brand-blue transition hover:bg-brand-accent hover:text-black">
+            <i class="fa-solid fa-pen text-base"></i>
+          </button>
+          <button type="button" id="addMediaStatus"
+            aria-label="Ajouter une photo ou vidéo"
+            title="Statut média"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-brand-blue transition hover:bg-brand-accent hover:text-black">
+            <i class="fa-solid fa-camera text-base"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="statusItems" class="min-h-0 flex-1 space-y-1 overflow-y-auto p-3 pb-[90px] md:pb-3">
+
+      <div class="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50 cursor-pointer">
+        <span class="relative shrink-0">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100"
+            alt="Votre profil" class="h-12 w-12 rounded-full object-cover">
+          <span class="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-brand-accent text-[10px] font-bold text-black">
+            <i class="fa-solid fa-plus"></i>
+          </span>
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-sm font-semibold text-brand-blue">Mon statut</span>
+          <span class="block truncate text-xs text-slate-500">Appuyez pour ajouter une mise à jour</span>
+        </span>
+      </div>
+
+      {{-- SECTION RÉCENTS --}}
+      <div class="px-2 pt-2">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-brand-blue/70">Récents</h2>
+      </div>
+
+      {{-- STATUT ALICE --}}
+      <button type="button" data-status-user="alice"
+        class="flex w-full items-center gap-3 rounded-xl border-l-4 border-transparent p-3 text-left transition hover:bg-slate-50">
+        <span class="relative shrink-0 rounded-full border-2 border-brand-accent p-[2px]">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
+            alt="Alice B." class="h-11 w-11 rounded-full object-cover">
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="mb-1 flex items-baseline justify-between gap-2">
+            <span class="truncate text-sm font-semibold text-brand-blue">Alice B.</span>
+          </span>
+          <span class="block truncate text-xs text-slate-500">
+            Aujourd'hui à 10:42
+          </span>
+        </span>
+      </button>
+
+      {{-- STATUT JOHN --}}
+      <button type="button" data-status-user="john"
+        class="flex w-full items-center gap-3 rounded-xl border-l-4 border-transparent p-3 text-left transition hover:bg-slate-50">
+        <span class="relative shrink-0 rounded-full border-2 border-brand-accent p-[2px]">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100"
+            alt="John D." class="h-11 w-11 rounded-full object-cover">
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="mb-1 flex items-baseline justify-between gap-2">
+            <span class="truncate text-sm font-semibold text-brand-blue">John D.</span>
+          </span>
+          <span class="block truncate text-xs text-slate-500">
+            Aujourd'hui à 08:15
+          </span>
+        </span>
+      </button>
+
+      {{-- SECTION VUS --}}
+      <div class="px-2 pt-2">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Vus</h2>
+      </div>
+
+      {{-- STATUT MARK --}}
+      <button type="button" data-status-user="mark"
+        class="flex w-full items-center gap-3 rounded-xl border-l-4 border-transparent p-3 text-left transition hover:bg-slate-50 opacity-75">
+        <span class="relative shrink-0 rounded-full border-2 border-slate-300 p-[2px]">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100"
+            alt="Mark S." class="h-11 w-11 rounded-full object-cover">
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="mb-1 flex items-baseline justify-between gap-2">
+            <span class="truncate text-sm font-semibold text-brand-blue">Mark S.</span>
+          </span>
+          <span class="block truncate text-xs text-slate-400">
+            Hier à 21:05
+          </span>
+        </span>
+      </button>
+
+    </div>
+  </section>
+
+  {{-- SECTION PRINCIPALE D'INFORMATION (Masquée sur Mobile, visible uniquement sur Desktop) --}}
+  <section id="emptyActusState"
+    class="hidden flex-1 items-center justify-center p-6 text-center bg-white md:flex">
+    <div class="max-w-md space-y-4">
+      <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50 border border-emerald-100 text-brand-blue">
+        <i class="fa-solid fa-circle-notch text-4xl"></i>
+      </div>
+      <h2 class="font-artega text-2xl font-bold text-brand-blue">
+        Partager des statuts
+      </h2>
+      <p class="text-sm leading-relaxed text-slate-500">
+        Partagez des photos, des vidéos et du texte qui disparaissent au bout de 24 heures.
+      </p>
+      <div class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-2 text-xs font-semibold text-brand-blue border border-emerald-100">
+        <i class="fa-solid fa-lock text-sm text-brand-accent"></i>
+        <span>Vos mises à jour de statut sont chiffrées de bout en bout</span>
+      </div>
+    </div>
+  </section>
+  @include('components/chat/mobile_navigation')
+
+</body>
+</html>

@@ -4,30 +4,87 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
-    'home': { paramsTuple?: []; params?: {} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
-    'new_account.store': { paramsTuple?: []; params?: {} }
-    'session.create': { paramsTuple?: []; params?: {} }
-    'session.store': { paramsTuple?: []; params?: {} }
-    'dashboard': { paramsTuple?: []; params?: {} }
-    'session.destroy': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
+    'register.show': { paramsTuple?: []; params?: {} }
+    'register.store': { paramsTuple?: []; params?: {} }
+    'auth.checkEmail': { paramsTuple?: []; params?: {} }
+    'verify-email.show': { paramsTuple?: []; params?: {} }
+    'verify-email.resend': { paramsTuple?: []; params?: {} }
+    'verify-email.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'login.show': { paramsTuple?: []; params?: {} }
+    'login.store': { paramsTuple?: []; params?: {} }
+    'forgot-password.show': { paramsTuple?: []; params?: {} }
+    'forgot-password.store': { paramsTuple?: []; params?: {} }
+    'reset-password.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'reset-password.store': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'chat.index': { paramsTuple?: []; params?: {} }
+    'explorer': { paramsTuple?: []; params?: {} }
+    'actus': { paramsTuple?: []; params?: {} }
+    'users.index': { paramsTuple?: []; params?: {} }
+    'conversations.index': { paramsTuple?: []; params?: {} }
+    'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'conversations.store': { paramsTuple?: []; params?: {} }
+    'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.store': { paramsTuple?: []; params?: {} }
+    'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
-    'home': { paramsTuple?: []; params?: {} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
-    'session.create': { paramsTuple?: []; params?: {} }
-    'dashboard': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'register.show': { paramsTuple?: []; params?: {} }
+    'auth.checkEmail': { paramsTuple?: []; params?: {} }
+    'verify-email.show': { paramsTuple?: []; params?: {} }
+    'verify-email.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'login.show': { paramsTuple?: []; params?: {} }
+    'forgot-password.show': { paramsTuple?: []; params?: {} }
+    'reset-password.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'chat.index': { paramsTuple?: []; params?: {} }
+    'explorer': { paramsTuple?: []; params?: {} }
+    'actus': { paramsTuple?: []; params?: {} }
+    'users.index': { paramsTuple?: []; params?: {} }
+    'conversations.index': { paramsTuple?: []; params?: {} }
+    'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
-    'home': { paramsTuple?: []; params?: {} }
-    'new_account.create': { paramsTuple?: []; params?: {} }
-    'session.create': { paramsTuple?: []; params?: {} }
-    'dashboard': { paramsTuple?: []; params?: {} }
+    'event_stream': { paramsTuple?: []; params?: {} }
+    'register.show': { paramsTuple?: []; params?: {} }
+    'auth.checkEmail': { paramsTuple?: []; params?: {} }
+    'verify-email.show': { paramsTuple?: []; params?: {} }
+    'verify-email.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'login.show': { paramsTuple?: []; params?: {} }
+    'forgot-password.show': { paramsTuple?: []; params?: {} }
+    'reset-password.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'chat.index': { paramsTuple?: []; params?: {} }
+    'explorer': { paramsTuple?: []; params?: {} }
+    'actus': { paramsTuple?: []; params?: {} }
+    'users.index': { paramsTuple?: []; params?: {} }
+    'conversations.index': { paramsTuple?: []; params?: {} }
+    'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
-    'new_account.store': { paramsTuple?: []; params?: {} }
-    'session.store': { paramsTuple?: []; params?: {} }
-    'session.destroy': { paramsTuple?: []; params?: {} }
+    'subscribe': { paramsTuple?: []; params?: {} }
+    'unsubscribe': { paramsTuple?: []; params?: {} }
+    'register.store': { paramsTuple?: []; params?: {} }
+    'verify-email.resend': { paramsTuple?: []; params?: {} }
+    'login.store': { paramsTuple?: []; params?: {} }
+    'forgot-password.store': { paramsTuple?: []; params?: {} }
+    'reset-password.store': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'conversations.store': { paramsTuple?: []; params?: {} }
+    'messages.store': { paramsTuple?: []; params?: {} }
+    'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  DELETE: {
+    'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  PATCH: {
+    'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

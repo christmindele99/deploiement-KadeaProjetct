@@ -1,0 +1,190 @@
+<style>
+    :root {
+      --primary: #075e8d;
+      --accent: #29ff9d;
+      --white: #ffffff;
+      --black: #000000;
+      --muted: #64748b;
+      --glass-border: rgba(255, 255, 255, 0.75);
+    }
+
+    body {
+      color: var(--black);
+      font-family: Poppins, sans-serif;
+      background:
+        radial-gradient(
+          circle at 5% 5%,
+          rgba(41, 255, 157, 0.18),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 95% 35%,
+          rgba(7, 94, 141, 0.12),
+          transparent 30%
+        ),
+        #f5f9fc;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .brand {
+      color: var(--primary);
+      font-family: Artega, Poppins, sans-serif;
+      letter-spacing: -0.8px;
+    }
+
+    .brand-mark {
+      background: var(--primary);
+      color: var(--accent);
+      box-shadow: 0 8px 22px rgba(7, 94, 141, 0.2);
+    }
+
+    .top-label {
+      border-color: rgba(7, 94, 141, 0.12);
+      background: rgba(255, 255, 255, 0.65);
+      color: var(--primary);
+    }
+
+    .hero {
+      border-color: var(--glass-border);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 20px 60px rgba(7, 94, 141, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: -75px;
+      right: -65px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(41, 255, 157, 0.23);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      background: rgba(41, 255, 157, 0.22);
+      color: var(--primary);
+    }
+
+    .eyebrow-dot {
+      background: var(--primary);
+    }
+
+    .hero h1 {
+      color: var(--primary);
+      letter-spacing: -1.5px;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 5px;
+      text-underline-offset: 5px;
+    }
+
+    .hero p,
+    .feature-card p,
+    .tip-card p {
+      color: #475569;
+    }
+
+    .btn {
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--accent);
+      box-shadow: 0 8px 20px rgba(7, 94, 141, 0.2);
+    }
+
+    .section-heading h2,
+    .feature-card h3,
+    .tip-card h3 {
+      color: var(--primary);
+    }
+
+    .section-count {
+      background: rgba(41, 255, 157, 0.25);
+      color: var(--primary);
+    }
+
+    .feature-card {
+      border-color: var(--glass-border);
+      background: rgba(255, 255, 255, 0.66);
+      box-shadow: 0 10px 30px rgba(7, 94, 141, 0.055);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(41, 255, 157, 0.9);
+      box-shadow: 0 18px 36px rgba(7, 94, 141, 0.1);
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 48px;
+      height: 3px;
+      border-radius: 0 0 6px 0;
+      background: var(--accent);
+    }
+
+    .feature-icon {
+      border-color: rgba(41, 255, 157, 0.55);
+      background: rgba(41, 255, 157, 0.2);
+      color: var(--primary);
+    }
+
+    .feature-card strong {
+      color: #173f54;
+    }
+
+    .tip-card {
+      border-color: rgba(41, 255, 157, 0.65);
+      background: rgba(41, 255, 157, 0.13);
+    }
+
+    .tip-icon {
+      background: var(--primary);
+      color: var(--accent);
+    }
+
+    .footer {
+      border-color: rgba(7, 94, 141, 0.12);
+    }
+
+    .footer p {
+      color: var(--muted);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
+    }
+</style>

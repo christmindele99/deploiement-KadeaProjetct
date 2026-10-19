@@ -1,0 +1,31 @@
+<footer class="app-panel shrink-0 border-t border-slate-200 bg-white p-3 pb-4 sm:p-5 md:pb-5">
+    <form id="messageForm" class="flex items-center gap-2 sm:gap-3">
+        <button type="button" data-demo-action="attachment"
+            aria-label="Ajouter une pièce jointe"
+            class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4]">
+            <i class="fa-solid fa-plus text-lg"></i>
+        </button>
+        <div class="relative min-w-0 flex-1">
+            <input id="messageInput" type="text" autocomplete="off"
+            placeholder="Écrivez un message..."
+            aria-label="Votre message"
+            class="app-input w-full rounded-xl border border-slate-200 bg-white py-3 pl-3 pr-16 text-sm text-brand-blue placeholder-slate-400 focus:outline-none sm:pl-4 sm:pr-20">
+            <div class="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-3 text-brand-blue">
+                <button type="button" data-demo-action="emoji"
+                    aria-label="Émojis">
+                    <i class="fa-regular fa-face-smile text-lg"></i>
+                </button>
+
+                <button type="button" data-demo-action="file"
+                    aria-label="Joindre un fichier">
+                    <i class="fa-solid fa-paperclip text-lg"></i>
+                </button>
+            </div>
+        </div>
+        <button type="submit"
+            aria-label="Envoyer le message"
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-accent text-black transition hover:brightness-95 active:scale-95">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </form>
+</footer>

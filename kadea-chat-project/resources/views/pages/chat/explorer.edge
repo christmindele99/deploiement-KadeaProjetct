@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explorer | Kadea Chat</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  @include('components/fonts')
+  @include('components/chat/style_explorer')
+</head>
+<body class="m-0 min-h-screen">
+  <main class="mx-auto w-[calc(100%-24px)] sm:w-[calc(100%-36px)] max-w-[1000px] pt-[22px] pb-12 sm:pt-9">
+    <header class="mb-7 sm:mb-12 flex items-center justify-between gap-4">
+      <span class="top-label rounded-full border px-2.5 py-2 sm:px-3.5 sm:py-[9px] text-[10px] sm:text-xs font-semibold">
+        CENTRE D'AIDE
+      </span>
+    </header>
+    <section class="hero relative isolate overflow-hidden rounded-[22px] sm:rounded-[28px] border p-5 sm:p-8 lg:p-12">
+      <span class="eyebrow relative z-10 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-bold">
+        <span class="eyebrow-dot h-[7px] w-[7px] rounded-full"></span>
+        TON GUIDE D'UTILISATION
+      </span>
+      <h1 class="relative z-10 mt-[22px] mb-3.5 max-w-[650px] text-[32px] sm:text-4xl lg:text-5xl leading-[1.15] font-bold">
+        Explore les possibilités de
+        <span>Kadea Chat.</span>
+      </h1>
+      <p class="relative z-10 max-w-[620px] text-sm sm:text-[15px] leading-[1.9]">
+        Découvre les fonctionnalités de ta messagerie et apprends
+        à gérer tes conversations, tes messages et ton profil.
+        Tout ce qu'il faut savoir pour mieux communiquer,
+        au même endroit.
+      </p>
+
+      <div class="hero-actions relative z-10 mt-7 flex flex-col sm:flex-row flex-wrap gap-3">
+
+        <a href="/chat" class="btn btn-primary inline-flex min-h-[46px] w-full sm:w-auto items-center justify-center gap-2.5 rounded-xl border border-transparent px-[18px] py-3 text-[13px] font-bold">
+          <svg viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" class="h-[17px] w-[17px] shrink-0">
+            <path d="m15 18-6-6 6-6"/>
+            <path d="M9 12h12"/>
+          </svg>
+          Retourner aux conversations
+        </a>
+
+      </div>
+    </section>
+    @include('components/chat/explorer')
+    <aside class="tip-card mt-6 flex items-start gap-[15px] rounded-[18px] border p-5">
+      <span class="tip-icon grid h-[38px] w-[38px] shrink-0 place-items-center rounded-xl">
+        <svg viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true" class="h-5 w-5">
+          <path d="M9 18h6M10 22h4"/>
+          <path d="M8 14a7 7 0 1 1 8 0c-1 .7-1 2-1 2h-6s0-1.3-1-2Z"/>
+        </svg>
+      </span>
+      <div>
+        <h3 class="mb-[5px] text-[15px] font-bold">Un conseil pour bien commencer</h3>
+        <p class="text-[13px] leading-[1.8]">
+          Familiarise-toi d'abord avec la liste des conversations
+          et l'envoi de messages. Tu pourras ensuite explorer
+          les autres options selon les fonctionnalités activées
+          dans ta version de Kadea Chat.
+        </p>
+      </div>
+    </aside>
+    @include('components/chat/footer_explorer')
+  </main>
+</body>
+</html>

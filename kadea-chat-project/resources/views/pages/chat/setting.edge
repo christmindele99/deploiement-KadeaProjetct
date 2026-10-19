@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#075e8d">
+  <title>Paramètres | Kadea Chat</title>
+  @include('components/link')
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  @include('components/scripts_tailwind')
+  @include('components/fonts')
+  @include('components/style')
+</head>
+<body class="h-full overflow-hidden bg-white font-sans text-brand-blue antialiased">
+<div id="app" class="flex h-full w-full overflow-hidden bg-white text-brand-blue">
+  {{-- NAVIGATION DESKTOP : CONSERVÉE DEPUIS index.edge --}}
+  @include('components/chat/desktop_navigation')  
+<section id="settingsList"
+  class="flex h-full min-h-0 w-full shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white pb-24 md:h-auto md:overflow-hidden md:pb-0 md:w-80 lg:w-96">
+    <header class="border-b border-slate-200 p-4 pb-5 sm:p-5">
+      <h1 class="font-artega text-2xl font-bold tracking-wide text-brand-blue">
+        Parametres
+      </h1>
+      <p class="mt-2 text-xs leading-5 text-slate-500">
+        Gérez votre compte et personnalisez votre expérience.
+      </p>
+    </header>
+    <div id="settingsContent" class="min-h-0 shrink-0 p-3 sm:p-4 md:flex-1 md:overflow-y-auto">
+      {{-- PROFIL --}}
+      <a href="/profile"
+        class="flex w-full items-center gap-3.5 rounded-xl border border-transparent px-3 py-[15px] text-left text-brand-blue no-underline transition-colors duration-200 hover:border-emerald-100 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
+          <i class="fa-solid fa-user-pen"></i>
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold">Modifier le profil</span>
+          <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">
+            Photo, nom, nom d'utilisateur et biographie.
+          </span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+      </a>
+      {{-- APPARENCE --}}
+      <div class="flex w-full items-center gap-3.5 rounded-xl border border-transparent px-3 py-[15px] text-left text-brand-blue">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
+          <i class="fa-solid fa-circle-half-stroke"></i>
+        </span>
+
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold">Apparence</span>
+          <span id="themeDescription" class="mt-1 block text-[11px] leading-relaxed text-slate-500">
+            Thème clair
+          </span>
+        </span>
+        <button
+          type="button"
+          id="themeSwitch"
+          class="theme-switch relative h-6 w-[42px] shrink-0 cursor-pointer rounded-full border-0 bg-slate-300 transition-colors duration-200"
+          role="switch"
+          aria-checked="false"
+          aria-label="Activer le thème sombre">
+        </button>
+
+      </div>
+
+      <div class="mx-3 my-2 h-px bg-slate-200"></div>
+
+      {{-- COMPTE --}}
+      <button type="button"
+        data-setting="account"
+        class="flex w-full items-center gap-3.5 rounded-xl border border-transparent bg-transparent px-3 py-[15px] text-left text-brand-blue transition-colors duration-200 hover:border-emerald-100 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
+          <i class="fa-solid fa-id-card"></i>
+        </span>
+
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold">Compte</span>
+          <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">
+            Consultez les informations de votre compte.
+          </span>
+        </span>
+
+        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+      </button>
+
+      {{-- CONFIDENTIALITÉ --}}
+      <button type="button"
+        data-setting="privacy"
+        class="flex w-full items-center gap-3.5 rounded-xl border border-transparent bg-transparent px-3 py-[15px] text-left text-brand-blue transition-colors duration-200 hover:border-emerald-100 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
+          <i class="fa-solid fa-shield-halved"></i>
+        </span>
+
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold">Confidentialité</span>
+          <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">
+            Préparez la gestion de votre confidentialité et du blocage.
+          </span>
+        </span>
+
+        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+      </button>
+
+      {{-- NOTIFICATIONS --}}
+      <button type="button"
+        data-setting="notifications"
+        class="flex w-full items-center gap-3.5 rounded-xl border border-transparent bg-transparent px-3 py-[15px] text-left text-brand-blue transition-colors duration-200 hover:border-emerald-100 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
+          <i class="fa-solid fa-bell"></i>
+        </span>
+
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold">Notifications</span>
+          <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">
+            Les préférences de notification seront ajoutées ici.
+          </span>
+        </span>
+
+        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+      </button>
+
+      {{-- AIDE --}}
+      <button type="button"
+        data-setting="help"
+        class="flex w-full items-center gap-3.5 rounded-xl border border-transparent bg-transparent px-3 py-[15px] text-left text-brand-blue transition-colors duration-200 hover:border-emerald-100 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
+          <i class="fa-solid fa-circle-question"></i>
+        </span>
+
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold">Aide et commentaires</span>
+          <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">
+            Informations et conseils sur Kadea Chat.
+          </span>
+        </span>
+
+        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+      </button>
+
+    </div>
+
+    {{-- DÉCONNEXION EN BAS --}}
+    <footer class="shrink-0 border-t border-slate-200 bg-white p-3 sm:p-4">
+
+      <button type="button"
+        id="logoutButton"
+        class="flex w-full items-center gap-3 rounded-[13px] border border-red-200 bg-red-50 px-3.5 py-[13px] text-left text-[13px] font-semibold text-red-600 transition-colors duration-200 hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+
+        <i class="fa-solid fa-right-from-bracket text-base"></i>
+        <span>Se déconnecter</span>
+      </button>
+    </footer>
+
+  </section>
+
+  {{-- ZONE PRINCIPALE : REMPLACE LA ZONE DE CONVERSATION --}}
+  <main id="mainPanel"
+    class="relative hidden min-w-0 flex-1 flex-col bg-white md:flex">
+
+    <header class="flex h-[76px] shrink-0 items-center border-b border-slate-200 bg-white px-6 lg:px-8">
+      <h2 class="font-artega text-xl font-bold text-brand-blue">
+        Parametres
+      </h2>
+    </header>
+
+    <section class="flex flex-1 items-center justify-center p-6 text-center">
+      <div class="max-w-md">
+
+        <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-50">
+          <i class="fa-solid fa-gear text-3xl text-brand-blue"></i>
+        </div>
+
+        <h3 class="font-artega text-2xl font-bold text-brand-blue">
+          Parametres
+        </h3>
+
+        <p class="mt-3 text-sm leading-7 text-slate-500">
+          Gérez vos informations personnelles et personnalisez votre expérience sur Kadea Chat.
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+
+  {{-- NAVIGATION MOBILE : MÊME STRUCTURE QUE index.edge --}}
+  <nav id="mobileNavigation"
+    class="fixed inset-x-3 bottom-3 z-30 flex min-h-[68px] items-center justify-around rounded-[26px] border border-slate-200 bg-white/90 px-2 py-[7px] shadow-[0_8px_30px_rgba(0,0,0,0.10)] backdrop-blur-xl md:hidden"
+    aria-label="Navigation mobile">
+
+    <a href="/actus"
+      aria-label="Actus"
+      class="mobile-nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition-colors duration-200 hover:bg-emerald-50">
+
+      <i class="fa-solid fa-circle-notch text-xl"></i>
+    </a>
+
+    <a href="/explorer"
+      aria-label="Explorer"
+      class="mobile-nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition-colors duration-200 hover:bg-emerald-50">
+
+      <i class="fa-regular fa-compass text-xl"></i>
+    </a>
+
+    <a href="/chat"
+      id="mobileNewChat"
+      aria-label="Chats"
+      title="Chats"
+      class="flex h-[52px] w-[52px] shrink-0 -translate-y-2 items-center justify-center rounded-[18px] bg-brand-blue text-white shadow-[0_5px_14px_rgba(7,94,141,0.25)] transition-colors duration-200 hover:bg-sky-800">
+
+      <i class="fa-solid fa-comment-dots text-xl"></i>
+    </a>
+
+    <a href="/chat"
+      aria-label="Chats"
+      class="mobile-nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition-colors duration-200 hover:bg-emerald-50">
+
+      <i class="fa-solid fa-comment-dots text-xl"></i>
+    </a>
+
+    <a href="/settings"
+      aria-label="Paramètres"
+      aria-current="page"
+      class="mobile-nav-item is-active flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-emerald-50 text-brand-blue">
+
+      <i class="fa-solid fa-gear text-xl"></i>
+    </a>
+
+  </nav>
+
+  {{-- NOTIFICATION --}}
+  <div id="toast"
+        role="status"
+        aria-live="polite"
+        class="fixed bottom-24 left-1/2 z-[60] hidden -translate-x-1/2 rounded-xl bg-brand-blue px-4 py-3 text-sm text-white shadow-lg md:bottom-5">
+    </div>
+
+</div>
+</body>
+</html>

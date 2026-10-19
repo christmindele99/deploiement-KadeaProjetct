@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kadea Chat - Accueil</title>
+  
+  <!-- Google Fonts : Roboto & Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Style pour charger la police Artega -->
+  <style>
+    @font-face {
+      font-family: 'Artega';
+      src: url('/fonts/Artega.woff2') format('woff2'),
+           url('/fonts/Artega.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    .font-artega {
+      font-family: 'Artega', sans-serif;
+    }
+  </style>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Configuration Tailwind : Polices & Couleurs -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              blue: '#075e8d',
+              accent: '#29ff9d',
+              dark: '#000000',
+              white: '#ffffff',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full bg-brand-blue font-sans text-white antialiased flex flex-col justify-between selection:bg-brand-accent selection:text-brand-dark">
+
+  <!-- ================= 1. HEADER ================= -->
+  <header class="w-full bg-white/10 backdrop-blur-md border-b border-white/15 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Logo avec police Artega -->
+      <a href="#" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-brand-accent/20 border border-brand-accent/40 flex items-center justify-center text-brand-accent font-artega text-xl font-bold shadow-inner">
+          K
+        </div>
+        <span class="font-artega text-2xl font-bold tracking-wider text-white">
+          Kadea Chat
+        </span>
+      </a>
+
+      <!-- Navigation & Boutons Header -->
+      <div class="flex items-center space-x-4">
+        <a href="#features" class="hidden sm:inline-block text-sm text-gray-200 hover:text-brand-accent transition">Fonctionnalités</a>
+        <a href="#" class="text-sm font-semibold text-brand-dark bg-brand-accent hover:opacity-90 py-2.5 px-5 rounded-xl shadow-md transition active:scale-95">
+          Connexion
+        </a>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ================= 2. HERO SECTION ================= -->
+  <section class="max-w-7xl mx-auto px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    
+    <!-- Texte de présentation (Gauche) -->
+    <div class="space-y-6 text-center lg:text-left">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-medium text-brand-accent backdrop-blur-sm">
+        <i class="fa-solid fa-sparkles"></i> La messagerie moderne repensée
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-bold tracking-tight leading-tight">
+        Discutez sans limites avec <span class="text-brand-accent">Kadea Chat</span>
+      </h1>
+      <p class="text-sm sm:text-base text-gray-200 leading-relaxed max-w-lg mx-auto lg:mx-0">
+        Rejoignez une plateforme rapide, fluide et sécurisée. Échangez en temps réel avec vos collaborateurs, amis et groupes de discussion en toute simplicité.
+      </p>
+      
+      <!-- Boutons d'action avec effet de scale au survol et au clic -->
+      <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+        <a href="#" class="w-full sm:w-auto bg-brand-accent text-brand-dark font-bold py-3.5 px-8 rounded-xl shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 text-center">
+          Commencer maintenant
+        </a>
+        <a href="#features" class="w-full sm:w-auto bg-white/10 text-white border border-white/30 font-semibold py-3.5 px-6 rounded-xl backdrop-blur-sm transition duration-300 transform hover:scale-105 active:scale-95 text-center">
+          En savoir plus
+        </a>
+      </div>
+    </div>
+
+    <!-- Container avec Photo de l'application (Droite) -->
+    <div class="w-full max-w-xl mx-auto bg-white/15 backdrop-blur-xl border border-white/20 p-4 sm:p-6 rounded-3xl shadow-2xl">
+      <div class="overflow-hidden rounded-2xl border border-white/10 shadow-inner">
+        <!-- Remplacez l'URL par celle de votre photo d'interface -->
+        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800" alt="Interface Kadea Chat" class="w-full h-auto object-cover transform hover:scale-105 transition duration-500">
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- ================= 3. FEATURE SECTION ================= -->
+  <section id="features" class="max-w-7xl mx-auto px-6 py-16 lg:py-24 space-y-12">
+    <div class="text-center space-y-3">
+      <h2 class="text-3xl sm:text-4xl font-bold">Fonctionnalités principales</h2>
+      <p class="text-sm text-gray-200 max-w-xl mx-auto">Survolez les cartes ci-dessous pour découvrir le détail de chaque fonctionnalité.</p>
+    </div>
+
+    <!-- Grille des fonctionnalités avec effet de mouvement au survol -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Feature 1 -->
+      <div class="group bg-white/10 backdrop-blur-md border border-white/15 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/15 hover:border-brand-accent/50 cursor-pointer flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-brand-accent/20 border border-brand-accent/40 flex items-center justify-center text-brand-accent text-2xl shadow-inner group-hover:scale-110 transition duration-300">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <h3 class="text-xl font-bold text-brand-accent">Discussions en temps réel</h3>
+        </div>
+        <!-- Contenu masqué par défaut, apparaît au survol -->
+        <div class="max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-500 ease-in-out mt-4 text-xs sm:text-sm text-gray-200 leading-relaxed">
+          Envoyez et recevez vos messages instantanément sans recharger la page, avec des indicateurs de statut en direct.
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="group bg-white/10 backdrop-blur-md border border-white/15 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/15 hover:border-brand-accent/50 cursor-pointer flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-brand-accent/20 border border-brand-accent/40 flex items-center justify-center text-brand-accent text-2xl shadow-inner group-hover:scale-110 transition duration-300">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="text-xl font-bold text-brand-accent">Authentification sécurisée</h3>
+        </div>
+        <div class="max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-500 ease-in-out mt-4 text-xs sm:text-sm text-gray-200 leading-relaxed">
+          Protégez votre compte grâce au hachage des mots de passe et la vérification d'email obligatoire.
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="group bg-white/10 backdrop-blur-md border border-white/15 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/15 hover:border-brand-accent/50 cursor-pointer flex flex-col justify-between">
+        <div class="space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-brand-accent/20 border border-brand-accent/40 flex items-center justify-center text-brand-accent text-2xl shadow-inner group-hover:scale-110 transition duration-300">
+            <i class="fa-solid fa-user-group"></i>
+          </div>
+          <h3 class="text-xl font-bold text-brand-accent">Gestion des groupes</h3>
+        </div>
+        <div class="max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-500 ease-in-out mt-4 text-xs sm:text-sm text-gray-200 leading-relaxed">
+          Organisez vos conversations par filtres et gérez vos espaces d'échange en toute liberté.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ================= 4. FOOTER ================= -->
+  <footer class="w-full bg-white/5 backdrop-blur-md border-t border-white/10 py-6 px-6 text-center text-xs text-gray-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 text-brand-accent font-medium">
+      <i class="fa-solid fa-shield-check text-sm"></i>
+      <span>2026 Kadea Chat</span>
+    </div>
+  </footer>
+
+</body>
+</html>

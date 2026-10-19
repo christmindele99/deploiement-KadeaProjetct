@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kadea Chat - Inscription</title>
+    @include('components/link')
+    @include('components/fonts')
+    @include('components/scripts_tailwind')
+  </head>
+  <body class="min-h-full bg-brand-white flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans">
+    <div class="w-full max-w-md bg-brand-blue/95 backdrop-blur-md border border-white/20 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6 my-8">
+      <div class="text-center space-y-2">
+        @include('components/logo_kadea')
+        <p class="text-xs sm:text-sm text-gray-200">
+          Créez votre compte pour commencer
+        </p>
+      </div>
+      @include('partials/flash/register/message_succes')
+      @include('components/auth/register')
+      <div class="text-center pt-2 border-t border-white/20">
+        <p class="text-xs sm:text-sm text-gray-200">
+          Vous avez déjà un compte ? 
+          <a 
+            href="{{ route('login.show') }}" 
+            class="font-bold text-brand-accent hover:underline">
+            Se connecter
+          </a>
+        </p>
+      </div>
+    </div>
+    @include('partials/flash/register/user_create')
+    @vite('resources/js/auth/register.js')
+  </body>
+</html>

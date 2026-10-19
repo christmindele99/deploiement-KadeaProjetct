@@ -1,0 +1,8 @@
+@if (flashMessages.get('error'))
+    <div
+        role="alert"
+        class="mt-6 rounded-xl border border-red-300/40 bg-red-500/10 px-4 py-3 text-sm text-white"
+    >
+        {{ flashMessages.get('error') }}
+    </div>
+@endif

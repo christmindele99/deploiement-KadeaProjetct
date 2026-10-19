@@ -1,0 +1,62 @@
+<main class="flex-1 grid place-items-center py-14 px-5">
+    <section class="w-full max-w-[520px] p-8 sm:p-10 bg-white border border-brand-border rounded-[24px] shadow-[0_20px_60px_rgba(7,94,141,0.08)] text-center" aria-labelledby="page-title">
+      {{-- Cercle bleu avec icône verte --}}
+      <div class="w-[88px] h-[88px] sm:w-[76px] sm:h-[76px] mx-auto mb-7 sm:mb-6 grid place-items-center bg-brand-blue border border-brand-blue rounded-full" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="w-[43px] h-[43px] sm:w-[37px] sm:h-[37px] text-brand-accent">
+          <path
+            d="m5 12.5 4.5 4.5L19 7"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <p class="mb-3 text-brand-blue text-xs font-bold tracking-[1.8px] uppercase">Vérification terminée</p>
+      <h1 id="page-title" class="mb-4 text-brand-blue text-[clamp(25px,4vw,34px)] font-bold leading-[1.3] tracking-[-1px]">
+        Votre e-mail est confirmé !
+      </h1>
+      <p class="mb-6 text-brand-muted text-sm sm:text-[13px] leading-[1.9] [overflow-wrap:anywhere]">
+        Félicitations ! Votre adresse e-mail a été vérifiée avec succès.
+        Votre compte Kadea Chat franchit une nouvelle étape.
+      </p>
+      <div class="inline-flex items-center justify-center gap-[9px] max-w-full mb-7 py-3 px-4 bg-[#f0f9ff] border border-[#dbeafe] rounded-xl text-brand-blue text-[13px] sm:text-xs font-semibold [overflow-wrap:anywhere] word-break-words">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="w-[18px] h-[18px] shrink-0">
+          <rect
+            x="3"
+            y="5"
+            width="18"
+            height="14"
+            rx="3"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+          <path
+            d="m4 7 8 6 8-6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span>{{ email }}</span>
+      </div>
+      {{-- Bouton en vert (brand-accent) avec texte en bleu (brand-blue) --}}
+      <a href="/login" class="w-full min-h-[52px] inline-flex items-center justify-center gap-2.5 py-3.5 px-5 bg-brand-accent text-brand-blue border-2 border-brand-accent rounded-xl font-semibold text-sm hover:opacity-90 transition transform hover:-translate-y-px focus:outline-none focus:ring-4 focus:ring-brand-accent/40">
+        Continuer vers la connexion
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="w-[18px] h-[18px]">
+          <path
+            d="M5 12h14m-6-6 6 6-6 6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </a>
+      <p class="mt-6 text-brand-muted text-xs leading-[1.8]">
+        Merci de rejoindre Kadea Chat.<br>
+        Connectez-vous pour commencer à échanger.
+      </p>
+    </section>
+</main>

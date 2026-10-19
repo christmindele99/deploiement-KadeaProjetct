@@ -1,0 +1,8 @@
+@if(flashMessages.has('errors.form'))
+    <div
+    class="bg-red-500/20 border-l-4 border-red-400 p-3 rounded-r text-sm text-white"
+    role="alert"
+    >
+    {{ flashMessages.get('errors.form') }}
+    </div>
+@endif

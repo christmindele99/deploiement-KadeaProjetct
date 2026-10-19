@@ -1,0 +1,5 @@
+@if(flashMessages.has('createdUser'))
+    <script>
+        const createdUser = {{{ JSON.stringify(flashMessages.get('createdUser')) }}};
+    </script>
+@endif

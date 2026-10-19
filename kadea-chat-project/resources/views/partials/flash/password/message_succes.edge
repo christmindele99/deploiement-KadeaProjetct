@@ -1,0 +1,8 @@
+@if(flashMessages.has('success'))
+    <div
+    class="bg-green-500/20 border-l-4 border-brand-accent p-3 rounded-r text-sm text-white"
+    role="status"
+    >
+    {{ flashMessages.get('success') }}
+    </div>
+@endif
