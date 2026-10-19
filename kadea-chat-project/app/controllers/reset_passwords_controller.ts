@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import UserToken from '#models/user_token'
-import hash from '@adonisjs/core/services/hash'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 

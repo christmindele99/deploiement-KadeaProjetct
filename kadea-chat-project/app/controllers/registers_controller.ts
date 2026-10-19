@@ -2,7 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { registerValidator } from '#validators/auth'
 import User from '#models/user'
 import UserToken from '#models/user_token'
-import hash from '@adonisjs/core/services/hash'
 import mail from '@adonisjs/mail/services/main'
 import env from '#start/env'
 import { DateTime } from 'luxon'
@@ -59,9 +58,6 @@ async store({ request, response, session }: HttpContext) {
     username,
     password: payload.password,
   })
-
-  // 6. Relire le compte depuis PostgreSQL
-  const savedUser = await User.findOrFail(user.id)
 
   // 8. Générer un token de vérification sécurisé
   const token = crypto.randomBytes(32).toString('hex')
