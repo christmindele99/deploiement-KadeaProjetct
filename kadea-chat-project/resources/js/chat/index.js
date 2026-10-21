@@ -1029,9 +1029,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selectText = document.createElement('span')
     selectText.textContent = 'Sélectionner les conversations'
-
     selectButton.append(selectIcon, selectText)
-    menu.append(deleteButton, selectButton)
+
+        const isFavorite = Boolean(getConversationById(conversationId)?.favorite)
+
+    const favoriteButton = document.createElement('button')
+
+    favoriteButton.type = 'button'
+    favoriteButton.dataset.conversationMenuAction = 'favorite'
+    favoriteButton.dataset.conversationId = String(conversationId)
+
+    favoriteButton.className =
+      'flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-amber-50 hover:text-amber-600'
+
+    const favoriteIcon = document.createElement('i')
+    favoriteIcon.className = 'fa-solid fa-star w-5 text-center text-amber-400'
+
+    const favoriteText = document.createElement('span')
+    favoriteText.textContent = isFavorite
+      ? 'Retirer des favoris'
+      : 'Ajouter aux favoris'
+
+    favoriteButton.append(favoriteIcon, favoriteText)
+    menu.append(favoriteButton, deleteButton, selectButton)
 
     return menu
   }
@@ -1411,6 +1431,111 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmDeleteConversations
   )
 
+
+
+    // ==================================================
+  // MESSAGES NON LUS
+  // ==================================================
+
+  const countedUnreadMessageIds = new Set()
+
+  function setUnreadCount(conversationId, count) {
+    const conversation = getConversationById(conversationId)
+
+    if (conversation) {
+      conversation.unreadCount = count
+    }
+
+    const item = conversationList.querySelector(
+      `.chat-item[data-conversation-id="${conversationId}"]`
+    )
+
+    if (!item) {
+      return
+    }
+
+    item.dataset.unread = String(count)
+
+    const badge = item.querySelector('[data-unread-badge]')
+
+    if (badge) {
+      badge.textContent = count > 99 ? '99+' : String(count)
+      badge.classList.toggle('hidden', count === 0)
+      badge.classList.toggle('flex', count > 0)
+    }
+
+    applyCurrentFilter()
+  }
+
+  async function markConversationAsRead(conversationId) {
+    setUnreadCount(conversationId, 0)
+
+    try {
+      await api(`/conversations/${conversationId}`)
+    } catch (error) {
+      if (error.message === 'SESSION_EXPIRED') {
+        window.location.reload()
+      }
+    }
+  }
+
+
+
+    // ==================================================
+  // FAVORIS
+  // ==================================================
+
+  function setFavoriteUI(conversationId, favorite) {
+    const conversation = getConversationById(conversationId)
+
+    if (conversation) {
+      conversation.favorite = favorite
+    }
+
+    const item = conversationList.querySelector(
+      `.chat-item[data-conversation-id="${conversationId}"]`
+    )
+
+    if (!item) {
+      return
+    }
+
+    item.dataset.favorite = favorite ? 'true' : 'false'
+
+    item
+      .querySelector('[data-favorite-star]')
+      ?.classList.toggle('hidden', !favorite)
+
+    applyCurrentFilter()
+  }
+
+  async function toggleFavorite(conversationId) {
+    const conversation = getConversationById(conversationId)
+
+    if (!conversation) {
+      return
+    }
+
+    const previous = Boolean(conversation.favorite)
+
+    setFavoriteUI(conversationId, !previous)
+
+    try {
+      const result = await api(`/conversations/${conversationId}/favorite`, {
+        method: 'PATCH',
+      })
+
+      setFavoriteUI(conversationId, Boolean(result?.data?.favorite))
+    } catch (error) {
+      setFavoriteUI(conversationId, previous)
+
+      if (error.message === 'SESSION_EXPIRED') {
+        window.location.reload()
+      }
+    }
+  }
+
+
   // ==================================================
   // CRÉATION D'UNE CONVERSATION
   // ==================================================
@@ -1421,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     item.type = 'button'
     item.dataset.chatUser = String(conversation.id)
     item.dataset.conversationId = String(conversation.id)
-    item.dataset.unread = '0'
+    item.dataset.unread = String(Number(conversation.unreadCount || 0))
 
     item.dataset.chatType = conversation.groupId
       ? 'group'
@@ -1536,7 +1661,29 @@ document.addEventListener('DOMContentLoaded', () => {
       ? getMessageText(conversation.lastMessage)
       : 'Aucun message'
 
-    details.append(top, preview)
+    const unreadCount = Number(conversation.unreadCount || 0)
+
+    const badge = document.createElement('span')
+    badge.dataset.unreadBadge = ''
+    badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount)
+    badge.className =
+      'h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[#29ff9d] px-1.5 text-xs font-semibold text-[#075e8d] ' +
+      (unreadCount > 0 ? 'flex' : 'hidden')
+
+    const star = document.createElement('i')
+    star.dataset.favoriteStar = ''
+    star.setAttribute('aria-hidden', 'true')
+    star.className =
+      'fa-solid fa-star shrink-0 text-xs text-amber-400 ' +
+      (conversation.favorite ? '' : 'hidden')
+
+    preview.classList.add('min-w-0', 'flex-1')
+
+    const bottom = document.createElement('div')
+    bottom.className = 'flex items-center justify-between gap-2'
+    bottom.append(preview, star, badge)
+
+    details.append(top, bottom)
     item.append(checkbox, avatar, details)
 
     item.addEventListener('mouseenter', () => {
@@ -1622,6 +1769,12 @@ document.addEventListener('DOMContentLoaded', () => {
       })
 
       conversations = sortConversations(newConversations)
+
+      const openConversation = getConversationById(selectedConversationId)
+
+      if (openConversation) {
+        openConversation.unreadCount = 0
+      }
 
       const existingIds = new Set(
         conversations.map((conversation) => Number(conversation.id))
@@ -2025,6 +2178,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (conversation) {
       conversation.lastMessage = message
       updateConversationPreview(conversationId, message)
+
+      if (!isMyMessage(message) && !countedUnreadMessageIds.has(messageId)) {
+        countedUnreadMessageIds.add(messageId)
+
+        if (Number(selectedConversationId) === conversationId) {
+          markConversationAsRead(conversationId)
+        } else {
+          setUnreadCount(
+            conversationId,
+            Number(conversation.unreadCount || 0) + 1
+          )
+        }
+      }
     } else {
       loadConversations(true)
     }
@@ -2276,6 +2442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showChatPanel()
     loadMessages(conversation.id)
+    markConversationAsRead(conversation.id)
     subscribeToConversation(conversation.id)
 
     messageInput.focus()
@@ -2880,6 +3047,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const conversationId = Number(menuAction.dataset.conversationId)
 
       closeConversationMenu()
+      
+      if (action === 'favorite') {
+        toggleFavorite(conversationId)
+        return
+      }
 
       if (action === 'delete') {
         showDeleteConfirmation([conversationId])

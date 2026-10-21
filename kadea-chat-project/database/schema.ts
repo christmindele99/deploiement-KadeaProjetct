@@ -36,12 +36,16 @@ export class GroupSchema extends BaseModel {
 }
 
 export class MembershipSchema extends BaseModel {
-  static $columns = ['conversationId', 'joinedAt', 'roleId', 'userId'] as const
+  static $columns = ['conversationId', 'isFavorite', 'joinedAt', 'lastReadAt', 'roleId', 'userId'] as const
   $columns = MembershipSchema.$columns
   @column()
   declare conversationId: number
+  @column()
+  declare isFavorite: boolean
   @column.dateTime()
   declare joinedAt: DateTime
+  @column.dateTime()
+  declare lastReadAt: DateTime | null
   @column()
   declare roleId: number
   @column({ isPrimary: true })

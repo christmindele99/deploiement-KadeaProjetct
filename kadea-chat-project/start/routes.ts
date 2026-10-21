@@ -120,6 +120,8 @@ router
   .post('/conversations', [ConversationsController, 'store'])
   .use(middleware.sessionAuth()).as('conversations.store')
 
+router.patch('/conversations/:id/favorite', [ConversationsController, 'toggleFavorite'])
+
 // Supprimer une conversation
 router
   .delete('/conversations/:id', [ConversationsController, 'destroy'])

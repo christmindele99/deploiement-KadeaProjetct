@@ -26,6 +26,7 @@ export type ScannedRoutes = {
     'conversations.index': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'conversations.store': { paramsTuple?: []; params?: {} }
+    'conversations.toggle_favorite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.store': { paramsTuple?: []; params?: {} }
     'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -79,12 +80,13 @@ export type ScannedRoutes = {
     'messages.store': { paramsTuple?: []; params?: {} }
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
+  PATCH: {
+    'conversations.toggle_favorite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
   DELETE: {
     'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
-  PATCH: {
-    'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {
