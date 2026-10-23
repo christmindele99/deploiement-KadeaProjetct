@@ -104,25 +104,6 @@
         <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
       </button>
 
-      {{-- NOTIFICATIONS --}}
-      <button type="button"
-        data-setting="notifications"
-        class="flex w-full items-center gap-3.5 rounded-xl border border-transparent bg-transparent px-3 py-[15px] text-left text-brand-blue transition-colors duration-200 hover:border-emerald-100 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
-
-        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[13px] bg-sky-50 text-[17px] text-brand-blue">
-          <i class="fa-solid fa-bell"></i>
-        </span>
-
-        <span class="min-w-0 flex-1">
-          <span class="block text-sm font-semibold">Notifications</span>
-          <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">
-            Les préférences de notification seront ajoutées ici.
-          </span>
-        </span>
-
-        <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
-      </button>
-
       {{-- AIDE --}}
       <button type="button"
         data-setting="help"
@@ -218,13 +199,6 @@
     </a>
 
   </nav>
-
-  {{-- NOTIFICATION --}}
-  <div id="toast"
-        role="status"
-        aria-live="polite"
-        class="fixed bottom-24 left-1/2 z-[60] hidden -translate-x-1/2 rounded-xl bg-brand-blue px-4 py-3 text-sm text-white shadow-lg md:bottom-5">
-    </div>
     @vite('resources/js/chat/setting.js')
 </div>
 </body>

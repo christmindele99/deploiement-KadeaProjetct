@@ -34,6 +34,7 @@ export type ScannedRoutes = {
     'profiles.show': { paramsTuple?: []; params?: {} }
     'profiles.update': { paramsTuple?: []; params?: {} }
     'profile.changePassword': { paramsTuple?: []; params?: {} }
+    'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -78,6 +79,7 @@ export type ScannedRoutes = {
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple?: []; params?: {} }
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
     'conversations.toggle_favorite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

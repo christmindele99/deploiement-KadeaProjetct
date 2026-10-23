@@ -17,6 +17,7 @@ const ResetPasswordsController = () => import('#controllers/reset_passwords_cont
 const UsersController = () => import('#controllers/users_controller')
 const MessagesController = () => import('#controllers/messages_controller')
 const ProfilesController = () => import('#controllers/profiles_controller')
+const LogoutsController = () => import('#controllers/logouts_controller')
 
 
 // Afficher le formulaire d'inscription
@@ -88,9 +89,11 @@ router.get('/chat', async ({ view, session }) => {
 }).use(middleware.sessionAuth()).as('chat.index')
 
 
-router.get('/settings', async ({ view }) => {
-  return view.render('pages/chat/setting')
-})
+router
+  .get('/settings', async ({ view }) => {
+    return view.render('pages/chat/setting')
+  })
+  .use(middleware.sessionAuth())
 
 router
   .get('/users', [UsersController, 'index'])
@@ -144,3 +147,9 @@ router
   ])
   .use(middleware.sessionAuth())
   .as('profile.changePassword')
+
+// Déconnexion de l'utilisateur
+router
+  .post('/logout', [LogoutsController, 'destroy'])
+  .use(middleware.sessionAuth())
+  .as('logout.destroy')
