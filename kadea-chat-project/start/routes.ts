@@ -16,6 +16,7 @@ const ForgotPasswordsController = () => import('#controllers/forgot_passwords_co
 const ResetPasswordsController = () => import('#controllers/reset_passwords_controller')
 const UsersController = () => import('#controllers/users_controller')
 const MessagesController = () => import('#controllers/messages_controller')
+const ProfilesController = () => import('#controllers/profiles_controller')
 
 
 // Afficher le formulaire d'inscription
@@ -86,19 +87,10 @@ router.get('/chat', async ({ view, session }) => {
   })
 }).use(middleware.sessionAuth()).as('chat.index')
 
-  router.get('/explorer', async ({ view }) => {
-  return view.render('pages/chat/explorer')
-}).as('explorer')
-
 
 router.get('/settings', async ({ view }) => {
   return view.render('pages/chat/setting')
 })
-
-router.get('/actus', async ({ view }) => {
-  return view.render('pages/chat/actus')
-}).as('actus')
-
 
 router
   .get('/users', [UsersController, 'index'])
@@ -133,3 +125,22 @@ router.get('/conversations/:id/messages', [MessagesController, 'index']).use(mid
 router.post('/conversations/:id/messages', [MessagesController, 'store']).as('conversations.messages.store')
 router.patch('/messages/:id', [MessagesController, 'update']).use(middleware.sessionAuth())
 router.delete('/messages/:id', [MessagesController, 'destroy']).use(middleware.sessionAuth())
+
+// Afficher le profil — accès réservé aux utilisateurs connectés
+router
+  .get('/profile', [ProfilesController, 'show'])
+  .use(middleware.sessionAuth())
+
+// Modifier les informations du profil
+router
+  .patch('/profile', [ProfilesController, 'update'])
+  .use(middleware.sessionAuth())
+
+// Modifier le mot de passe
+router
+  .patch('/profile/change-password', [
+    ProfilesController,
+    'changePassword',
+  ])
+  .use(middleware.sessionAuth())
+  .as('profile.changePassword')

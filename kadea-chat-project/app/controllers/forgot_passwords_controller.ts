@@ -18,15 +18,19 @@ export default class ForgotPasswordsController {
    * Traite la demande de réinitialisation du mot de passe
    */
   async store({ request, response, session }: HttpContext) {
+    const wantsJson =
+  request.header('accept')?.includes('application/json') ?? false
     const email = request.input('email')
 
     // 1. Vérifier l'adresse e-mail
     if (typeof email !== 'string' || !email.trim()) {
-      session.flash(
-        'errors.form',
-        'Veuillez saisir une adresse e-mail valide.'
-      )
+      const message = 'Veuillez saisir une adresse e-mail valide.'
 
+      if (wantsJson) {
+        return response.badRequest({ message })
+      }
+
+      session.flash('errors.form', message)
       return response.redirect().back()
     }
 
@@ -40,6 +44,10 @@ export default class ForgotPasswordsController {
       'Si cette adresse correspond à un compte, un lien de réinitialisation sera envoyé.'
 
     if (!user) {
+      if (wantsJson) {
+        return response.ok({ message: successMessage })
+      }
+
       session.flash('success', successMessage)
       return response.redirect().back()
     }
@@ -140,18 +148,19 @@ export default class ForgotPasswordsController {
         })
 
       console.error('Échec de l’envoi du mail :', error)
-
-      session.flash(
-        'errors.form',
-        'Impossible d’envoyer l’e-mail. Réessayez plus tard.'
-      )
-
+      const message = 'Impossible d’envoyer l’e-mail. Réessayez plus tard.'
+      if (wantsJson) {
+        return response.internalServerError({ message })
+      }
+      session.flash('errors.form', message)
       return response.redirect().back()
     }
 
     // 9. Confirmer la demande
+    if (wantsJson) {
+      return response.ok({ message: successMessage })
+    }
     session.flash('success', successMessage)
-
     return response.redirect().back()
   }
 }

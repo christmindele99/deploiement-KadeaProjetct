@@ -36,8 +36,10 @@ export class GroupSchema extends BaseModel {
 }
 
 export class MembershipSchema extends BaseModel {
-  static $columns = ['conversationId', 'isFavorite', 'joinedAt', 'lastReadAt', 'roleId', 'userId'] as const
+  static $columns = ['clearedAt', 'conversationId', 'isFavorite', 'joinedAt', 'lastReadAt', 'roleId', 'userId'] as const
   $columns = MembershipSchema.$columns
+  @column.dateTime()
+  declare clearedAt: DateTime | null
   @column()
   declare conversationId: number
   @column()

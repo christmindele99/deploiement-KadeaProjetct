@@ -20,8 +20,6 @@ export type ScannedRoutes = {
     'reset-password.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'reset-password.store': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'chat.index': { paramsTuple?: []; params?: {} }
-    'explorer': { paramsTuple?: []; params?: {} }
-    'actus': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
     'conversations.index': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -33,6 +31,9 @@ export type ScannedRoutes = {
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profiles.show': { paramsTuple?: []; params?: {} }
+    'profiles.update': { paramsTuple?: []; params?: {} }
+    'profile.changePassword': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -44,12 +45,11 @@ export type ScannedRoutes = {
     'forgot-password.show': { paramsTuple?: []; params?: {} }
     'reset-password.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'chat.index': { paramsTuple?: []; params?: {} }
-    'explorer': { paramsTuple?: []; params?: {} }
-    'actus': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
     'conversations.index': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profiles.show': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -61,12 +61,11 @@ export type ScannedRoutes = {
     'forgot-password.show': { paramsTuple?: []; params?: {} }
     'reset-password.show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'chat.index': { paramsTuple?: []; params?: {} }
-    'explorer': { paramsTuple?: []; params?: {} }
-    'actus': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
     'conversations.index': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profiles.show': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -83,6 +82,8 @@ export type ScannedRoutes = {
   PATCH: {
     'conversations.toggle_favorite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'profiles.update': { paramsTuple?: []; params?: {} }
+    'profile.changePassword': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

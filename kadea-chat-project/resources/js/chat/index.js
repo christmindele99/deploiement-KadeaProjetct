@@ -1,4 +1,3 @@
-
 import { Transmit } from '@adonisjs/transmit-client'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -364,7 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
     )
   }
 
-  function getMessageText(message) {
+    function getMessageText(message) {
+    if (message?.deletedAt) {
+      return 'Ce message a été supprimé'
+    }
+
     return message?.content ?? message?.text ?? ''
   }
 
@@ -1853,6 +1856,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     text.textContent = getMessageText(message)
 
+        const isDeleted = Boolean(message.deletedAt)
+
+    if (isDeleted) {
+      text.style.fontStyle = 'italic'
+      text.style.opacity = '0.7'
+    }
+
     // Pied de la bulle : flèche à gauche, heure à droite.
     const footer = document.createElement('div')
 
@@ -1912,7 +1922,12 @@ document.addEventListener('DOMContentLoaded', () => {
       time.appendChild(edited)
     }
 
-    footer.append(actionsButton, time)
+      if (isDeleted && !mine) {
+        footer.style.justifyContent = 'flex-end'
+        footer.append(time)
+      } else {
+        footer.append(actionsButton, time)
+      }
     bubble.append(text, footer)
 
     // Case à cocher pour la sélection multiple.
@@ -2237,9 +2252,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (Number(selectedConversationId) === conversationId) {
-      currentMessages = currentMessages.filter(
-        (item) => getMessageId(item) !== messageId
-      )
+        currentMessages = message.removed
+        ? currentMessages.filter((item) => getMessageId(item) !== messageId)
+        : currentMessages.map((item) =>
+            getMessageId(item) === messageId
+              ? { ...item, content: null, deletedAt: message.deletedAt }
+              : item
+          )
 
       selectedMessageIds.delete(messageId)
 
@@ -2754,6 +2773,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ids = [...pendingDeleteMessageIds]
 
+      const alreadyDeletedIds = new Set(
+      ids
+        .map(Number)
+        .filter((id) =>
+          currentMessages.some(
+            (message) => getMessageId(message) === id && message.deletedAt
+          )
+        )
+    )
+
     deletingMessages = true
 
     if (confirmDeleteMessages) {
@@ -2803,10 +2832,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (deletedIds.length) {
-        currentMessages = currentMessages.filter(
-          (message) =>
-            !deletedIds.includes(getMessageId(message))
-        )
+          currentMessages = currentMessages.filter(
+            (message) =>
+              !(
+                deletedIds.includes(getMessageId(message)) &&
+                alreadyDeletedIds.has(getMessageId(message))
+              )
+          )
+          .map((message) =>
+            deletedIds.includes(getMessageId(message))
+              ? { ...message, content: null, deletedAt: new Date().toISOString() }
+              : message
+          )
 
         deletedIds.forEach((id) => {
           selectedMessageIds.delete(id)

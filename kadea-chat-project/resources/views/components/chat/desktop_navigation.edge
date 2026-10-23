@@ -24,31 +24,32 @@
         data-section="chats"
         title="Chats"
         aria-label="Chats"
-        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue' : '' }}"
-      >
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue' : '' }}">
         <i class="fa-solid fa-comment-dots text-lg"></i>
       </a>
-
       <a
-        href="/explorer"
-        data-section="explorer"
-        title="Explorer"
-        aria-label="Explorer"
-        id="explorerButton"
-        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/explorer' ? 'bg-brand-accent text-brand-blue' : '' }}"
+        href="/users"
+        data-section="users"
+        title="Utilisateurs"
+        aria-label="Utilisateurs"
+        id="usersButton"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/users' ? 'bg-brand-accent text-brand-blue' : '' }}"
       >
-        <i class="fa-regular fa-compass text-lg"></i>
+        <i class="fa-solid fa-user-group text-lg"></i>
       </a>
 
       <a
-        href="/actus"
-        data-section="actus"
-        title="Actus"
-        aria-label="Actus"
-        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/actus' ? 'bg-brand-accent text-brand-blue' : '' }}"
+        href="/groups"
+        data-section="groups"
+        title="Groupes"
+        aria-label="Groupes"
+        id="groupsButton"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/groups' ? 'bg-brand-accent text-brand-blue' : '' }}"
       >
-        <i class="fa-solid fa-circle-notch text-lg"></i>
+        <i class="fa-solid fa-users text-lg"></i>
       </a>
+
+
     </nav>
   </div>
 

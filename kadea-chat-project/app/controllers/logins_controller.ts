@@ -146,11 +146,6 @@ export default class LoginsController {
       return response.redirect('/verify-email')
     }
 
-    // 6. L'e-mail est confirmé : ouvrir la session
-    session.put('userId', user.id)
-    console.log('USER ID CONNECTÉ :', user.id)
-    console.log('SESSION APRÈS CONNEXION :', session.all())
-
     // 7. Rediriger vers le chat
     return response.redirect().toRoute('chat.index')
   }

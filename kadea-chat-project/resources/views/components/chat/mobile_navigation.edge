@@ -2,20 +2,12 @@
   class="app-panel mobile-glass fixed inset-x-3 bottom-[10px] z-30 flex min-h-[68px] items-center justify-around rounded-[26px] border border-slate-200 bg-white/90 px-2 py-[7px] shadow-[0_8px_30px_rgba(0,0,0,0.10)] backdrop-blur-xl md:hidden"
   aria-label="Navigation mobile">
 
-  <a href="/actus"
-    data-section="actus"
-    title="Actus"
-    aria-label="Actus"
-    class="mobile-nav-item relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/actus' ? 'bg-brand-accent text-brand-blue font-bold' : '' }}">
-    <i class="fa-solid fa-circle-notch text-xl"></i>
-  </a>
-
-  <a href="/explorer"
-    data-section="explorer"
-    title="Explorer"
-    aria-label="Explorer"
-    class="mobile-nav-item relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/explorer' ? 'bg-brand-accent text-brand-blue font-bold' : '' }}">
-    <i class="fa-regular fa-compass text-xl"></i>
+  <a href="/chat"
+    data-section="chats"
+    title="Chats"
+    aria-label="Chats"
+    class="mobile-nav-item relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue font-bold' : '' }}">
+    <i class="fa-solid fa-comment-dots text-xl"></i>
   </a>
 
   <button type="button" id="mobileNewChat"
@@ -25,13 +17,6 @@
     <i class="fa-solid fa-plus text-xl"></i>
   </button>
 
-  <a href="/chat"
-    data-section="chats"
-    title="Chats"
-    aria-label="Chats"
-    class="mobile-nav-item relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue font-bold' : '' }}">
-    <i class="fa-solid fa-comment-dots text-xl"></i>
-  </a>
 
   <a href="/settings"
     data-section="settings"

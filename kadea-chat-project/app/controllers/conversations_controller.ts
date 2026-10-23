@@ -28,6 +28,10 @@ export default class ConversationsController {
       memberships.map((membership) => [membership.conversationId, membership.isFavorite])
     )
 
+    const clearedByConversation = new Map(
+      memberships.map((membership) => [membership.conversationId, membership.clearedAt])
+    )
+
     const conversationIds = [...lastReadByConversation.keys()]
 
     if (conversationIds.length === 0) {
@@ -42,19 +46,29 @@ export default class ConversationsController {
       conversations.map(async (conversation) => {
         const result = conversation.serialize()
 
-        // Dernier message de la conversation
-        const lastMessage = await Message.query()
-          .where('conversationId', conversation.id)
+                const clearedAt = clearedByConversation.get(conversation.id)
+        const lastReadAt = lastReadByConversation.get(conversation.id)
+
+        // Dernier message visible
+        const lastMessageQuery = Message.query().where('conversationId', conversation.id)
+
+        if (clearedAt) {
+          lastMessageQuery.where('createdAt', '>=', clearedAt.toJSDate())
+        }
+
+        const lastMessage = await lastMessageQuery
           .orderBy('createdAt', 'desc')
           .orderBy('id', 'desc')
           .first()
 
-        // Nombre de messages non lus : messages des autres, après mon marque-page
-        const lastReadAt = lastReadByConversation.get(conversation.id)
-
+        // Messages non lus
         const unreadQuery = Message.query()
           .where('conversationId', conversation.id)
           .whereNot('authorId', userId)
+
+        if (clearedAt) {
+          unreadQuery.where('createdAt', '>=', clearedAt.toJSDate())
+        }
 
         if (lastReadAt) {
           unreadQuery.where('createdAt', '>', lastReadAt.toJSDate())

@@ -1,8 +1,8 @@
-
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import transmit from '@adonisjs/transmit/services/main'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import Conversation from '#models/conversation'
 import Membership from '#models/membership'
@@ -94,6 +94,44 @@ export default class MessagesController {
     }
   }
 
+
+    /**
+   * Recréer la participation d'un utilisateur qui a supprimé
+   * une conversation privée de sa liste.
+   */
+  private async restorePairMemberships(
+    conversation: Conversation,
+    trx: TransactionClientContract
+  ) {
+    if (conversation.groupId || !conversation.pairKey) {
+      return
+    }
+
+    const userIds = conversation.pairKey
+      .split(':')
+      .map(Number)
+      .filter((id) => Number.isInteger(id) && id > 0)
+
+    for (const memberId of userIds) {
+      const membership = await Membership.query({ client: trx })
+        .where('userId', memberId)
+        .where('conversationId', conversation.id)
+        .first()
+
+      if (!membership) {
+        await Membership.create(
+          {
+            userId: memberId,
+            conversationId: conversation.id,
+            roleId: 2,
+            clearedAt: DateTime.now(),
+          },
+          { client: trx }
+        )
+      }
+    }
+  }
+
   /**
    * Récupérer les messages d'une conversation.
    */
@@ -127,10 +165,13 @@ export default class MessagesController {
       })
     }
 
-    const messages = await Message.query()
+    const messagesQuery = Message.query()
       .where('conversationId', conversationId)
-      .whereNull('deletedAt')
-      .orderBy('createdAt', 'asc')
+
+    if (membership.clearedAt) {
+      messagesQuery.where('createdAt', '>=', membership.clearedAt.toJSDate())
+    }
+    const messages = await messagesQuery.orderBy('createdAt', 'asc')
 
     return response.ok({
       data: messages,
@@ -196,8 +237,8 @@ export default class MessagesController {
           if (!foundConversation) {
             throw new Error('CONVERSATION_NOT_FOUND')
           }
-
           conversation = foundConversation
+          await this.restorePairMemberships(conversation, trx)
         } else {
           if (
             !Number.isInteger(recipientId) ||
@@ -242,6 +283,7 @@ export default class MessagesController {
                     userId: memberId,
                     conversationId: conversation.id,
                     roleId: 2,
+                    clearedAt: DateTime.now(),
                   },
                   { client: trx }
                 )
@@ -416,7 +458,6 @@ export default class MessagesController {
     const message = await Message.query()
       .where('id', messageId)
       .where('authorId', userId)
-      .whereNull('deletedAt')
       .first()
 
     if (!message) {
@@ -426,6 +467,20 @@ export default class MessagesController {
     }
 
     const conversationId = Number(message.conversationId)
+
+    if (message.deletedAt) {
+      await message.delete()
+
+      await this.publish(conversationId, 'message.deleted', {
+        id: messageId,
+        conversationId,
+        removed: true,
+      })
+
+      return response.ok({
+        message: 'Message retiré de la conversation.',
+      })
+    }
 
     message.content = null
     message.deletedAt = DateTime.now()
