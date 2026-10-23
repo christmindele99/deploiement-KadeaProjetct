@@ -16,6 +16,8 @@ export default defineConfig({
         'resources/js/auth/register.js',
         'resources/js/auth/reset_password.js',
         'resources/js/chat/index.js',
+        'resources/js/chat/setting.js',
+        'resources/js/chat/profile.js',
       ],
 
       /**
