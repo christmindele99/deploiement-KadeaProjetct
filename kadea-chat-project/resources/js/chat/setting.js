@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoutButton = document.getElementById('logoutButton')
 
   if (logoutButton) {
-    logoutButton.addEventListener('click', async () => {
+    async function performLogout() {
       const originalContent = logoutButton.innerHTML
 
       logoutButton.disabled = true
@@ -83,6 +83,98 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           alert(error.message || 'Impossible de se déconnecter.')
         }
+      }
+    }
+        let logoutModal = null
+
+    function closeLogoutModal() {
+      if (!logoutModal) return
+
+      logoutModal.classList.add('hidden')
+      logoutModal.classList.remove('flex')
+      document.body.classList.remove('overflow-hidden')
+    }
+
+    function createLogoutModal() {
+      const modal = document.createElement('div')
+
+      modal.id = 'logoutModal'
+      modal.className =
+        'fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 px-4 py-6'
+
+      modal.innerHTML = `
+        <div
+          class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="logoutModalTitle"
+        >
+          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <i class="fa-solid fa-right-from-bracket text-xl"></i>
+          </div>
+
+          <h2 id="logoutModalTitle" class="text-lg font-bold text-brand-blue">
+            Se déconnecter ?
+          </h2>
+
+          <p class="mt-2 text-sm leading-6 text-slate-600">
+            Êtes-vous sûr de vouloir vous déconnecter de votre compte ?
+          </p>
+
+          <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              id="cancelLogout"
+              class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+            >
+              Annuler
+            </button>
+
+            <button
+              type="button"
+              id="confirmLogout"
+              class="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+            >
+              Confirmer
+            </button>
+          </div>
+        </div>
+      `
+
+      document.body.appendChild(modal)
+
+      // Clic en dehors de la boîte = annuler
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          closeLogoutModal()
+        }
+      })
+
+      modal
+        .querySelector('#cancelLogout')
+        .addEventListener('click', closeLogoutModal)
+
+      modal.querySelector('#confirmLogout').addEventListener('click', () => {
+        closeLogoutModal()
+        performLogout()
+      })
+
+      return modal
+    }
+
+    logoutButton.addEventListener('click', () => {
+      if (!logoutModal) {
+        logoutModal = createLogoutModal()
+      }
+
+      logoutModal.classList.remove('hidden')
+      logoutModal.classList.add('flex')
+      document.body.classList.add('overflow-hidden')
+    })
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeLogoutModal()
       }
     })
   }

@@ -148,6 +148,8 @@ router
   .use(middleware.sessionAuth())
   .as('profile.changePassword')
 
+router.patch('/profile/avatar', [ProfilesController, 'updateAvatar'])
+
 // Déconnexion de l'utilisateur
 router
   .post('/logout', [LogoutsController, 'destroy'])

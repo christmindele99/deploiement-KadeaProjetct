@@ -1,7 +1,7 @@
-
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import hash from '@adonisjs/core/services/hash'
+import CloudinaryService from '#services/cloudinary_service'
 
 export default class ProfilesController {
   /**
@@ -108,6 +108,49 @@ export default class ProfilesController {
         createdAt: user.createdAt,
         emailVerifiedAt: user.emailVerifiedAt,
       },
+    })
+  }
+
+
+
+  async updateAvatar({ request, response, session }: HttpContext) {
+    const userId = session.get('userId')
+
+    if (!userId) {
+      return response.unauthorized({
+        message: 'Vous devez être connecté pour modifier votre photo.',
+      })
+    }
+
+    const user = await User.find(userId)
+
+    if (!user) {
+      return response.notFound({
+        message: 'Utilisateur introuvable.',
+      })
+    }
+
+    const avatar = request.file('avatar', {
+      size: '5mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    })
+
+    if (!avatar) {
+      return response.badRequest({ message: 'Aucune photo envoyée.' })
+    }
+
+    if (!avatar.isValid) {
+      return response.badRequest({ message: avatar.errors[0].message })
+    }
+
+    const result = await CloudinaryService.uploadAvatar(avatar.tmpPath!, user.id)
+
+    user.avatar = result.secure_url
+    await user.save()
+
+    return response.ok({
+      message: 'Photo de profil mise à jour.',
+      data: { avatar: user.avatar },
     })
   }
 

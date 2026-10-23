@@ -75,8 +75,8 @@
       class="nav-item flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/profile' ? 'bg-brand-accent text-brand-blue' : '' }}"
     >
       <img
-        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100"
-        alt="Votre profil"
+        src="{{ user?.avatar || '/default-avatar.jpg' }}"
+        alt="Photo de profil de {{ user?.fullName }}"
         class="h-10 w-10 rounded-full border-2 border-brand-accent object-cover"
       >
     </a>
