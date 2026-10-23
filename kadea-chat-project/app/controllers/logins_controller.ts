@@ -146,7 +146,10 @@ export default class LoginsController {
       return response.redirect('/verify-email')
     }
 
-    // 7. Rediriger vers le chat
+    // 7. Enregistrer l'identifiant de l'utilisateur dans la session
+    session.put('userId', user.id)
+
+    // 8. Rediriger vers le chat
     return response.redirect().toRoute('chat.index')
   }
 }
