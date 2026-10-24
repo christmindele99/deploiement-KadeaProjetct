@@ -35,6 +35,7 @@ export type ScannedRoutes = {
     'profiles.update': { paramsTuple?: []; params?: {} }
     'profile.changePassword': { paramsTuple?: []; params?: {} }
     'profiles.update_avatar': { paramsTuple?: []; params?: {} }
+    'groups.store': { paramsTuple?: []; params?: {} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -80,6 +81,7 @@ export type ScannedRoutes = {
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple?: []; params?: {} }
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.store': { paramsTuple?: []; params?: {} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   PATCH: {

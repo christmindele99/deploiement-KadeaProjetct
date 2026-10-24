@@ -18,6 +18,7 @@ const UsersController = () => import('#controllers/users_controller')
 const MessagesController = () => import('#controllers/messages_controller')
 const ProfilesController = () => import('#controllers/profiles_controller')
 const LogoutsController = () => import('#controllers/logouts_controller')
+const GroupsController = () => import('#controllers/groups_controller')
 
 
 // Afficher le formulaire d'inscription
@@ -149,6 +150,8 @@ router
   .as('profile.changePassword')
 
 router.patch('/profile/avatar', [ProfilesController, 'updateAvatar'])
+
+router.post('/groups', [GroupsController, 'store'])
 
 // Déconnexion de l'utilisateur
 router

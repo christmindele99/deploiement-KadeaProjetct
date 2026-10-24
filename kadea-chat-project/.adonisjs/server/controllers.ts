@@ -6,6 +6,7 @@
 export const controllers = {
   Conversations: () => import('#controllers/conversations_controller'),
   ForgotPasswords: () => import('#controllers/forgot_passwords_controller'),
+  Groups: () => import('#controllers/groups_controller'),
   Logins: () => import('#controllers/logins_controller'),
   Logouts: () => import('#controllers/logouts_controller'),
   Messages: () => import('#controllers/messages_controller'),

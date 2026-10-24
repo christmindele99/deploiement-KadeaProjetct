@@ -672,6 +672,226 @@ document.addEventListener('DOMContentLoaded', () => {
     renderRegisteredUsers(contactSearch.value)
   })
 
+
+
+    // ==================================================
+  // CRÉATION D'UN GROUPE
+  // ==================================================
+
+  const createGroupButton = $('#createGroupButton')
+  const createGroupModal = $('#createGroupModal')
+  const closeCreateGroupButton = $('#closeCreateGroup')
+  const cancelCreateGroupButton = $('#cancelCreateGroup')
+  const confirmCreateGroupButton = $('#confirmCreateGroup')
+  const groupNameInput = $('#groupName')
+  const groupDescriptionInput = $('#groupDescription')
+  const groupMemberSearch = $('#groupMemberSearch')
+  const groupMembersList = $('#groupMembersList')
+  const groupSelectedCount = $('#groupSelectedCount')
+  const createGroupError = $('#createGroupError')
+
+  const selectedGroupMemberIds = new Set()
+  let creatingGroup = false
+
+  const CREATE_GROUP_BUTTON_HTML =
+    '<i class="fa-solid fa-users" aria-hidden="true"></i><span>Créer le groupe</span>'
+
+  function showCreateGroupError(message) {
+    if (!createGroupError) return
+
+    createGroupError.textContent = message
+    createGroupError.classList.toggle('hidden', !message)
+  }
+
+  function updateCreateGroupUI() {
+    if (groupSelectedCount) {
+      groupSelectedCount.textContent = String(selectedGroupMemberIds.size)
+    }
+
+    if (confirmCreateGroupButton) {
+      confirmCreateGroupButton.disabled =
+        creatingGroup ||
+        groupNameInput.value.trim().length < 2 ||
+        selectedGroupMemberIds.size === 0
+    }
+  }
+
+  function renderGroupMembers(query = '') {
+    if (!groupMembersList) return
+
+    const currentUserId = getCurrentUserId()
+    const normalizedQuery = query.trim().toLowerCase()
+
+    const users = registeredUsers
+      .filter((user) => Number(user.id) !== currentUserId)
+      .filter(
+        (user) =>
+          (user.fullName || '').toLowerCase().includes(normalizedQuery) ||
+          (user.username || '').toLowerCase().includes(normalizedQuery)
+      )
+
+    groupMembersList.replaceChildren()
+
+    if (!users.length) {
+      const empty = document.createElement('p')
+
+      empty.className = 'py-4 text-center text-sm text-gray-500'
+      empty.textContent = 'Aucun utilisateur trouvé.'
+      groupMembersList.appendChild(empty)
+
+      return
+    }
+
+    users.forEach((user) => {
+      const label = document.createElement('label')
+
+      label.className =
+        'flex w-full cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors hover:bg-emerald-50'
+
+      const checkbox = document.createElement('input')
+
+      checkbox.type = 'checkbox'
+      checkbox.className =
+        'h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
+      checkbox.checked = selectedGroupMemberIds.has(Number(user.id))
+
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          selectedGroupMemberIds.add(Number(user.id))
+        } else {
+          selectedGroupMemberIds.delete(Number(user.id))
+        }
+
+        updateCreateGroupUI()
+      })
+
+      // Réutilise l'avatar + nom de createUserElement
+      const userItem = createUserElement(user)
+
+      label.append(checkbox, ...userItem.childNodes)
+      groupMembersList.appendChild(label)
+    })
+  }
+
+  function openCreateGroupModal() {
+    if (!createGroupModal) return
+
+    closeNewChatModal()
+
+    selectedGroupMemberIds.clear()
+    groupNameInput.value = ''
+    groupDescriptionInput.value = ''
+    groupMemberSearch.value = ''
+    showCreateGroupError('')
+
+    renderGroupMembers()
+    updateCreateGroupUI()
+
+    createGroupModal.classList.remove('hidden')
+    createGroupModal.classList.add('flex')
+
+    if (!registeredUsers.length) {
+      loadRegisteredUsers().then(() => renderGroupMembers())
+    }
+
+    groupNameInput.focus()
+  }
+
+  function closeCreateGroupModal() {
+    if (!createGroupModal || creatingGroup) return
+
+    createGroupModal.classList.add('hidden')
+    createGroupModal.classList.remove('flex')
+  }
+
+  async function createGroup() {
+    if (creatingGroup) return
+
+    const name = groupNameInput.value.trim()
+
+    if (name.length < 2) {
+      showCreateGroupError('Le nom du groupe doit contenir au moins 2 caractères.')
+      return
+    }
+
+    if (!selectedGroupMemberIds.size) {
+      showCreateGroupError('Sélectionne au moins un membre.')
+      return
+    }
+
+    creatingGroup = true
+    showCreateGroupError('')
+
+    confirmCreateGroupButton.disabled = true
+    confirmCreateGroupButton.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Création...</span>'
+
+    try {
+      const result = await api('/groups', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          description: groupDescriptionInput.value.trim(),
+          memberIds: Array.from(selectedGroupMemberIds),
+        }),
+      })
+
+      const conversationId = Number(result?.data?.conversationId)
+
+      creatingGroup = false
+      closeCreateGroupModal()
+
+      await loadConversations(true)
+
+      if (conversationId) {
+        selectConversation(conversationId)
+      }
+    } catch (error) {
+      if (error.message === 'SESSION_EXPIRED') {
+        window.location.reload()
+        return
+      }
+
+      showCreateGroupError(
+        error.message.startsWith('REQUEST_FAILED')
+          ? 'Impossible de créer le groupe. Réessaie.'
+          : error.message
+      )
+    } finally {
+      creatingGroup = false
+      confirmCreateGroupButton.innerHTML = CREATE_GROUP_BUTTON_HTML
+      updateCreateGroupUI()
+    }
+  }
+
+  createGroupButton?.addEventListener('click', openCreateGroupModal)
+  closeCreateGroupButton?.addEventListener('click', closeCreateGroupModal)
+  cancelCreateGroupButton?.addEventListener('click', closeCreateGroupModal)
+  confirmCreateGroupButton?.addEventListener('click', createGroup)
+  groupNameInput?.addEventListener('input', updateCreateGroupUI)
+
+  groupMemberSearch?.addEventListener('input', () => {
+    renderGroupMembers(groupMemberSearch.value)
+  })
+
+  createGroupModal?.addEventListener('click', (event) => {
+    if (event.target === createGroupModal) {
+      closeCreateGroupModal()
+    }
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (
+      event.key === 'Escape' &&
+      createGroupModal &&
+      !createGroupModal.classList.contains('hidden')
+    ) {
+      closeCreateGroupModal()
+    }
+  })
+
+
+
   // ==================================================
   // MENU D'ACTIONS DES MESSAGES
   // ==================================================
