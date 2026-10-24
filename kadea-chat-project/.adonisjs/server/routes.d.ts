@@ -36,6 +36,8 @@ export type ScannedRoutes = {
     'profile.changePassword': { paramsTuple?: []; params?: {} }
     'profiles.update_avatar': { paramsTuple?: []; params?: {} }
     'groups.store': { paramsTuple?: []; params?: {} }
+    'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -53,6 +55,7 @@ export type ScannedRoutes = {
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profiles.show': { paramsTuple?: []; params?: {} }
+    'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -69,6 +72,7 @@ export type ScannedRoutes = {
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.index': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'profiles.show': { paramsTuple?: []; params?: {} }
+    'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -90,6 +94,7 @@ export type ScannedRoutes = {
     'profiles.update': { paramsTuple?: []; params?: {} }
     'profile.changePassword': { paramsTuple?: []; params?: {} }
     'profiles.update_avatar': { paramsTuple?: []; params?: {} }
+    'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

@@ -152,6 +152,8 @@ router
 router.patch('/profile/avatar', [ProfilesController, 'updateAvatar'])
 
 router.post('/groups', [GroupsController, 'store'])
+router.get('/conversations/:id/group', [GroupsController, 'show'])
+router.patch('/conversations/:id/group', [GroupsController, 'update'])
 
 // Déconnexion de l'utilisateur
 router

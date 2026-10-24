@@ -105,4 +105,166 @@ export default class GroupsController {
       data: { conversationId: conversation.id, groupId: conversation.groupId },
     })
   }
+
+    async show({ params, session, response }: HttpContext) {
+    const userId = Number(session.get('userId'))
+
+    if (!userId) {
+      return response.unauthorized({ message: 'Vous devez être connecté.' })
+    }
+
+    const conversationId = Number(params.id)
+
+    if (!Number.isInteger(conversationId) || conversationId <= 0) {
+      return response.badRequest({ message: 'Identifiant de conversation invalide.' })
+    }
+
+    // Seuls les membres du groupe peuvent voir ses infos
+    const myMembership = await Membership.query()
+      .where('userId', userId)
+      .where('conversationId', conversationId)
+      .first()
+
+    if (!myMembership) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    const conversation = await Conversation.find(conversationId)
+
+    if (!conversation || !conversation.groupId) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    const group = await Group.find(conversation.groupId)
+
+    if (!group) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    const memberships = await Membership.query().where('conversationId', conversationId)
+
+    const users = await User.query().whereIn(
+      'id',
+      memberships.map((membership) => membership.userId)
+    )
+
+    const usersById = new Map(users.map((user) => [user.id, user]))
+
+    const members = memberships.flatMap((membership) => {
+      const user = usersById.get(membership.userId)
+
+      if (!user) {
+        return []
+      }
+
+      return [
+        {
+          id: user.id,
+          fullName: user.fullName ?? user.username,
+          username: user.username,
+          avatar: user.avatar,
+          roleId: membership.roleId,
+          role: membership.roleId === 1 ? 'admin' : 'member',
+        },
+      ]
+    })
+
+    return response.ok({
+      data: {
+        group: {
+          id: group.id,
+          name: group.name,
+          description: group.description,
+        },
+        myRole: myMembership.roleId === 1 ? 'admin' : 'member',
+        members,
+      },
+    })
+  }
+
+    async update({ params, session, request, response }: HttpContext) {
+    const userId = Number(session.get('userId'))
+
+    if (!userId) {
+      return response.unauthorized({ message: 'Vous devez être connecté.' })
+    }
+
+    const conversationId = Number(params.id)
+
+    if (!Number.isInteger(conversationId) || conversationId <= 0) {
+      return response.badRequest({ message: 'Identifiant de conversation invalide.' })
+    }
+
+    const myMembership = await Membership.query()
+      .where('userId', userId)
+      .where('conversationId', conversationId)
+      .first()
+
+    if (!myMembership) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    // Seuls les admins (roleId 1) peuvent modifier le groupe
+    if (myMembership.roleId !== 1) {
+      return response.forbidden({
+        message: 'Seuls les admins peuvent modifier le groupe.',
+      })
+    }
+
+    const conversation = await Conversation.find(conversationId)
+
+    if (!conversation || !conversation.groupId) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    const group = await Group.find(conversation.groupId)
+
+    if (!group) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    const name = String(request.input('name', '')).trim()
+    const rawDescription = request.input('description')
+    const description =
+      typeof rawDescription === 'string' && rawDescription.trim()
+        ? rawDescription.trim()
+        : null
+
+    if (name.length < 2 || name.length > 100) {
+      return response.badRequest({
+        message: 'Le nom du groupe doit contenir entre 2 et 100 caractères.',
+      })
+    }
+
+    if (description && description.length > 255) {
+      return response.badRequest({
+        message: 'La description ne doit pas dépasser 255 caractères.',
+      })
+    }
+
+    group.name = name
+    group.description = description
+    await group.save()
+
+    // Prévenir tous les membres pour que leur liste se mette à jour
+    const memberships = await Membership.query().where('conversationId', conversationId)
+
+    for (const membership of memberships) {
+      transmit.broadcast(`users/${membership.userId}`, {
+        event: 'user.notification',
+        data: { conversationId },
+      })
+    }
+
+    return response.ok({
+      message: 'Groupe mis à jour.',
+      data: {
+        group: {
+          id: group.id,
+          name: group.name,
+          description: group.description,
+        },
+      },
+    })
+  }
 }

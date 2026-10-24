@@ -3,6 +3,7 @@ import Conversation from '#models/conversation'
 import Membership from '#models/membership'
 import User from '#models/user'
 import Message from '#models/message'
+import Group from '#models/group'
 
 export default class ConversationsController {
   /**
@@ -46,7 +47,7 @@ export default class ConversationsController {
       conversations.map(async (conversation) => {
         const result = conversation.serialize()
 
-                const clearedAt = clearedByConversation.get(conversation.id)
+        const clearedAt = clearedByConversation.get(conversation.id)
         const lastReadAt = lastReadByConversation.get(conversation.id)
 
         // Dernier message visible
@@ -84,9 +85,21 @@ export default class ConversationsController {
           favorite: favoriteByConversation.get(conversation.id) ?? false,
         }
 
-        // Conversation de groupe : pas d'autre utilisateur unique
+        // Conversation de groupe : on renvoie les infos du groupe
         if (conversation.groupId) {
-          return { ...base, otherUser: null }
+          const group = await Group.find(conversation.groupId)
+
+          return {
+            ...base,
+            otherUser: null,
+            group: group
+              ? {
+                  id: group.id,
+                  name: group.name,
+                  description: group.description,
+                }
+              : null,
+          }
         }
 
         // Identifier l'autre participant

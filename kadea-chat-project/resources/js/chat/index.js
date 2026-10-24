@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let pendingDeleteConversationIds = []
   let deletingConversations = false
+  let suppressNextConversationClick = false
 
   // ==================================================
   // ÉTAT DES MESSAGES
@@ -1200,6 +1201,442 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileNavigation?.classList.remove('hidden')
   }
 
+
+
+
+    // ==================================================
+  // INFOS DU GROUPE
+  // ==================================================
+
+  const groupInfoModal = $('#groupInfoModal')
+  const closeGroupInfoButton = $('#closeGroupInfo')
+  const groupInfoAvatar = $('#groupInfoAvatar')
+  const groupInfoName = $('#groupInfoName')
+  const groupInfoDescription = $('#groupInfoDescription')
+  const groupInfoMembersCount = $('#groupInfoMembersCount')
+  const groupInfoSearch = $('#groupInfoSearch')
+  const groupInfoMembers = $('#groupInfoMembers')
+  const groupInfoError = $('#groupInfoError')
+
+  let groupInfo = null
+
+  function showGroupInfoError(message) {
+    if (!groupInfoError) return
+
+    groupInfoError.textContent = message
+    groupInfoError.classList.toggle('hidden', !message)
+  }
+
+  function showGroupInfoMessage(message) {
+    groupInfoMembers.replaceChildren()
+
+    const paragraph = document.createElement('p')
+
+    paragraph.className = 'py-4 text-center text-sm text-gray-500'
+    paragraph.textContent = message
+
+    groupInfoMembers.appendChild(paragraph)
+  }
+
+  function renderGroupInfoHeader(name, description, avatarUrl) {
+    groupInfoName.textContent = name || 'Groupe'
+    groupInfoDescription.textContent =
+      description || 'Aucune description.'
+
+    groupInfoAvatar.replaceChildren()
+    groupInfoAvatar.textContent = ''
+
+    if (avatarUrl) {
+      const img = document.createElement('img')
+
+      img.src = avatarUrl
+      img.alt = ''
+      img.className = 'h-full w-full object-cover'
+
+      img.addEventListener(
+        'error',
+        () => {
+          img.remove()
+          groupInfoAvatar.textContent = getUserInitials({
+            fullName: name,
+          })
+        },
+        { once: true }
+      )
+
+      groupInfoAvatar.appendChild(img)
+    } else {
+      groupInfoAvatar.textContent = getUserInitials({
+        fullName: name,
+      })
+    }
+  }
+
+  function renderGroupInfoMembers(query = '') {
+    if (!groupInfo || !groupInfoMembers) return
+
+    const normalizedQuery = query.trim().toLowerCase()
+    const currentUserId = getCurrentUserId()
+
+    groupInfoMembersCount.textContent = String(groupInfo.members.length)
+
+    const members = groupInfo.members
+      .filter(
+        (member) =>
+          (member.fullName || '').toLowerCase().includes(normalizedQuery) ||
+          (member.username || '').toLowerCase().includes(normalizedQuery)
+      )
+      .sort((a, b) => {
+        if (a.roleId !== b.roleId) {
+          return a.roleId - b.roleId
+        }
+
+        return (a.fullName || '').localeCompare(b.fullName || '', 'fr')
+      })
+
+    if (!members.length) {
+      showGroupInfoMessage('Aucun membre trouvé.')
+      return
+    }
+
+    groupInfoMembers.replaceChildren()
+
+    members.forEach((member) => {
+      const row = document.createElement('div')
+
+      row.className = 'flex w-full items-center gap-3 rounded-xl p-3'
+
+      const avatar = document.createElement('div')
+
+      avatar.className =
+        'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#075e8d] text-sm font-semibold text-white'
+
+      if (member.avatar) {
+        const img = document.createElement('img')
+
+        img.src = member.avatar
+        img.alt = ''
+        img.className = 'h-full w-full object-cover'
+
+        img.addEventListener(
+          'error',
+          () => {
+            img.remove()
+            avatar.textContent = getUserInitials(member)
+          },
+          { once: true }
+        )
+
+        avatar.appendChild(img)
+      } else {
+        avatar.textContent = getUserInitials(member)
+      }
+
+      const details = document.createElement('div')
+
+      details.className = 'min-w-0 flex-1'
+
+      const name = document.createElement('p')
+
+      name.className = 'truncate text-sm font-semibold text-slate-800'
+      name.textContent =
+        (member.fullName || member.username || 'Utilisateur') +
+        (Number(member.id) === currentUserId ? ' (Vous)' : '')
+
+      const username = document.createElement('p')
+
+      username.className = 'truncate text-xs text-slate-500'
+      username.textContent = member.username ? `@${member.username}` : ''
+
+      details.append(name, username)
+
+      const isAdmin = member.roleId === 1
+      const badge = document.createElement('span')
+
+      badge.className =
+        'shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ' +
+        (isAdmin
+          ? 'bg-emerald-500/15 text-emerald-700'
+          : 'bg-sky-500/15 text-sky-700')
+
+      badge.textContent = isAdmin ? 'Admin' : 'Membre'
+
+      row.append(avatar, details, badge)
+      groupInfoMembers.appendChild(row)
+    })
+  }
+
+  async function openGroupInfo() {
+    const conversation = getConversationById(selectedConversationId)
+
+    if (!conversation?.groupId || !groupInfoModal) {
+      return
+    }
+
+    groupInfo = null
+    updateGroupInfoMenu()
+    groupInfoSearch.value = ''
+    groupInfoMembersCount.textContent = '0'
+    showGroupInfoError('')
+
+    // Affichage immédiat avec les infos déjà connues
+    renderGroupInfoHeader(
+      conversation.group?.name,
+      conversation.group?.description,
+      conversation.group?.avatar
+    )
+
+    showGroupInfoMessage('Chargement des membres...')
+
+    groupInfoModal.classList.remove('hidden')
+    groupInfoModal.classList.add('flex')
+
+    try {
+      const result = await api(`/conversations/${conversation.id}/group`)
+
+      groupInfo = result.data
+      updateGroupInfoMenu()
+
+      renderGroupInfoHeader(
+        groupInfo.group.name,
+        groupInfo.group.description,
+        groupInfo.group.avatar
+      )
+
+      renderGroupInfoMembers()
+    } catch (error) {
+      if (error.message === 'SESSION_EXPIRED') {
+        window.location.reload()
+        return
+      }
+
+      groupInfoMembers.replaceChildren()
+      showGroupInfoError('Impossible de charger les infos du groupe.')
+    }
+  }
+
+  function closeGroupInfo() {
+    if (!groupInfoModal) return
+    closeGroupInfoMenu()
+    groupInfoModal.classList.add('hidden')
+    groupInfoModal.classList.remove('flex')
+  }
+
+  $('#chatHeaderName')?.addEventListener('click', openGroupInfo)
+  $('#chatHeaderAvatar')?.addEventListener('click', openGroupInfo)
+
+  closeGroupInfoButton?.addEventListener('click', closeGroupInfo)
+
+  groupInfoSearch?.addEventListener('input', () => {
+    renderGroupInfoMembers(groupInfoSearch.value)
+  })
+
+  groupInfoModal?.addEventListener('click', (event) => {
+    if (event.target === groupInfoModal) {
+      closeGroupInfo()
+    }
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (
+      event.key === 'Escape' &&
+      groupInfoModal &&
+      !groupInfoModal.classList.contains('hidden')
+    ) {
+      closeGroupInfo()
+    }
+  })
+
+
+    // ==================================================
+  // MENU DES OPTIONS DU GROUPE (ADMIN)
+  // ==================================================
+
+  const groupInfoMenuWrapper = $('#groupInfoMenuWrapper')
+  const groupInfoMenuButton = $('#groupInfoMenuButton')
+  const groupInfoMenu = $('#groupInfoMenu')
+
+  function closeGroupInfoMenu() {
+    groupInfoMenu?.classList.add('hidden')
+  }
+
+  function updateGroupInfoMenu() {
+    const isAdmin = groupInfo?.myRole === 'admin'
+
+    groupInfoMenuWrapper?.classList.toggle('hidden', !isAdmin)
+
+    if (!isAdmin) {
+      closeGroupInfoMenu()
+    }
+  }
+
+    function handleGroupAction(action) {
+      if (action === 'edit-info') {
+        openEditGroupModal()
+        return
+      }
+
+      // Les étapes suivantes viendront ici.
+      console.log('Action de groupe :', action)
+    }
+
+  groupInfoMenuButton?.addEventListener('click', (event) => {
+    event.stopPropagation()
+    groupInfoMenu?.classList.toggle('hidden')
+  })
+
+  groupInfoMenu?.addEventListener('click', (event) => {
+    const target = event.target
+
+    if (!(target instanceof Element)) {
+      return
+    }
+
+    const button = target.closest('[data-group-action]')
+
+    if (!button) {
+      return
+    }
+
+    closeGroupInfoMenu()
+    handleGroupAction(button.dataset.groupAction)
+  })
+
+  document.addEventListener('click', (event) => {
+    if (
+      event.target instanceof Element &&
+      !event.target.closest('#groupInfoMenuWrapper')
+    ) {
+      closeGroupInfoMenu()
+    }
+  })
+
+
+
+
+
+    // ==================================================
+  // MODIFIER LE NOM ET LA DESCRIPTION DU GROUPE
+  // ==================================================
+
+  const editGroupModal = $('#editGroupModal')
+  const editGroupNameInput = $('#editGroupName')
+  const editGroupDescriptionInput = $('#editGroupDescription')
+  const editGroupError = $('#editGroupError')
+  const saveEditGroupButton = $('#saveEditGroup')
+  const cancelEditGroupButton = $('#cancelEditGroup')
+  const closeEditGroupButton = $('#closeEditGroup')
+
+  let savingGroupInfo = false
+
+  function showEditGroupError(message) {
+    if (!editGroupError) return
+
+    editGroupError.textContent = message
+    editGroupError.classList.toggle('hidden', !message)
+  }
+
+  function updateEditGroupUI() {
+    if (saveEditGroupButton) {
+      saveEditGroupButton.disabled =
+        savingGroupInfo || editGroupNameInput.value.trim().length < 2
+    }
+  }
+
+  function openEditGroupModal() {
+    if (!groupInfo || groupInfo.myRole !== 'admin' || !editGroupModal) {
+      return
+    }
+
+    editGroupNameInput.value = groupInfo.group.name || ''
+    editGroupDescriptionInput.value = groupInfo.group.description || ''
+
+    showEditGroupError('')
+    updateEditGroupUI()
+
+    editGroupModal.classList.remove('hidden')
+    editGroupModal.classList.add('flex')
+
+    editGroupNameInput.focus()
+  }
+
+  function closeEditGroupModal() {
+    if (!editGroupModal || savingGroupInfo) return
+
+    editGroupModal.classList.add('hidden')
+    editGroupModal.classList.remove('flex')
+  }
+
+  async function saveGroupInfo() {
+    if (savingGroupInfo) return
+
+    const name = editGroupNameInput.value.trim()
+
+    if (name.length < 2) {
+      showEditGroupError('Le nom du groupe doit contenir au moins 2 caractères.')
+      return
+    }
+
+    savingGroupInfo = true
+    showEditGroupError('')
+    saveEditGroupButton.disabled = true
+    saveEditGroupButton.innerHTML = '<span>Enregistrement...</span>'
+
+    try {
+      const result = await api(`/conversations/${selectedConversationId}/group`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name,
+          description: editGroupDescriptionInput.value.trim(),
+        }),
+      })
+
+      const updatedGroup = result.data.group
+
+      groupInfo.group = { ...groupInfo.group, ...updatedGroup }
+
+      renderGroupInfoHeader(
+        groupInfo.group.name,
+        groupInfo.group.description,
+        groupInfo.group.avatar
+      )
+
+      savingGroupInfo = false
+      closeEditGroupModal()
+
+      await loadConversations(true)
+    } catch (error) {
+      if (error.message === 'SESSION_EXPIRED') {
+        window.location.reload()
+        return
+      }
+
+      showEditGroupError(
+        error.message.startsWith('REQUEST_FAILED')
+          ? 'Impossible de modifier le groupe. Réessaie.'
+          : error.message
+      )
+    } finally {
+      savingGroupInfo = false
+      saveEditGroupButton.innerHTML = '<span>Enregistrer</span>'
+      updateEditGroupUI()
+    }
+  }
+
+  saveEditGroupButton?.addEventListener('click', saveGroupInfo)
+  cancelEditGroupButton?.addEventListener('click', closeEditGroupModal)
+  closeEditGroupButton?.addEventListener('click', closeEditGroupModal)
+  editGroupNameInput?.addEventListener('input', updateEditGroupUI)
+
+  editGroupModal?.addEventListener('click', (event) => {
+    if (event.target === editGroupModal) {
+      closeEditGroupModal()
+    }
+  })
+
+
+
+
   // ==================================================
   // MENU D'ACTIONS D'UNE CONVERSATION
   // ==================================================
@@ -1782,7 +2219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     item.setAttribute('aria-selected', 'false')
 
     item.className =
-      'chat-item relative flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50'
+    'chat-item group relative flex w-full select-none items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50'
 
     const checkbox = document.createElement('input')
 
@@ -1806,8 +2243,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const avatar = document.createElement('div')
 
-    avatar.className =
-      'flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#075e8d] text-sm font-semibold text-white'
+      avatar.className =
+      'flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-semibold ' +
+      (conversation.groupId
+        ? 'bg-[#29ff9d] text-[#075e8d]'
+        : 'bg-[#075e8d] text-white')
 
     if (user?.avatar) {
       const img = document.createElement('img')
@@ -1827,7 +2267,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       avatar.appendChild(img)
     } else {
-      avatar.textContent = user ? getUserInitials(user) : 'KC'
+        avatar.textContent = user
+        ? getUserInitials(user)
+        : conversation.group
+          ? getUserInitials({ fullName: conversation.group.name })
+        : 'KC'
     }
 
     const details = document.createElement('div')
@@ -1865,7 +2309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actionsButton.title = 'Options de la conversation'
 
     actionsButton.className =
-      'conversation-actions-button absolute right-0 top-full z-10 hidden h-5 w-5 items-center justify-center rounded-full bg-white text-slate-400 shadow-sm transition hover:bg-slate-100 hover:text-brand-blue'
+    'conversation-actions-button pointer-events-none absolute right-8 top-full z-10 flex h-5 w-5 items-center justify-center bg-transparent text-[#075e8d] opacity-0 transition md:pointer-events-auto md:focus:opacity-100 md:group-hover:opacity-100'
 
     const actionsIcon = document.createElement('i')
     actionsIcon.className = 'fa-solid fa-chevron-down text-[10px]'
@@ -1909,22 +2353,67 @@ document.addEventListener('DOMContentLoaded', () => {
     details.append(top, bottom)
     item.append(checkbox, avatar, details)
 
-    item.addEventListener('mouseenter', () => {
-      if (conversationSelectionMode) {
+        // ----- Appui prolongé (mobile) -----
+    item.style.webkitTouchCallout = 'none'
+
+    let longPressTimer = null
+    let pressStartX = 0
+    let pressStartY = 0
+
+    const cancelLongPress = () => {
+      clearTimeout(longPressTimer)
+      longPressTimer = null
+    }
+
+    item.addEventListener('pointerdown', (event) => {
+      suppressNextConversationClick = false
+
+      if (
+        event.pointerType === 'mouse' ||
+        conversationSelectionMode ||
+        (event.target instanceof Element &&
+          event.target.closest('[data-conversation-menu]'))
+      ) {
         return
       }
 
-      actionsButton.classList.remove('hidden')
-      actionsButton.classList.add('flex')
+      pressStartX = event.clientX
+      pressStartY = event.clientY
+
+      cancelLongPress()
+
+      longPressTimer = setTimeout(() => {
+        longPressTimer = null
+        suppressNextConversationClick = true
+
+        if (navigator.vibrate) {
+          navigator.vibrate(30)
+        }
+
+        openConversationMenu(conversation.id, actionsButton)
+      }, 500)
     })
 
-    item.addEventListener('mouseleave', () => {
-      if (conversationSelectionMode) {
-        return
-      }
+    item.addEventListener('pointermove', (event) => {
+      if (!longPressTimer) return
 
-      actionsButton.classList.add('hidden')
-      actionsButton.classList.remove('flex')
+      if (
+        Math.abs(event.clientX - pressStartX) > 10 ||
+        Math.abs(event.clientY - pressStartY) > 10
+      ) {
+        cancelLongPress()
+      }
+    })
+
+    ;['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => {
+      item.addEventListener(name, cancelLongPress)
+    })
+
+    // Empêche le menu natif du navigateur sur mobile
+    item.addEventListener('contextmenu', (event) => {
+      if (isMobile()) {
+        event.preventDefault()
+      }
     })
 
     return item
@@ -2010,6 +2499,12 @@ document.addEventListener('DOMContentLoaded', () => {
       })
 
       renderConversations()
+
+      const headerNameElement = $('#chatHeaderName')
+
+      if (openConversation && headerNameElement) {
+        headerNameElement.textContent = getConversationName(openConversation)
+      }
 
       if (selectedConversationId !== null) {
         const selectedConversation = conversations.find(
@@ -2655,6 +3150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (headerName) {
       headerName.textContent = getConversationName(conversation)
+      headerName.classList.toggle('cursor-pointer', Boolean(conversation.groupId))
     }
 
     if (headerAvatar) {
@@ -3257,6 +3753,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const target = event.target
 
     if (!(target instanceof Element)) {
+      return
+    }
+
+    if (suppressNextConversationClick) {
+      suppressNextConversationClick = false
+      event.stopPropagation()
       return
     }
 
