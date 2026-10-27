@@ -18,6 +18,7 @@ export default defineConfig({
         'resources/js/chat/index.js',
         'resources/js/chat/setting.js',
         'resources/js/chat/profile.js',
+        'resources/js/chat/confidentialite.js',
       ],
 
       /**
