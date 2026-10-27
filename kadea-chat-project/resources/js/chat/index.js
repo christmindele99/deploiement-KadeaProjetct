@@ -130,6 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let pendingDeleteMessageIds = []
   let deletingMessages = false
+  let suppressNextMessageClick = false
+  let editingMessageId = null
 
   // ==================================================
   // UTILITAIRES
@@ -993,11 +995,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cancelButton.append(cancelIcon, cancelText)
 
-    menu.append(
-      deleteButton,
-      selectButton,
-      cancelButton
+    menu.append(deleteButton, selectButton)
+
+    // Modifier le message (seulement pour mes propres messages)
+    const messageData = currentMessages.find(
+      (item) => getMessageId(item) === Number(messageId)
     )
+
+    if (mine && messageData && !messageData.deletedAt) {
+      const editButton = document.createElement('button')
+
+      editButton.type = 'button'
+      editButton.dataset.messageMenuAction = 'edit'
+      editButton.dataset.messageId = String(messageId)
+
+      editButton.className =
+        'flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-[#075e8d]'
+
+      const editIcon = document.createElement('i')
+      editIcon.className =
+        'fa-solid fa-pen w-5 text-center text-[#075e8d]'
+
+      const editText = document.createElement('span')
+      editText.textContent = 'Modifier le message'
+
+      editButton.append(editIcon, editText)
+      menu.append(editButton)
+    }
+
+    menu.append(cancelButton)
 
     return menu
   }
@@ -1058,13 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
         )
 
         if (actionsButton) {
-          actionsButton.style.display =
-            messageSelectionMode ? 'none' : 'flex'
-
-          if (messageSelectionMode) {
-            actionsButton.style.opacity = '0'
-            actionsButton.style.pointerEvents = 'none'
-          }
+          actionsButton.style.display = messageSelectionMode ? 'none' : 'flex'
         }
       })
 
@@ -1142,6 +1162,101 @@ document.addEventListener('DOMContentLoaded', () => {
     exitMessageSelectionMode
   )
 
+
+  const defaultMessagePlaceholder = messageInput.placeholder
+
+  function setEditingUI(isEditing) {
+    messageInput.placeholder = isEditing
+      ? 'Modifier le message...'
+      : defaultMessagePlaceholder
+
+    const sendIcon = messageForm.querySelector('button[type="submit"] i')
+
+    sendIcon?.classList.toggle('fa-paper-plane', !isEditing)
+    sendIcon?.classList.toggle('fa-check', isEditing)
+  }
+
+
+    // ==================================================
+  // MODIFICATION D'UN MESSAGE
+  // ==================================================
+
+  function startEditingMessage(messageId) {
+    const message = currentMessages.find(
+      (item) => getMessageId(item) === Number(messageId)
+    )
+
+    if (!message || message.deletedAt || !isMyMessage(message)) {
+      return
+    }
+
+    closeMessageMenu()
+
+    editingMessageId = getMessageId(message)
+    setEditingUI(true)
+
+    messageInput.value = message.content ?? ''
+    messageInput.focus()
+
+    messageInput.setSelectionRange(
+      messageInput.value.length,
+      messageInput.value.length
+    )
+  }
+
+  function cancelEditingMessage() {
+    if (editingMessageId === null) {
+      return
+    }
+
+    editingMessageId = null
+    messageInput.value = ''
+    setEditingUI(false)
+  }
+
+  async function submitMessageEdit(content) {
+    const messageId = editingMessageId
+
+    const original = currentMessages.find(
+      (item) => getMessageId(item) === messageId
+    )
+
+    // Rien n'a changé : on quitte simplement le mode édition
+    if (!original || original.content === content) {
+      cancelEditingMessage()
+      return
+    }
+
+    sendingMessage = true
+    messageInput.disabled = true
+
+    try {
+      const result = await api(`/messages/${messageId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ content }),
+      })
+
+      const updated = result?.data
+
+      if (updated?.id) {
+        handleMessageUpdated(updated)
+      }
+
+      cancelEditingMessage()
+    } catch (error) {
+      if (error.message === 'SESSION_EXPIRED') {
+        window.location.reload()
+      }
+
+      // Sinon on reste en mode édition : le texte est conservé pour réessayer
+    } finally {
+      sendingMessage = false
+      messageInput.disabled = false
+      messageInput.focus()
+    }
+  }
+
+
   // ==================================================
   // LAYOUT
   // ==================================================
@@ -1149,6 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function showConversationList() {
     hideMessageActions()
     exitMessageSelectionMode()
+    cancelEditingMessage()
 
     conversationList.classList.remove('hidden')
 
@@ -2550,6 +2666,9 @@ document.addEventListener('DOMContentLoaded', () => {
     wrapper.dataset.messageId = String(messageId)
     wrapper.dataset.messageSender = mine ? 'me' : 'them'
 
+    wrapper.className =
+    'group max-md:select-none [-webkit-touch-callout:none]'
+
     const bubble = document.createElement('div')
 
     bubble.style.cssText =
@@ -2599,10 +2718,8 @@ document.addEventListener('DOMContentLoaded', () => {
     actionsButton.title = 'Options du message'
 
     actionsButton.className =
-      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-100 hover:text-[#075e8d]'
-
-    actionsButton.style.cssText =
-      'opacity:0;pointer-events:none;'
+    'pointer-events-none flex h-6 w-6 shrink-0 items-center justify-center bg-transparent opacity-0 transition md:pointer-events-auto md:focus:opacity-100 md:group-hover:opacity-100 ' +
+    (mine ? 'text-white' : 'text-[#075e8d]')
 
     const actionsIcon = document.createElement('i')
     actionsIcon.className = 'fa-solid fa-chevron-down text-xs'
@@ -2661,24 +2778,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkbox.checked = selectedMessageIds.has(messageId)
 
-    // La flèche apparaît au survol, sans sortir de la bulle.
-    wrapper.addEventListener('mouseenter', () => {
-      if (messageSelectionMode) {
+        // ----- Appui prolongé (mobile) -----
+    let longPressTimer = null
+    let pressStartX = 0
+    let pressStartY = 0
+
+    const cancelLongPress = () => {
+      clearTimeout(longPressTimer)
+      longPressTimer = null
+    }
+
+    wrapper.addEventListener('pointerdown', (event) => {
+      suppressNextMessageClick = false
+
+      if (
+        event.pointerType === 'mouse' ||
+        messageSelectionMode ||
+        (isDeleted && !mine) ||
+        (event.target instanceof Element &&
+          event.target.closest('[data-message-menu]'))
+      ) {
         return
       }
 
-      actionsButton.style.opacity = '1'
-      actionsButton.style.pointerEvents = 'auto'
+      pressStartX = event.clientX
+      pressStartY = event.clientY
+
+      cancelLongPress()
+
+      longPressTimer = setTimeout(() => {
+        longPressTimer = null
+        suppressNextMessageClick = true
+
+        if (navigator.vibrate) {
+          navigator.vibrate(30)
+        }
+
+        openMessageMenu(messageId, wrapper)
+      }, 500)
     })
 
-    wrapper.addEventListener('mouseleave', () => {
-      if (messageSelectionMode) {
-        return
-      }
+    wrapper.addEventListener('pointermove', (event) => {
+      if (!longPressTimer) return
 
-      if (openMessageMenuId !== messageId) {
-        actionsButton.style.opacity = '0'
-        actionsButton.style.pointerEvents = 'none'
+      if (
+        Math.abs(event.clientX - pressStartX) > 10 ||
+        Math.abs(event.clientY - pressStartY) > 10
+      ) {
+        cancelLongPress()
+      }
+    })
+
+    ;['pointerup', 'pointercancel', 'pointerleave'].forEach((name) => {
+      wrapper.addEventListener(name, cancelLongPress)
+    })
+
+    // Empêche le menu natif du navigateur sur mobile
+    wrapper.addEventListener('contextmenu', (event) => {
+      if (isMobile()) {
+        event.preventDefault()
       }
     })
 
@@ -3124,8 +3282,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const conversation = getConversationById(conversationId)
 
     if (!conversation) return
-
     exitMessageSelectionMode()
+    cancelEditingMessage()
 
     selectedConversationId = Number(conversation.id)
     selectedRecipient = null
@@ -3190,6 +3348,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeNewChatModal()
     exitMessageSelectionMode()
+    cancelEditingMessage()
 
     selectedConversationId = null
     selectedRecipient = user
@@ -3287,9 +3446,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==================================================
 
   async function sendMessage() {
+        if (sendingMessage) {
+      return
+    }
+
     const content = messageInput.value.trim()
 
-    if (!content || sendingMessage) {
+    // En mode modification : champ vide + envoyer = annuler la modification
+    if (editingMessageId !== null) {
+      if (!content) {
+        cancelEditingMessage()
+        return
+      }
+
+      await submitMessageEdit(content)
+      return
+    }
+
+    if (!content) {
       return
     }
 
@@ -3651,6 +3825,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return
     }
 
+    if (suppressNextMessageClick) {
+      suppressNextMessageClick = false
+      event.stopPropagation()
+      return
+    }
+
     // Case à cocher d'un message.
     const checkbox = target.closest(
       '[data-message-checkbox]'
@@ -3716,6 +3896,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const messageId = Number(menuAction.dataset.messageId)
 
       closeMessageMenu()
+
+      if (action === 'edit') {
+        startEditingMessage(messageId)
+        return
+      }
 
       if (action === 'delete') {
         showDeleteMessagesConfirmation([messageId])
@@ -3985,6 +4170,11 @@ document.addEventListener('DOMContentLoaded', () => {
       !deleteMessagesConfirmModal.classList.contains('hidden')
     ) {
       closeDeleteMessagesConfirmation()
+      return
+    }
+
+    if (editingMessageId !== null) {
+      cancelEditingMessage()
       return
     }
 

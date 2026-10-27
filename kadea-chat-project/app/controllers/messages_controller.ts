@@ -421,6 +421,7 @@ export default class MessagesController {
     }
 
     message.content = content.trim()
+    message.editedAt = DateTime.now()
     await message.save()
 
     const data = message.serialize()
