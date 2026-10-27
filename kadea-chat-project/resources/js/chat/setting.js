@@ -1,3 +1,4 @@
+import { applyTheme, getTheme } from './theme.js'
 
 document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
@@ -526,4 +527,22 @@ if (
       }
     })
   }
+
+  const themeSwitch = document.getElementById('themeSwitch')
+const themeDescription = document.getElementById('themeDescription')
+
+function syncThemeUI(theme) {
+  const isDark = theme === 'dark'
+  themeSwitch.setAttribute('aria-checked', String(isDark))
+  themeSwitch.setAttribute('aria-label', isDark ? 'Activer le thème clair' : 'Activer le thème sombre')
+  themeDescription.textContent = isDark ? 'Thème sombre' : 'Thème clair'
+}
+
+syncThemeUI(getTheme())
+
+themeSwitch.addEventListener('click', () => {
+  const next = getTheme() === 'dark' ? 'light' : 'dark'
+  applyTheme(next)
+  syncThemeUI(next)
+})
 })

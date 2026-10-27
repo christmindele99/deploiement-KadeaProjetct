@@ -6,6 +6,11 @@
     <meta name="csrf-token" content="{{ csrfToken }}">
     <meta name="theme-color" content="#075e8d">
     <title>Kadea Chat</title>
+    <script>
+      if (localStorage.getItem('kadea-theme') === 'dark') {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
     @include('components/link')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @include('components/scripts_tailwind')

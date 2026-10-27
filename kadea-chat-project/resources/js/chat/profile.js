@@ -1,3 +1,4 @@
+import { applyTheme, getTheme } from './theme.js'
 
 document.addEventListener('DOMContentLoaded', () => {
   // ============================================================

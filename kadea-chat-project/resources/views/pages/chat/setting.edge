@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#075e8d">
   <title>Paramètres | Kadea Chat</title>
+  <script>
+    if (localStorage.getItem('kadea-theme') === 'dark') {
+        document.documentElement.classList.add('dark')
+    }
+  </script>
   @include('components/link')
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -56,10 +61,11 @@
         <button
           type="button"
           id="themeSwitch"
-          class="theme-switch relative h-6 w-[42px] shrink-0 cursor-pointer rounded-full border-0 bg-slate-300 transition-colors duration-200"
           role="switch"
           aria-checked="false"
-          aria-label="Activer le thème sombre">
+          aria-label="Activer le thème sombre"
+          class="group relative h-6 w-[42px] shrink-0 cursor-pointer rounded-full border-0 bg-emerald-500 transition-colors duration-200 aria-checked:bg-slate-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent">
+          <span class="absolute left-[3px] top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow transition-all duration-200 group-aria-checked:translate-x-[18px] group-aria-checked:bg-emerald-500"></span>
         </button>
 
       </div>
