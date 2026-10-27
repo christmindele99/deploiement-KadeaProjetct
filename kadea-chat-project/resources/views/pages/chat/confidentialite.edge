@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Kadea Chat - Confidentialité</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    @font-face {
+      font-family: 'Artega';
+      src: url('/fonts/Artega.woff2') format('woff2'),
+           url('/fonts/Artega.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    .font-artega {
+      font-family: 'Artega', sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #29ff9d;
+    }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              blue: '#075e8d',
+              accent: '#29ff9d',
+              dark: '#000000',
+              white: '#ffffff',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="h-full bg-white font-sans text-brand-blue antialiased flex flex-row overflow-hidden relative">
+
+  {{-- NAVIGATION DESKTOP --}}
+
+  <aside class="app-panel hidden w-20 shrink-0 flex-col items-center justify-between border-r border-slate-200 bg-white py-6 md:flex">
+
+    <div class="flex w-full flex-col items-center gap-9">
+
+      <div class="flex w-full justify-center">
+        <img
+          src="/kadea-logo.png"
+          alt="Logo Kadea Chat"
+          class="h-15 w-15 scale-150 object-contain"
+        >
+      </div>
+
+      <nav class="flex w-full flex-col items-center gap-5" aria-label="Navigation principale">
+
+        <a
+          href="/chat"
+          title="Chats"
+          aria-label="Chats"
+          class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue' : '' }}"
+        >
+          <i class="fa-solid fa-comment-dots text-lg"></i>
+        </a>
+
+        <a
+          href="/users"
+          title="Utilisateurs"
+          aria-label="Utilisateurs"
+          id="usersButton"
+          class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/users' ? 'bg-brand-accent text-brand-blue' : '' }}"
+        >
+          <i class="fa-solid fa-user-group text-lg"></i>
+        </a>
+
+        <a
+          href="/groups"
+          title="Groupes"
+          aria-label="Groupes"
+          id="groupsButton"
+          class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/groups' ? 'bg-brand-accent text-brand-blue' : '' }}"
+        >
+          <i class="fa-solid fa-users text-lg"></i>
+        </a>
+
+      </nav>
+    </div>
+
+    <div class="flex flex-col items-center gap-5">
+
+      <a
+        href="/settings"
+        title="Paramètres"
+        aria-label="Paramètres"
+        id="settingsButton"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/settings' ? 'bg-brand-accent text-brand-blue' : '' }}"
+      >
+        <i class="fa-solid fa-gear text-lg"></i>
+      </a>
+
+      <a
+        href="/profile"
+        title="Mon profil"
+        aria-label="Mon profil"
+        class="nav-item flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/profile' ? 'bg-brand-accent text-brand-blue' : '' }}"
+      >
+        <img
+          src="{{ user.avatar || '/default-avatar.jpg' }}"
+          alt="Photo de profil de {{ user.fullName }}"
+          class="h-10 w-10 rounded-full border-2 border-brand-accent object-cover"
+        >
+      </a>
+
+    </div>
+  </aside>
+
+
+  {{-- ZONE PRINCIPALE --}}
+
+  <main id="mainPanel" class="relative flex min-w-0 flex-1 flex-col bg-white overflow-y-auto">
+
+    <header class="sticky top-0 z-20 flex h-[76px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 lg:px-8">
+
+      <div class="flex items-center gap-3">
+
+        <a
+          href="/settings"
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-brand-blue hover:bg-emerald-50 md:hidden"
+          aria-label="Retour aux paramètres"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
+        <h2 class="font-artega text-xl font-bold text-brand-blue">
+          Confidentialité
+        </h2>
+
+      </div>
+    </header>
+
+
+    <div class="flex-1 px-4 py-6 sm:px-8 lg:px-12 max-w-3xl w-full mx-auto space-y-6 pb-28 md:pb-10">
+
+      {{-- MESSAGE DE RETOUR --}}
+
+      <div
+        id="passwordMessage"
+        class="hidden rounded-xl border px-4 py-3 text-sm"
+        role="alert"
+        aria-live="polite"
+      ></div>
+
+
+      {{-- SÉCURITÉ --}}
+
+      <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+
+        <h4 class="text-sm font-bold text-brand-blue flex items-center gap-2 border-b border-slate-100 pb-4">
+          <i class="fa-solid fa-lock text-brand-accent"></i>
+          Sécurité et mot de passe
+        </h4>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+
+          <button
+            type="button"
+            id="changePasswordButton"
+            class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-brand-blue hover:bg-emerald-50 transition-colors"
+          >
+            <i class="fa-solid fa-key text-xs"></i>
+            Modifier le mot de passe
+          </button>
+
+          <button
+            type="button"
+            id="resetPasswordButton"
+            class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
+          >
+            <i class="fa-solid fa-rotate-right text-xs"></i>
+            Réinitialiser le mot de passe
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+
+  {{-- NAVIGATION MOBILE --}}
+
+  <nav
+    id="mobileNavigation"
+    class="app-panel mobile-glass fixed inset-x-3 bottom-[10px] z-30 flex min-h-[68px] items-center justify-around rounded-[26px] border border-slate-200 bg-white/90 px-2 py-[7px] shadow-[0_8px_30px_rgba(0,0,0,0.10)] backdrop-blur-xl md:hidden"
+    aria-label="Navigation mobile"
+  >
+
+    <a
+      href="/chat"
+      title="Chats"
+      aria-label="Chats"
+      class="mobile-nav-item relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/chat' ? 'bg-brand-accent text-brand-blue font-bold' : '' }}"
+    >
+      <i class="fa-solid fa-comment-dots text-xl"></i>
+    </a>
+
+    <a
+      href="/settings"
+      id="mobileBack"
+      aria-label="Retour"
+      title="Retour"
+      class="flex h-[52px] w-[52px] shrink-0 -translate-y-2 items-center justify-center rounded-full bg-brand-blue text-white shadow-[0_5px_14px_rgba(7,94,141,0.25)] transition-colors duration-200 hover:bg-sky-800"
+    >
+      <i class="fa-solid fa-arrow-left text-xl"></i>
+    </a>
+
+    <a
+      href="/settings"
+      title="Paramètres"
+      aria-label="Paramètres"
+      class="mobile-nav-item relative flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-emerald-50 text-brand-blue font-bold"
+    >
+      <i class="fa-solid fa-gear text-xl"></i>
+    </a>
+
+  </nav>
+
+  @vite(['resources/js/chat/confidentialite.js'])
+
+</body>
+</html>

@@ -96,6 +96,43 @@ router
   })
   .use(middleware.sessionAuth())
 
+  // Afficher la politique de confidentialité
+router
+  .get('/politique-confidentialite', async ({ view }) => {
+    return view.render('pages/chat/politiqueConficdentialite')
+  })
+  .use(middleware.sessionAuth())
+  .as('politique-confidentialite.show')
+
+// Afficher le formulaire de commentaire
+router
+  .get('/commentaire', async ({ view, session, response }) => {
+    const userId = session.get('userId')
+
+    if (!userId) {
+      return response.unauthorized({
+        message: 'Vous devez être connecté pour accéder à cette page.',
+      })
+    }
+
+    const User = (await import('#models/user')).default
+    const user = await User.find(userId)
+
+    if (!user) {
+      session.forget('userId')
+
+      return response.unauthorized({
+        message: 'Utilisateur introuvable. Veuillez vous reconnecter.',
+      })
+    }
+
+    return view.render('pages/chat/commentaire', {
+      user,
+    })
+  })
+  .use(middleware.sessionAuth())
+  .as('commentaire.show')
+
 router
   .get('/users', [UsersController, 'index'])
   .as('users.index')
@@ -134,6 +171,14 @@ router.delete('/messages/:id', [MessagesController, 'destroy']).use(middleware.s
 router
   .get('/profile', [ProfilesController, 'show'])
   .use(middleware.sessionAuth())
+
+  // Afficher les paramètres de confidentialité
+router
+  .get('/confidentialite', async ({ view }) => {
+    return view.render('pages/chat/confidentialite')
+  })
+  .use(middleware.sessionAuth())
+  .as('confidentialite.show')
 
 // Modifier les informations du profil
 router
