@@ -141,6 +141,7 @@ if (
 
     // Restaurer le contenu original
     settingsContent.innerHTML = originalSettingsContent
+    syncThemeUI(getTheme())
 
     // Restaurer le titre
     mainPanelTitle.textContent = 'Parametres'
@@ -528,10 +529,12 @@ if (
     })
   }
 
+  function syncThemeUI(theme) {
   const themeSwitch = document.getElementById('themeSwitch')
-const themeDescription = document.getElementById('themeDescription')
+  const themeDescription = document.getElementById('themeDescription')
 
-function syncThemeUI(theme) {
+  if (!themeSwitch || !themeDescription) return
+
   const isDark = theme === 'dark'
   themeSwitch.setAttribute('aria-checked', String(isDark))
   themeSwitch.setAttribute('aria-label', isDark ? 'Activer le thème clair' : 'Activer le thème sombre')
@@ -540,7 +543,9 @@ function syncThemeUI(theme) {
 
 syncThemeUI(getTheme())
 
-themeSwitch.addEventListener('click', () => {
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('#themeSwitch')) return
+
   const next = getTheme() === 'dark' ? 'light' : 'dark'
   applyTheme(next)
   syncThemeUI(next)

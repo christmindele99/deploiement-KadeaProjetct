@@ -139,13 +139,13 @@
 
         <div class="relative group">
 
-          <div class="h-24 w-24 sm:h-28 sm:w-28 rounded-2xl overflow-hidden border-2 border-brand-accent/40 bg-white/10 flex items-center justify-center shadow-inner">
+          <div class="h-24 w-24 sm:h-28 sm:w-28 rounded-full overflow-hidden border-2 border-brand-accent/40 bg-white/10 flex items-center justify-center shadow-inner">
 
             <img
               id="avatarPreview"
               src="{{ user.avatar || '/default-avatar.jpg' }}"
               alt="Photo de profil de {{ user.fullName }}"
-              class="h-full w-full object-cover"
+              class="h-full w-full object-cover rounded-full"
             >
 
           </div>
