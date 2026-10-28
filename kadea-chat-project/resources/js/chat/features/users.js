@@ -1,0 +1,214 @@
+import { closeNewChatButton, contactSearch, mobileNewChatButton, newChatContacts, newChatModal, openNewChatButton, state } from './state.js'
+import { api, getCurrentUserId, getData, getUserInitials } from './utils.js'
+
+// ==================================================
+// UTILISATEURS
+// ==================================================
+
+function showUsersMessage(message, isError = false) {
+  if (!newChatContacts) {
+    return
+  }
+
+  newChatContacts.replaceChildren()
+
+  const paragraph = document.createElement('p')
+
+  paragraph.className = 'py-4 text-center text-sm'
+
+  paragraph.classList.add(
+    isError ? 'text-red-500' : 'text-gray-500'
+  )
+
+  paragraph.textContent = message
+
+  newChatContacts.appendChild(paragraph)
+}
+
+export function createUserElement(user) {
+  const item = document.createElement('button')
+
+  item.type = 'button'
+  item.dataset.startChat = String(user.id)
+
+  item.className =
+    'flex w-full items-center gap-3 rounded-xl p-3 text-left transition-colors hover:bg-emerald-50'
+
+  const avatarContainer = document.createElement('div')
+
+  avatarContainer.className =
+    'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#075e8d] text-sm font-semibold text-white'
+
+  if (user.avatar) {
+    const avatar = document.createElement('img')
+
+    avatar.src = user.avatar
+    avatar.alt = ''
+    avatar.className = 'h-full w-full object-cover'
+
+    avatar.addEventListener(
+      'error',
+      () => {
+        avatar.remove()
+        avatarContainer.textContent = getUserInitials(user)
+      },
+      { once: true }
+    )
+
+    avatarContainer.appendChild(avatar)
+  } else {
+    avatarContainer.textContent = getUserInitials(user)
+  }
+
+  const details = document.createElement('div')
+  details.className = 'min-w-0 flex-1'
+
+  const name = document.createElement('p')
+  name.className =
+    'truncate text-sm font-semibold text-slate-800'
+  name.textContent =
+    user.fullName || user.username || 'Utilisateur'
+
+  const username = document.createElement('p')
+  username.className =
+    'truncate text-xs text-slate-500'
+  username.textContent = user.username
+    ? `@${user.username}`
+    : ''
+
+  details.append(name, username)
+
+  if (user.bio) {
+    const bio = document.createElement('p')
+    bio.className =
+      'mt-1 truncate text-xs text-slate-400'
+    bio.textContent = user.bio
+    details.appendChild(bio)
+  }
+
+  item.append(avatarContainer, details)
+
+  return item
+}
+
+function renderRegisteredUsers(query = '') {
+  if (!newChatContacts) {
+    return
+  }
+
+  const currentUserId = getCurrentUserId()
+  const normalizedQuery = query.trim().toLowerCase()
+
+  const filteredUsers = state.registeredUsers
+    .filter(
+      (user) =>
+        Number(user.id) !== Number(currentUserId)
+    )
+    .filter((user) => {
+      const fullName = (
+        user.fullName || ''
+      ).toLowerCase()
+
+      const username = (
+        user.username || ''
+      ).toLowerCase()
+
+      return (
+        fullName.includes(normalizedQuery) ||
+        username.includes(normalizedQuery)
+      )
+    })
+
+  newChatContacts.replaceChildren()
+
+  if (!filteredUsers.length) {
+    showUsersMessage(
+      normalizedQuery
+        ? 'Aucun utilisateur ne correspond à ta recherche.'
+        : 'Aucun autre utilisateur inscrit pour le moment.'
+    )
+
+    return
+  }
+
+  filteredUsers.forEach((user) => {
+    newChatContacts.appendChild(createUserElement(user))
+  })
+}
+
+export async function loadRegisteredUsers() {
+  if (state.usersLoading) {
+    return
+  }
+
+  state.usersLoading = true
+  showUsersMessage('Chargement des utilisateurs...')
+
+  try {
+    const result = await api('/users')
+
+    state.registeredUsers = getData(result)
+
+    renderRegisteredUsers(contactSearch?.value || '')
+  } catch (error) {
+    if (error.message !== 'SESSION_EXPIRED') {
+      showUsersMessage(
+        'Impossible de charger les utilisateurs.',
+        true
+      )
+    } else {
+      window.location.reload()
+    }
+  } finally {
+    state.usersLoading = false
+  }
+}
+
+function openNewChatModal() {
+  if (!newChatModal) {
+    return
+  }
+
+  newChatModal.classList.remove('hidden')
+  newChatModal.classList.add('flex')
+
+  loadRegisteredUsers()
+}
+
+export function closeNewChatModal() {
+  if (!newChatModal) {
+    return
+  }
+
+  newChatModal.classList.add('hidden')
+  newChatModal.classList.remove('flex')
+}
+
+// Branche les écouteurs d'événements de cette fonctionnalité
+export function setupUsers() {
+  openNewChatButton?.addEventListener(
+    'click',
+    openNewChatModal
+  )
+
+  mobileNewChatButton?.addEventListener(
+    'click',
+    openNewChatModal
+  )
+
+  closeNewChatButton?.addEventListener(
+    'click',
+    closeNewChatModal
+  )
+
+  newChatModal?.addEventListener('click', (event) => {
+    if (event.target === newChatModal) {
+      closeNewChatModal()
+    }
+  })
+
+  contactSearch?.addEventListener('input', () => {
+    renderRegisteredUsers(contactSearch.value)
+  })
+
+}

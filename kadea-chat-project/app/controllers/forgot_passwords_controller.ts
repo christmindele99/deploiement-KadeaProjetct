@@ -19,8 +19,10 @@ export default class ForgotPasswordsController {
    */
   async store({ request, response, session }: HttpContext) {
     const wantsJson =
-  request.header('accept')?.includes('application/json') ?? false
+    request.header('accept')?.includes('application/json') ?? false
     const email = request.input('email')
+    console.log('EMAIL REÇU :', email)
+  console.log('BODY REÇU :', request.all())
 
     // 1. Vérifier l'adresse e-mail
     if (typeof email !== 'string' || !email.trim()) {
