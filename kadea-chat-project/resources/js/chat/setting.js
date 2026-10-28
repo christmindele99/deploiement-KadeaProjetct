@@ -1,4 +1,5 @@
 import { applyTheme, getTheme } from './theme.js'
+import { sendComment, showFlash } from './comments.js'
 
 document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
@@ -276,6 +277,7 @@ if (
     if (window.innerWidth < 768) {
     mainPanel.classList.add('hidden')
     mainPanel.classList.remove('flex')
+    settingsList.classList.remove('hidden')
   }
   }
 
@@ -352,13 +354,35 @@ if (
       })
     }
 
-    // Envoi temporaire
-    commentForm.addEventListener('submit', (event) => {
+    commentForm.addEventListener('submit', async (event) => {
       event.preventDefault()
+      const sendButton = document.getElementById('sendCommentButton')
+      const originalButtonContent = sendButton.innerHTML
+      const text = commentInput.value
+      const ratingValue = ratingInput.value
+      // Vider le champ et afficher la boule qui tourne
+      commentInput.value = ''
+      commentCounter.textContent = '0 / 1000'
 
-      alert(
-        'Le formulaire fonctionne correctement. L’enregistrement du commentaire sera ajouté prochainement.'
-      )
+      sendButton.disabled = true
+      sendButton.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin mr-2"></i>Envoyer
+      `
+      try {
+        const data = await sendComment({
+          rating: ratingValue,
+          comment: text,
+        })
+        showFlash(data.message)
+      } catch (error) {
+        // En cas d'erreur, on remet le texte pour qu'il ne soit pas perdu
+        commentInput.value = text
+        commentCounter.textContent = `${text.length} / 1000`
+        showFlash(error.message, 'error')
+      } finally {
+        sendButton.disabled = false
+        sendButton.innerHTML = originalButtonContent
+      }
     })
   }
 }

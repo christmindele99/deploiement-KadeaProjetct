@@ -19,7 +19,7 @@ const MessagesController = () => import('#controllers/messages_controller')
 const ProfilesController = () => import('#controllers/profiles_controller')
 const LogoutsController = () => import('#controllers/logouts_controller')
 const GroupsController = () => import('#controllers/groups_controller')
-
+const CommentsController = () => import('#controllers/comments_controller')
 
 // Afficher le formulaire d'inscription
 router
@@ -132,6 +132,12 @@ router
   })
   .use(middleware.sessionAuth())
   .as('commentaire.show')
+  
+  // Enregistrer le commentaire d'un utilisateur
+router
+  .post('/comments', [CommentsController, 'store'])
+  .use(middleware.sessionAuth())
+  .as('comments.store')
 
 router
   .get('/users', [UsersController, 'index'])

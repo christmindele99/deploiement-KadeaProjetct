@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  Comments: () => import('#controllers/comments_controller'),
   Conversations: () => import('#controllers/conversations_controller'),
   ForgotPasswords: () => import('#controllers/forgot_passwords_controller'),
   Groups: () => import('#controllers/groups_controller'),

@@ -22,6 +22,7 @@ export type ScannedRoutes = {
     'chat.index': { paramsTuple?: []; params?: {} }
     'politique-confidentialite.show': { paramsTuple?: []; params?: {} }
     'commentaire.show': { paramsTuple?: []; params?: {} }
+    'comments.store': { paramsTuple?: []; params?: {} }
     'users.index': { paramsTuple?: []; params?: {} }
     'conversations.index': { paramsTuple?: []; params?: {} }
     'conversations.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -91,6 +92,7 @@ export type ScannedRoutes = {
     'login.store': { paramsTuple?: []; params?: {} }
     'forgot-password.store': { paramsTuple?: []; params?: {} }
     'reset-password.store': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'comments.store': { paramsTuple?: []; params?: {} }
     'conversations.store': { paramsTuple?: []; params?: {} }
     'messages.store': { paramsTuple?: []; params?: {} }
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
