@@ -367,11 +367,12 @@ function createMessageBubble(message, index) {
   const messageId = getMessageId(message)
 
   const wrapper = document.createElement('div')
+  
+wrapper.style.cssText =
+  'position:relative;display:flex;flex-direction:column;' +
+  'width:fit-content;max-width:70%;min-width:0;' +
+  `align-items:${mine ? 'flex-end' : 'flex-start'};`
 
-  wrapper.style.cssText =
-    'position:relative;display:flex;flex-direction:column;' +
-    'max-width:min(100%,560px);min-width:0;' +
-    `align-items:${mine ? 'flex-end' : 'flex-start'};`
 
   wrapper.dataset.messageRow = ''
   wrapper.dataset.messageIndex = String(index)
@@ -384,8 +385,8 @@ function createMessageBubble(message, index) {
   const bubble = document.createElement('div')
 
   bubble.style.cssText =
-    'box-sizing:border-box;max-width:100%;padding:12px 16px;' +
-    'overflow-wrap:anywhere;word-break:break-word;' +
+  'box-sizing:border-box;width:fit-content;max-width:100%;' +
+  'padding:12px 16px;overflow-wrap:anywhere;word-break:break-word;' +
     'box-shadow:0 1px 3px rgba(0,0,0,.08);' +
     (
       mine

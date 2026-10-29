@@ -523,4 +523,55 @@
     html:not(.dark) [data-conversation-menu] button:hover {
       background-color: #f1f5f9;
     }
+
+    
+/* ==========================================
+   MENU DES OPTIONS DES MESSAGES
+   ========================================== */
+
+    /* Mode clair : fond blanc */
+    html:not(.dark) #messageList [data-message-menu] {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+    }
+
+    /* Mode clair : icônes vertes et textes bleus */
+    html:not(.dark) #messageList [data-message-menu] button i {
+      color: #10b981 !important;
+    }
+
+    html:not(.dark) #messageList [data-message-menu] button span {
+      color: #075e8d !important;
+    }
+
+    /* Mode sombre : fond sombre */
+    html.dark #messageList [data-message-menu] {
+      background-color: #0f172a;
+      border-color: #334155;
+    }
+
+    /* Mode sombre : icônes vertes et textes blancs */
+    html.dark #messageList [data-message-menu] button i {
+      color: #10b981 !important;
+    }
+
+    html.dark #messageList [data-message-menu] button span {
+      color: #ffffff !important;
+    }
+
+    /* Bordures des options en mode sombre */
+    html.dark #messageList [data-message-menu] button {
+      border-color: #334155;
+    }
+
+    /* Survol en mode clair */
+    html:not(.dark) #messageList [data-message-menu] button:hover {
+      background-color: #f1f5f9;
+    }
+
+    /* Survol en mode sombre */
+    html.dark #messageList [data-message-menu] button:hover {
+      background-color: #1e293b;
+    }
+
   </style>
