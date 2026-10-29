@@ -182,7 +182,7 @@ export default class GroupsController {
     })
   }
 
-    async update({ params, session, request, response }: HttpContext) {
+  async update({ params, session, request, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
     if (!userId) {
@@ -265,6 +265,102 @@ export default class GroupsController {
           description: group.description,
         },
       },
+    })
+  }
+
+  async addMembers({ params, session, request, response }: HttpContext) {
+    const userId = Number(session.get('userId'))
+
+    if (!userId) {
+      return response.unauthorized({ message: 'Vous devez être connecté.' })
+    }
+
+    const conversationId = Number(params.id)
+
+    if (!Number.isInteger(conversationId) || conversationId <= 0) {
+      return response.badRequest({ message: 'Identifiant de conversation invalide.' })
+    }
+
+    const myMembership = await Membership.query()
+      .where('userId', userId)
+      .where('conversationId', conversationId)
+      .first()
+
+    if (!myMembership) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    // Seuls les admins (roleId 1) peuvent ajouter des membres
+    if (myMembership.roleId !== 1) {
+      return response.forbidden({
+        message: 'Seuls les admins peuvent ajouter des membres.',
+      })
+    }
+
+    const conversation = await Conversation.find(conversationId)
+
+    if (!conversation || !conversation.groupId) {
+      return response.notFound({ message: 'Groupe introuvable.' })
+    }
+
+    const rawMemberIds = request.input('memberIds')
+
+    if (!Array.isArray(rawMemberIds)) {
+      return response.badRequest({ message: 'La liste des membres est invalide.' })
+    }
+
+    const memberIds = [
+      ...new Set(
+        rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)
+      ),
+    ]
+
+    if (memberIds.length < 1) {
+      return response.badRequest({ message: 'Sélectionne au moins un utilisateur.' })
+    }
+
+    // On ignore ceux qui sont déjà membres du groupe
+    const currentMemberships = await Membership.query().where('conversationId', conversationId)
+    const currentMemberIds = new Set(currentMemberships.map((membership) => membership.userId))
+    const newMemberIds = memberIds.filter((id) => !currentMemberIds.has(id))
+
+    if (newMemberIds.length < 1) {
+      return response.badRequest({
+        message: 'Ces utilisateurs sont déjà membres du groupe.',
+      })
+    }
+
+    const existingUsers = await User.query().whereIn('id', newMemberIds)
+
+    if (existingUsers.length !== newMemberIds.length) {
+      return response.badRequest({
+        message: 'Certains utilisateurs sélectionnés sont introuvables.',
+      })
+    }
+
+    const now = DateTime.now()
+
+    await Membership.createMany(
+      newMemberIds.map((id) => ({
+        userId: id,
+        conversationId,
+        roleId: 2,
+        joinedAt: now,
+        isFavorite: false,
+      }))
+    )
+
+    // Prévenir les anciens et les nouveaux membres en temps réel
+    for (const id of [...currentMemberIds, ...newMemberIds]) {
+      transmit.broadcast(`users/${id}`, {
+        event: 'user.notification',
+        data: { conversationId },
+      })
+    }
+
+    return response.created({
+      message: 'Membres ajoutés avec succès.',
+      data: { addedCount: newMemberIds.length },
     })
   }
 }

@@ -119,16 +119,16 @@
               <span>Modifier le nom et la description</span>
             </button>
 
-            <button type="button" data-group-action="edit-photo"
-              class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-brand-blue">
-              <i class="fa-solid fa-image w-5 text-center text-brand-blue"></i>
-              <span>Modifier la photo du groupe</span>
-            </button>
-
             <button type="button" data-group-action="add-admin"
               class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-brand-blue">
               <i class="fa-solid fa-user-plus w-5 text-center text-brand-blue"></i>
               <span>Ajouter un membre</span>
+            </button>
+
+            <button type="button" data-group-action="remove-member"
+              class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-brand-blue">
+              <i class="fa-solid fa-user-minus w-5 text-center text-brand-blue"></i>
+              <span>Retirer un membre</span>
             </button>
 
             <button type="button" data-group-action="delete-group"
@@ -149,15 +149,31 @@
     </div>
 
     {{-- PHOTO, NOM ET DESCRIPTION --}}
-    <div class="flex flex-col items-center text-center">
+<div class="flex flex-col items-center text-center">
+    <div class="relative">
+      {{-- PHOTO OU INITIALES DU GROUPE --}}
       <div id="groupInfoAvatar"
-        class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-[#29ff9d] text-2xl font-semibold text-[#075e8d]"></div>
+        class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-[#29ff9d] text-2xl font-semibold text-[#075e8d]">
+      </div>
 
-      <h3 id="groupInfoName" class="mt-3 break-words text-lg font-bold text-brand-blue"></h3>
-
-      <p id="groupInfoDescription" class="mt-1 break-words text-sm text-slate-500"></p>
+      {{-- ICÔNE SUPERPOSÉE SUR LE CERCLE --}}
+      <button
+        type="button"
+        id="changeGroupAvatarButton"
+        aria-label="Modifier la photo du groupe"
+        title="Modifier la photo du groupe"
+        class="absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-brand-blue text-white shadow-md transition hover:brightness-110">
+        <i class="fa-solid fa-camera text-sm text-white"></i>
+      </button>
     </div>
 
+    <h3 id="groupInfoName"
+      class="mt-3 break-words text-lg font-bold text-brand-blue"></h3>
+
+    <p id="groupInfoDescription"
+      class="mt-1 break-words text-sm text-slate-500"></p>
+  </div>
+    <div id="groupInfoMembersSection" class="flex min-h-0 flex-1 flex-col"></div>
     {{-- MEMBRES --}}
     <div class="mt-5 border-t border-slate-100 pt-4">
       <p class="mb-2 text-sm font-semibold text-brand-blue">
@@ -170,6 +186,35 @@
     </div>
 
     <div id="groupInfoMembers" class="min-h-0 flex-1 space-y-1 overflow-y-auto"></div>
+    </div>
+
+        </div>
+
+    {{-- AJOUTER DES MEMBRES --}}
+    <div id="addMembersSection" class="mt-5 hidden min-h-0 flex-1 flex-col border-t border-slate-100 pt-4">
+      <p class="mb-2 text-sm font-semibold text-brand-blue">
+        Ajouter des membres
+        (<span id="addMembersSelectedCount">0</span> sélectionné(s))
+      </p>
+
+      <input id="addMembersSearch" type="search" placeholder="Rechercher un utilisateur..."
+        aria-label="Rechercher un utilisateur à ajouter"
+        class="app-input mb-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:border-brand-blue focus:outline-none">
+
+      <div id="addMembersList" class="min-h-0 flex-1 space-y-1 overflow-y-auto"></div>
+
+      <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <button type="button" id="cancelAddMembers"
+          class="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+          Annuler
+        </button>
+        <button type="button" id="confirmAddMembers" disabled
+          class="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-brand-accent px-4 py-2.5 text-sm font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50">
+          <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+          <span>Ajouter</span>
+        </button>
+      </div>
+    </div>
 
     <p id="groupInfoError" role="alert"
       class="mt-3 hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"></p>

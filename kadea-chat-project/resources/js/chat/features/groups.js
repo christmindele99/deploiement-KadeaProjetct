@@ -422,6 +422,7 @@ async function openGroupInfo() {
 function closeGroupInfo() {
   if (!groupInfoModal) return
   closeGroupInfoMenu()
+  closeAddMembers()
   groupInfoModal.classList.add('hidden')
   groupInfoModal.classList.remove('flex')
 }
@@ -456,9 +457,200 @@ function handleGroupAction(action) {
       return
     }
 
+    if (action === 'add-admin') {
+      openAddMembers()
+      return
+    }
+
     // Les étapes suivantes viendront ici.
     console.log('Action de groupe :', action)
   }
+
+
+
+  // ==================================================
+// AJOUTER DES MEMBRES AU GROUPE
+// ==================================================
+
+const groupInfoMembersSection = $('#groupInfoMembersSection')
+
+const addMembersSection = $('#addMembersSection')
+
+const addMembersSearch = $('#addMembersSearch')
+
+const addMembersList = $('#addMembersList')
+
+const addMembersSelectedCount = $('#addMembersSelectedCount')
+
+const cancelAddMembersButton = $('#cancelAddMembers')
+
+const confirmAddMembersButton = $('#confirmAddMembers')
+
+const selectedNewMemberIds = new Set()
+
+let isAddingMembers = false
+
+const ADD_MEMBERS_BUTTON_HTML =
+  '<i class="fa-solid fa-user-plus" aria-hidden="true"></i><span>Ajouter</span>'
+
+function updateAddMembersUI() {
+  if (addMembersSelectedCount) {
+    addMembersSelectedCount.textContent = String(selectedNewMemberIds.size)
+  }
+
+  // Le bouton Ajouter n'est cliquable que si au moins un utilisateur est coché
+  if (confirmAddMembersButton) {
+    confirmAddMembersButton.disabled =
+      isAddingMembers || selectedNewMemberIds.size === 0
+  }
+}
+
+function renderAddMembersList(query = '') {
+  if (!addMembersList || !state.groupInfo) return
+
+  const currentMemberIds = new Set(
+    state.groupInfo.members.map((member) => Number(member.id))
+  )
+
+  const normalizedQuery = query.trim().toLowerCase()
+
+  // Uniquement les utilisateurs qui ne sont pas encore membres
+  const users = state.registeredUsers
+    .filter((user) => !currentMemberIds.has(Number(user.id)))
+    .filter(
+      (user) =>
+        (user.fullName || '').toLowerCase().includes(normalizedQuery) ||
+        (user.username || '').toLowerCase().includes(normalizedQuery)
+    )
+
+  addMembersList.replaceChildren()
+
+  if (!users.length) {
+    const empty = document.createElement('p')
+
+    empty.className = 'py-4 text-center text-sm text-gray-500'
+    empty.textContent = normalizedQuery
+      ? 'Aucun utilisateur trouvé.'
+      : 'Tous les utilisateurs sont déjà membres du groupe.'
+
+    addMembersList.appendChild(empty)
+
+    return
+  }
+
+  users.forEach((user) => {
+    const label = document.createElement('label')
+
+    label.className =
+      'flex w-full cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors hover:bg-emerald-50'
+
+    const checkbox = document.createElement('input')
+
+    checkbox.type = 'checkbox'
+    checkbox.className = 'h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
+    checkbox.checked = selectedNewMemberIds.has(Number(user.id))
+
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        selectedNewMemberIds.add(Number(user.id))
+      } else {
+        selectedNewMemberIds.delete(Number(user.id))
+      }
+
+      updateAddMembersUI()
+    })
+
+    const userItem = createUserElement(user)
+
+    label.append(checkbox, ...userItem.childNodes)
+    addMembersList.appendChild(label)
+  })
+}
+
+function openAddMembers() {
+  if (!state.groupInfo || state.groupInfo.myRole !== 'admin') return
+  if (!groupInfoMembersSection || !addMembersSection) return
+
+  selectedNewMemberIds.clear()
+  addMembersSearch.value = ''
+  showGroupInfoError('')
+
+  // Cacher la partie "Membres", afficher la liste des non-membres
+  groupInfoMembersSection.classList.add('hidden')
+  groupInfoMembersSection.classList.remove('flex')
+
+  addMembersSection.classList.remove('hidden')
+  addMembersSection.classList.add('flex')
+
+  renderAddMembersList()
+  updateAddMembersUI()
+
+  if (!state.registeredUsers.length) {
+    loadRegisteredUsers().then(() => renderAddMembersList())
+  }
+}
+
+function closeAddMembers() {
+  if (isAddingMembers) return
+  if (!groupInfoMembersSection || !addMembersSection) return
+
+  addMembersSection.classList.add('hidden')
+  addMembersSection.classList.remove('flex')
+
+  groupInfoMembersSection.classList.remove('hidden')
+  groupInfoMembersSection.classList.add('flex')
+
+  selectedNewMemberIds.clear()
+  showGroupInfoError('')
+}
+
+async function confirmAddMembers() {
+  if (isAddingMembers || !selectedNewMemberIds.size || !state.groupInfo) return
+
+  const conversationId = state.selectedConversationId
+
+  isAddingMembers = true
+  showGroupInfoError('')
+
+  confirmAddMembersButton.disabled = true
+  confirmAddMembersButton.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Ajout...</span>'
+
+  try {
+    await api(`/conversations/${conversationId}/group/members`, {
+      method: 'POST',
+      body: JSON.stringify({
+        memberIds: Array.from(selectedNewMemberIds),
+      }),
+    })
+
+    // Recharger les infos du groupe pour afficher les nouveaux membres
+    const result = await api(`/conversations/${conversationId}/group`)
+
+    state.groupInfo = result.data
+
+    isAddingMembers = false
+    closeAddMembers()
+
+    groupInfoSearch.value = ''
+    renderGroupInfoMembers()
+  } catch (error) {
+    if (error.message === 'SESSION_EXPIRED') {
+      window.location.reload()
+      return
+    }
+
+    showGroupInfoError(
+      error.message.startsWith('REQUEST_FAILED')
+        ? "Impossible d'ajouter les membres. Réessaie."
+        : error.message
+    )
+  } finally {
+    isAddingMembers = false
+    confirmAddMembersButton.innerHTML = ADD_MEMBERS_BUTTON_HTML
+    updateAddMembersUI()
+  }
+}
 
 // ==================================================
 // MODIFIER LE NOM ET LA DESCRIPTION DU GROUPE
@@ -673,6 +865,14 @@ export function setupGroups() {
     if (event.target === editGroupModal) {
       closeEditGroupModal()
     }
+  })
+
+    cancelAddMembersButton?.addEventListener('click', closeAddMembers)
+
+  confirmAddMembersButton?.addEventListener('click', confirmAddMembers)
+
+  addMembersSearch?.addEventListener('input', () => {
+    renderAddMembersList(addMembersSearch.value)
   })
 
 }

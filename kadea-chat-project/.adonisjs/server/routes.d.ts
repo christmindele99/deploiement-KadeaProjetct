@@ -42,6 +42,7 @@ export type ScannedRoutes = {
     'groups.store': { paramsTuple?: []; params?: {} }
     'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -97,6 +98,7 @@ export type ScannedRoutes = {
     'messages.store': { paramsTuple?: []; params?: {} }
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.store': { paramsTuple?: []; params?: {} }
+    'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   PATCH: {
