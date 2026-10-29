@@ -173,23 +173,24 @@
     <p id="groupInfoDescription"
       class="mt-1 break-words text-sm text-slate-500"></p>
   </div>
-    <div id="groupInfoMembersSection" class="flex min-h-0 flex-1 flex-col"></div>
-    {{-- MEMBRES --}}
-    <div class="mt-5 border-t border-slate-100 pt-4">
-      <p class="mb-2 text-sm font-semibold text-brand-blue">
-        Membres (<span id="groupInfoMembersCount">0</span>)
-      </p>
 
-      <input id="groupInfoSearch" type="search" placeholder="Rechercher un membre..."
-        aria-label="Rechercher un membre"
-        class="app-input mb-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:border-brand-blue focus:outline-none">
+      <div id="groupInfoMembersSection" class="flex min-h-0 flex-1 flex-col">
+
+      {{-- MEMBRES --}}
+      <div class="mt-5 border-t border-slate-100 pt-4">
+        <p class="mb-2 text-sm font-semibold text-brand-blue">
+          Membres (<span id="groupInfoMembersCount">0</span>)
+        </p>
+
+        <input id="groupInfoSearch" type="search" placeholder="Rechercher un membre..."
+          aria-label="Rechercher un membre"
+          class="app-input mb-2 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm focus:border-brand-blue focus:outline-none">
+      </div>
+
+      <div id="groupInfoMembers" class="min-h-0 flex-1 space-y-1 overflow-y-auto"></div>
+
     </div>
-
-    <div id="groupInfoMembers" class="min-h-0 flex-1 space-y-1 overflow-y-auto"></div>
-    </div>
-
-        </div>
-
+    
     {{-- AJOUTER DES MEMBRES --}}
     <div id="addMembersSection" class="mt-5 hidden min-h-0 flex-1 flex-col border-t border-slate-100 pt-4">
       <p class="mb-2 text-sm font-semibold text-brand-blue">
