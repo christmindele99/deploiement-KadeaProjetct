@@ -11,6 +11,12 @@
         document.documentElement.classList.add('dark')
       }
     </script>
+    <script>
+      // Arrivée depuis une autre page avec /chat#users : on prépare le mode utilisateurs avant le premier affichage
+      if (location.hash === '#users' && window.innerWidth >= 768) {
+        document.documentElement.classList.add('users-mode')
+      }
+    </script>
     @include('components/link')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @include('components/scripts_tailwind')
@@ -20,10 +26,12 @@
     <div id="app" class="app-surface flex h-full w-full overflow-hidden bg-white">
       @include('components/chat/desktop_navigation')
       @include('components/chat/conversation_list')
+      @include('components/chat/users_list')
       {{-- ZONE PRINCIPALE --}}
       <main id="mainPanel"
         class="app-surface relative hidden h-full min-w-0 w-full flex-1 flex-col bg-white">
         @include('components/chat/interface_message_info')
+        @include('components/chat/interface_info_user')
         {{-- CONVERSATION --}}
         <div id="chatContent" class="hidden min-h-0 flex-1 flex-col">
           @include('components/chat/header_message')        

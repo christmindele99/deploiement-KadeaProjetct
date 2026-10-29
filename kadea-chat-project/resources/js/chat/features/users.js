@@ -1,28 +1,31 @@
-import { closeNewChatButton, contactSearch, mobileNewChatButton, newChatContacts, newChatModal, openNewChatButton, state } from './state.js'
-import { api, getCurrentUserId, getData, getUserInitials } from './utils.js'
+import { exitConversationSelectionMode, openChatWithUser, setActiveNavigation } from './conversations.js'
+import { app, closeNewChatButton, contactSearch, mobileNewChatButton, newChatContacts, newChatModal, openNewChatButton, state, usersButton, usersPanelList, usersSearch } from './state.js'
+import { api, getCurrentUserId, getData, getUserInitials, isMobile } from './utils.js'
 
 // ==================================================
 // UTILISATEURS
 // ==================================================
 
-function showUsersMessage(message, isError = false) {
-  if (!newChatContacts) {
-    return
-  }
+function showUsersMessage(
+  message,
+  isError = false,
+  containers = [newChatContacts, usersPanelList]
+) {
+  containers.forEach((container) => {
+    if (!container) {
+      return
+    }
 
-  newChatContacts.replaceChildren()
+    container.replaceChildren()
 
-  const paragraph = document.createElement('p')
+    const paragraph = document.createElement('p')
 
-  paragraph.className = 'py-4 text-center text-sm'
+    paragraph.className = 'py-4 text-center text-sm'
+    paragraph.classList.add(isError ? 'text-red-500' : 'text-gray-500')
+    paragraph.textContent = message
 
-  paragraph.classList.add(
-    isError ? 'text-red-500' : 'text-gray-500'
-  )
-
-  paragraph.textContent = message
-
-  newChatContacts.appendChild(paragraph)
+    container.appendChild(paragraph)
+  })
 }
 
 export function createUserElement(user) {
@@ -91,8 +94,8 @@ export function createUserElement(user) {
   return item
 }
 
-function renderRegisteredUsers(query = '') {
-  if (!newChatContacts) {
+function renderUsersList(container, query = '') {
+  if (!container) {
     return
   }
 
@@ -100,18 +103,10 @@ function renderRegisteredUsers(query = '') {
   const normalizedQuery = query.trim().toLowerCase()
 
   const filteredUsers = state.registeredUsers
-    .filter(
-      (user) =>
-        Number(user.id) !== Number(currentUserId)
-    )
+    .filter((user) => Number(user.id) !== Number(currentUserId))
     .filter((user) => {
-      const fullName = (
-        user.fullName || ''
-      ).toLowerCase()
-
-      const username = (
-        user.username || ''
-      ).toLowerCase()
+      const fullName = (user.fullName || '').toLowerCase()
+      const username = (user.username || '').toLowerCase()
 
       return (
         fullName.includes(normalizedQuery) ||
@@ -119,21 +114,29 @@ function renderRegisteredUsers(query = '') {
       )
     })
 
-  newChatContacts.replaceChildren()
+  container.replaceChildren()
 
   if (!filteredUsers.length) {
     showUsersMessage(
       normalizedQuery
         ? 'Aucun utilisateur ne correspond à ta recherche.'
-        : 'Aucun autre utilisateur inscrit pour le moment.'
+        : 'Aucun autre utilisateur inscrit pour le moment.',
+      false,
+      [container]
     )
 
     return
   }
 
   filteredUsers.forEach((user) => {
-    newChatContacts.appendChild(createUserElement(user))
+    container.appendChild(createUserElement(user))
   })
+}
+
+// Met à jour la liste de la modale ET celle du panneau Utilisateurs
+function renderRegisteredUsers() {
+  renderUsersList(newChatContacts, contactSearch?.value || '')
+  renderUsersList(usersPanelList, usersSearch?.value || '')
 }
 
 export async function loadRegisteredUsers() {
@@ -184,6 +187,39 @@ export function closeNewChatModal() {
   newChatModal.classList.remove('flex')
 }
 
+
+// ==================================================
+// MODE UTILISATEURS (desktop)
+// ==================================================
+
+export function enterUsersMode() {
+  if (isMobile() || state.usersMode) {
+    return
+  }
+
+  exitConversationSelectionMode()
+
+  state.usersMode = true
+  app.classList.add('users-mode')
+
+  if (usersSearch) {
+    usersSearch.value = ''
+  }
+
+  loadRegisteredUsers()
+}
+
+function exitUsersMode() {
+  if (!state.usersMode) {
+    return
+  }
+
+  state.usersMode = false
+  app.classList.remove('users-mode')
+
+  setActiveNavigation('chats')
+}
+
 // Branche les écouteurs d'événements de cette fonctionnalité
 export function setupUsers() {
   openNewChatButton?.addEventListener(
@@ -209,6 +245,63 @@ export function setupUsers() {
 
   contactSearch?.addEventListener('input', () => {
     renderRegisteredUsers(contactSearch.value)
+  })
+
+    // ----- Mode Utilisateurs (desktop) -----
+    usersButton?.addEventListener('click', (event) => {
+    // Sur la page du chat on reste sur la page ; ailleurs le lien mène à /chat#users
+    event.preventDefault()
+    enterUsersMode()
+  })
+
+  usersSearch?.addEventListener('input', () => {
+    renderRegisteredUsers()
+  })
+
+  usersPanelList?.addEventListener('click', (event) => {
+    const target = event.target
+
+    if (!(target instanceof Element)) {
+      return
+    }
+
+    const button = target.closest('[data-start-chat]')
+
+    if (!button) {
+      return
+    }
+
+    const user = state.registeredUsers.find(
+      (item) => String(item.id) === button.dataset.startChat
+    )
+
+    if (!user || Number(user.id) === Number(getCurrentUserId())) {
+      return
+    }
+
+    exitUsersMode()
+    openChatWithUser(user)
+  })
+
+  // Icône Chats : revenir aux conversations sans recharger la page
+  document
+    .querySelectorAll('[data-section="chats"]')
+    .forEach((link) => {
+      link.addEventListener('click', (event) => {
+        if (!state.usersMode) {
+          return
+        }
+
+        event.preventDefault()
+        exitUsersMode()
+      })
+    })
+
+  // Si la fenêtre devient mobile, on quitte le mode Utilisateurs
+  window.addEventListener('resize', () => {
+    if (isMobile()) {
+      exitUsersMode()
+    }
   })
 
 }

@@ -1,0 +1,35 @@
+{{-- PANNEAU UTILISATEURS (desktop) --}}
+<section
+  id="usersPanel"
+  class="app-panel min-h-0 w-full shrink-0 flex-col border-slate-200 bg-white md:w-80 md:border-r lg:w-96"
+>
+  <div class="space-y-4 p-4 pb-3 sm:p-5">
+    <h1 class="font-artega text-2xl font-bold tracking-wide text-brand-blue">
+      Utilisateurs
+    </h1>
+
+    <div class="relative">
+      <i
+        class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-brand-blue/60"
+      ></i>
+
+      <input
+        id="usersSearch"
+        type="search"
+        placeholder="Rechercher un utilisateur..."
+        aria-label="Rechercher un utilisateur"
+        class="app-input w-full rounded-full border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-brand-blue placeholder-slate-400 focus:border-brand-blue focus:outline-none"
+      >
+    </div>
+  </div>
+
+  <div
+    id="usersPanelList"
+    class="min-h-0 flex-1 space-y-1 overflow-y-auto p-3"
+    aria-live="polite"
+  >
+    <p class="p-4 text-center text-sm text-slate-500">
+      Chargement des utilisateurs...
+    </p>
+  </div>
+</section>

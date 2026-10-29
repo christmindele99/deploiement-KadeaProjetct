@@ -17,6 +17,10 @@ export const closeNewChatButton = $('#closeNewChat')
 export const newChatContacts = $('#newChatContacts')
 export const contactSearch = $('#contactSearch')
 export const chatItems = $('#chatItems')
+export const app = $('#app')
+export const usersButton = $('#usersButton')
+export const usersPanelList = $('#usersPanelList')
+export const usersSearch = $('#usersSearch')
 
 // ==================================================
 // SÉLECTION DES CONVERSATIONS
@@ -121,6 +125,7 @@ export const state = {
   creatingGroup: false,
   groupInfo: null,
   savingGroupInfo: false,
+  usersMode: false
 }
 
 export const conversationSubscriptions = new Map()

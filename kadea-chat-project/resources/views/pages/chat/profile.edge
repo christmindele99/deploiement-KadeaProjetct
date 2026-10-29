@@ -46,23 +46,14 @@
         </a>
 
         <a
-          href="/users"
+          href="/chat#users"
+          data-section="users"
           title="Utilisateurs"
           aria-label="Utilisateurs"
           id="usersButton"
-          class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/users' ? 'bg-brand-accent text-brand-blue' : '' }}"
+          class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4]"
         >
           <i class="fa-solid fa-user-group text-lg"></i>
-        </a>
-
-        <a
-          href="/groups"
-          title="Groupes"
-          aria-label="Groupes"
-          id="groupsButton"
-          class="nav-item flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-brand-blue transition duration-200 hover:bg-[#e8fff4] {{ request.url() === '/groups' ? 'bg-brand-accent text-brand-blue' : '' }}"
-        >
-          <i class="fa-solid fa-users text-lg"></i>
         </a>
 
       </nav>

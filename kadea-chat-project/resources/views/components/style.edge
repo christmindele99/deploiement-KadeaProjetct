@@ -574,4 +574,20 @@
       background-color: #1e293b;
     }
 
+    /* MODE UTILISATEURS (desktop) */
+    #usersPanel,
+    #usersInfoState {
+      display: none;
+    }
+
+    #app.users-mode #usersPanel,
+    #app.users-mode #usersInfoState {
+      display: flex;
+    }
+
+    #app.users-mode #conversationList,
+    #app.users-mode #emptyChatState,
+    #app.users-mode #chatContent {
+      display: none !important;
+    }
   </style>

@@ -253,7 +253,7 @@ function enterConversationSelectionMode() {
   updateSelectionUI()
 }
 
-function exitConversationSelectionMode() {
+export function exitConversationSelectionMode() {
   state.conversationSelectionMode = false
   selectedConversationIds.clear()
 
@@ -1125,6 +1125,27 @@ function startConversationWithUser(user) {
   })
 }
 
+
+export function openChatWithUser(user) {
+  const existing = state.conversations.find((conversation) => {
+    if (conversation.groupId) {
+      return false
+    }
+
+    const peer = getConversationUser(conversation)
+
+    return peer && Number(peer.id) === Number(user.id)
+  })
+
+  if (existing) {
+    closeNewChatModal()
+    selectConversation(existing.id)
+    return
+  }
+
+  startConversationWithUser(user)
+}
+
 // ==================================================
 // FILTRES
 // ==================================================
@@ -1237,23 +1258,7 @@ export function setupConversations() {
       return
     }
 
-    const existing = state.conversations.find((conversation) => {
-      if (conversation.groupId) {
-        return false
-      }
-
-      const peer = getConversationUser(conversation)
-
-      return peer && Number(peer.id) === Number(user.id)
-    })
-
-    if (existing) {
-      closeNewChatModal()
-      selectConversation(existing.id)
-      return
-    }
-
-    startConversationWithUser(user)
+    openChatWithUser(user)
   })
 
   // ==================================================
