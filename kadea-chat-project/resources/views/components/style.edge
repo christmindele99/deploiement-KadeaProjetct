@@ -457,5 +457,70 @@
     html.dark #messageList [data-message-sender="them"] [data-message-options] {
       color: #ffffff !important;
     }
+
+
+    /* Mode clair : icônes vertes et textes bleus */
+    html:not(.dark) #groupInfoMenu button i {
+      color: #10b981 !important;
+    }
+
+    html:not(.dark) #groupInfoMenu button span {
+      color: #075e8d !important;
+    }
+
+    /* Mode sombre : icônes vertes et textes blancs */
+    html.dark #groupInfoMenu button i {
+      color: #10b981 !important;
+    }
+
+    html.dark #groupInfoMenu button span {
+      color: #ffffff !important;
+    }
     
+    
+  /* ==========================================
+   MENU DES OPTIONS DES CONVERSATIONS
+   ========================================== */
+
+    /* Icônes vertes en mode clair et sombre */
+    [data-conversation-menu] button i {
+      color: #10b981 !important;
+    }
+
+    /* Mode clair : textes noirs */
+    html:not(.dark) [data-conversation-menu] button span {
+      color: #000000 !important;
+    }
+
+    /* Mode sombre : textes blancs */
+    html.dark [data-conversation-menu] button span {
+      color: #ffffff !important;
+    }
+
+    /* Mode clair : fond blanc et bordures claires */
+    html:not(.dark) [data-conversation-menu] {
+      background-color: #ffffff;
+      border-color: #e2e8f0;
+    }
+
+    /* Mode sombre : fond sombre et bordures adaptées */
+    html.dark [data-conversation-menu] {
+      background-color: #0f172a;
+      border-color: #334155;
+    }
+
+    /* Mode sombre : bordures entre les options */
+    html.dark [data-conversation-menu] button {
+      border-color: #334155;
+    }
+
+    /* Survol en mode sombre */
+    html.dark [data-conversation-menu] button:hover {
+      background-color: #1e293b;
+    }
+
+    /* Survol en mode clair */
+    html:not(.dark) [data-conversation-menu] button:hover {
+      background-color: #f1f5f9;
+    }
   </style>
