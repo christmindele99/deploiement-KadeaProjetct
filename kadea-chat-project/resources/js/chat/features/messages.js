@@ -1,7 +1,7 @@
 import { loadConversations, updateConversationPreview, updateLastMessageAfterDeletion } from './conversations.js'
 import { handleMessageUpdated, subscribeToConversation } from './realtime.js'
 import { cancelDeleteMessages, cancelMessageSelection, closeDeleteMessagesConfirm, confirmDeleteMessages, deleteMessagesConfirmMessage, deleteMessagesConfirmModal, deleteMessagesConfirmTitle, deleteMessagesError, deleteSelectedMessagesButton, messageForm, messageInput, messageList, messageSelectionCount, messageSelectionHeader, selectedMessageIds, state } from './state.js'
-import { api, formatDate, formatTime, getConversationUser, getData, getMessageDateValue, getMessageId, getMessageText, hasMessage, isMobile, isMyMessage, sortMessages, upsertMessage } from './utils.js'
+import { api, formatDate, formatTime, getConversationById, getConversationUser, getData, getMessageDateValue, getMessageId, getMessageText, hasMessage, isMobile, isMyMessage, sortMessages, upsertMessage, } from './utils.js'
 
 // ==================================================
 // MENU D'ACTIONS DES MESSAGES
@@ -362,6 +362,68 @@ async function submitMessageEdit(content) {
 // MESSAGES : MENU, CASES À COCHER ET BULLES
 // ==================================================
 
+
+// Membres du groupe ouvert (id -> membre), pour retrouver le nom des auteurs
+let groupMembersById = new Map()
+
+async function loadGroupMembers(conversationId) {
+  groupMembersById = new Map()
+
+  if (!getConversationById(conversationId)?.groupId) {
+    return
+  }
+
+  try {
+    const result = await api(`/conversations/${conversationId}/group`)
+
+    groupMembersById = new Map(
+      result.data.members.map((member) => [Number(member.id), member])
+    )
+  } catch (error) {
+    if (error.message === 'SESSION_EXPIRED') {
+      window.location.reload()
+    }
+  }
+}
+
+
+// Couleurs du nom de l'auteur : chaque utilisateur garde toujours la même
+const AUTHOR_NAME_COLORS = [
+  '#0f766e',
+  '#b45309',
+  '#7e22ce',
+  '#be123c',
+  '#1d4ed8',
+  '#15803d',
+]
+
+function createAuthorNameElement(message) {
+  const authorId = Number(message.authorId ?? message.author_id)
+
+  const author =
+  groupMembersById.get(authorId) ||
+  state.registeredUsers.find((user) => Number(user.id) === authorId)
+
+  const colorIndex = Number.isFinite(authorId)
+    ? authorId % AUTHOR_NAME_COLORS.length
+    : 0
+
+  const name = document.createElement('p')
+
+  name.style.cssText =
+    'margin:0 0 4px 0;font-size:12px;font-weight:600;line-height:1.3;' +
+    'color:#29ff9d;'
+
+  name.style.setProperty('color', '#29ff9d', 'important')
+
+  name.textContent =
+  author?.fullName ||
+  author?.username ||
+  (isMyMessage(message) ? 'Vous' : 'Utilisateur')
+
+  return name
+}
+
 function createMessageBubble(message, index) {
   const mine = isMyMessage(message)
   const messageId = getMessageId(message)
@@ -473,7 +535,17 @@ wrapper.style.cssText =
     } else {
       footer.append(actionsButton, time)
     }
-  bubble.append(text, footer)
+  
+      // Conversation de groupe : le nom de l'auteur apparaît au-dessus du message
+    const isGroupConversation = Boolean(
+      getConversationById(state.selectedConversationId)?.groupId
+    )
+
+    if (isGroupConversation) {
+      bubble.append(createAuthorNameElement(message), text, footer)
+    } else {
+      bubble.append(text, footer)
+    }
 
   // Case à cocher pour la sélection multiple.
   const checkbox = document.createElement('input')
@@ -655,6 +727,14 @@ export async function loadMessages(conversationId) {
       `/conversations/${requestedConversationId}/messages`
     )
 
+    if (
+      Number(state.selectedConversationId) !==
+      requestedConversationId
+    ) {
+      return
+    }
+
+    await loadGroupMembers(requestedConversationId)
     if (
       Number(state.selectedConversationId) !==
       requestedConversationId

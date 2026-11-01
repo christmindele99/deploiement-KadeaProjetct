@@ -800,6 +800,8 @@ export function setupGroups() {
 
   $('#chatHeaderAvatar')?.addEventListener('click', openGroupInfo)
 
+  $('#chatHeaderAvatarFallback')?.addEventListener('click', openGroupInfo)
+
   closeGroupInfoButton?.addEventListener('click', closeGroupInfo)
 
   groupInfoSearch?.addEventListener('input', () => {

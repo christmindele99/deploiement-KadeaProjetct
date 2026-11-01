@@ -902,6 +902,10 @@ export async function loadConversations(force = false) {
       headerNameElement.textContent = getConversationName(openConversation)
     }
 
+      if (openConversation) {
+      updateChatHeaderForGroup(openConversation)
+    }
+
     if (state.selectedConversationId !== null) {
       const selectedConversation = state.conversations.find(
         (conversation) =>
@@ -1000,6 +1004,52 @@ export function updateLastMessageAfterDeletion(conversationId) {
 // OUVERTURE D'UNE CONVERSATION
 // ==================================================
 
+
+
+// En-tête d'un groupe : photo (ou initiales) à gauche, nom et description à droite
+function updateChatHeaderForGroup(conversation) {
+  const headerAvatar = $('#chatHeaderAvatar')
+  const headerAvatarFallback = $('#chatHeaderAvatarFallback')
+  const headerStatus = $('#chatHeaderStatus')
+
+  if (!headerAvatarFallback) {
+    return
+  }
+
+  // Conversation privée ou nouvelle conversation : on cache les initiales de groupe
+  if (!conversation?.groupId) {
+    headerAvatarFallback.classList.add('hidden')
+    headerAvatarFallback.classList.remove('flex')
+    return
+  }
+
+  const groupName =
+    conversation.group?.name || getConversationName(conversation)
+
+  const groupAvatar = conversation.group?.avatar
+
+  if (headerStatus) {
+    headerStatus.textContent =
+      conversation.group?.description || 'Aucune description'
+  }
+
+  if (groupAvatar && headerAvatar) {
+    headerAvatar.src = groupAvatar
+    headerAvatar.alt = groupName
+    headerAvatar.classList.remove('hidden')
+
+    headerAvatarFallback.classList.add('hidden')
+    headerAvatarFallback.classList.remove('flex')
+  } else {
+    headerAvatar?.classList.add('hidden')
+
+    headerAvatarFallback.textContent = getUserInitials({ fullName: groupName })
+    headerAvatarFallback.classList.remove('hidden')
+    headerAvatarFallback.classList.add('flex')
+  }
+}
+
+
 export async function selectConversation(conversationId) {
   if (state.conversationSelectionMode) {
     toggleConversationSelection(conversationId)
@@ -1053,6 +1103,8 @@ export async function selectConversation(conversationId) {
   if (headerStatus) {
     headerStatus.textContent = 'Disponible'
   }
+
+  updateChatHeaderForGroup(conversation)
 
   emptyChatState.classList.add('hidden')
   chatContent.classList.remove('hidden')
@@ -1112,6 +1164,8 @@ function startConversationWithUser(user) {
   if (headerStatus) {
     headerStatus.textContent = 'Nouvelle conversation'
   }
+
+  updateChatHeaderForGroup(null)
 
   emptyChatState.classList.add('hidden')
   chatContent.classList.remove('hidden')
