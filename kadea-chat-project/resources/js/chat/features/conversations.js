@@ -1,4 +1,5 @@
 import { cancelEditingMessage, closeDeleteMessagesConfirmation, closeMessageMenu, exitMessageSelectionMode, hideMessageActions, loadMessages } from './messages.js'
+import { refreshPeerPresence } from './presence.js'
 import { subscribeToConversation, unsubscribeFromConversation } from './realtime.js'
 import { cancelConversationSelection, cancelDeleteConfirmButton, chatContent, chatItems, chatSearch, closeDeleteConfirmButton, conversationList, conversationSelectionCount, conversationSelectionHeader, deleteConfirmButton, deleteConfirmMessage, deleteConfirmModal, deleteConfirmTitle, deleteConversationsError, deleteMessagesConfirmModal, deleteSelectedConversationsButton, emptyChatState, mainPanel, messageInput, messageList, mobileBackToChats, mobileNavigation, newChatContacts, selectedConversationIds, state } from './state.js'
 import { closeNewChatModal } from './users.js'
@@ -1100,11 +1101,12 @@ export async function selectConversation(conversationId) {
     }
   }
 
-  if (headerStatus) {
-    headerStatus.textContent = 'Disponible'
+    if (headerStatus) {
+    headerStatus.textContent = ''
   }
 
   updateChatHeaderForGroup(conversation)
+  refreshPeerPresence()
 
   emptyChatState.classList.add('hidden')
   chatContent.classList.remove('hidden')
@@ -1162,10 +1164,11 @@ function startConversationWithUser(user) {
   }
 
   if (headerStatus) {
-    headerStatus.textContent = 'Nouvelle conversation'
+    headerStatus.textContent = ''
   }
 
   updateChatHeaderForGroup(null)
+  refreshPeerPresence()
 
   emptyChatState.classList.add('hidden')
   chatContent.classList.remove('hidden')

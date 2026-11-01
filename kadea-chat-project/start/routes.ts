@@ -20,6 +20,7 @@ const ProfilesController = () => import('#controllers/profiles_controller')
 const LogoutsController = () => import('#controllers/logouts_controller')
 const GroupsController = () => import('#controllers/groups_controller')
 const CommentsController = () => import('#controllers/comments_controller')
+const PresenceController = () => import('#controllers/presence_controller')
 
 // Afficher le formulaire d'inscription
 router
@@ -206,6 +207,9 @@ router.post('/groups', [GroupsController, 'store'])
 router.get('/conversations/:id/group', [GroupsController, 'show'])
 router.patch('/conversations/:id/group', [GroupsController, 'update'])
 router.post('/conversations/:id/group/members', [GroupsController, 'addMembers'])
+
+router.post('/presence/ping', [PresenceController, 'ping']).use(middleware.sessionAuth())
+router.get('/presence/:id', [PresenceController, 'show']).use(middleware.sessionAuth())
 
 // Déconnexion de l'utilisateur
 router

@@ -43,6 +43,8 @@ export type ScannedRoutes = {
     'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.ping': { paramsTuple?: []; params?: {} }
+    'presence.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -64,6 +66,7 @@ export type ScannedRoutes = {
     'profiles.show': { paramsTuple?: []; params?: {} }
     'confidentialite.show': { paramsTuple?: []; params?: {} }
     'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -84,6 +87,7 @@ export type ScannedRoutes = {
     'profiles.show': { paramsTuple?: []; params?: {} }
     'confidentialite.show': { paramsTuple?: []; params?: {} }
     'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'subscribe': { paramsTuple?: []; params?: {} }
@@ -99,6 +103,7 @@ export type ScannedRoutes = {
     'conversations.messages.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.store': { paramsTuple?: []; params?: {} }
     'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.ping': { paramsTuple?: []; params?: {} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   PATCH: {

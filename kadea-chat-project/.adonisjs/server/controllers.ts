@@ -16,4 +16,5 @@ export const controllers = {
   ResetPasswords: () => import('#controllers/reset_passwords_controller'),
   Users: () => import('#controllers/users_controller'),
   VerifyEmails: () => import('#controllers/verify_emails_controller'),
+  Presence: () => import('#controllers/presence_controller'),
 }
