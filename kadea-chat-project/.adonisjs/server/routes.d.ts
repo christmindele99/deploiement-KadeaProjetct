@@ -43,6 +43,7 @@ export type ScannedRoutes = {
     'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.remove_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.update_avatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
     'presence.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -119,6 +120,7 @@ export type ScannedRoutes = {
   DELETE: {
     'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'messages.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.remove_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

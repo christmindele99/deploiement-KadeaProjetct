@@ -28,34 +28,24 @@ export const usersSearch = $('#usersSearch')
 
 export const conversationSelectionHeader =
   $('#conversationSelectionHeader')
-
 export const conversationSelectionCount =
   $('#conversationSelectionCount')
-
 export const cancelConversationSelection =
   $('#cancelConversationSelection')
-
 export const deleteSelectedConversationsButton =
   $('#deleteSelectedConversationsButton')
-
 export const deleteConfirmModal =
   $('#deleteConversationsConfirmModal')
-
 export const deleteConfirmTitle =
   $('#deleteConversationsConfirmTitle')
-
 export const deleteConfirmMessage =
   $('#deleteConversationsConfirmMessage')
-
 export const deleteConfirmButton =
   $('#confirmDeleteConversations')
-
 export const closeDeleteConfirmButton =
   $('#closeDeleteConversationsConfirm')
-
 export const cancelDeleteConfirmButton =
   $('#cancelDeleteConversations')
-
 export const deleteConversationsError =
   $('#deleteConversationsError')
 
@@ -65,34 +55,24 @@ export const deleteConversationsError =
 
 export const messageSelectionHeader =
   $('#messageSelectionHeader')
-
 export const messageSelectionCount =
   $('#messageSelectionCount')
-
 export const cancelMessageSelection =
   $('#cancelMessageSelection')
-
 export const deleteSelectedMessagesButton =
   $('#deleteSelectedMessagesButton')
-
 export const deleteMessagesConfirmModal =
   $('#deleteMessagesConfirmModal')
-
 export const deleteMessagesConfirmTitle =
   $('#deleteMessagesConfirmTitle')
-
 export const deleteMessagesConfirmMessage =
   $('#deleteMessagesConfirmMessage')
-
 export const deleteMessagesError =
   $('#deleteMessagesError')
-
 export const closeDeleteMessagesConfirm =
   $('#closeDeleteMessagesConfirm')
-
 export const cancelDeleteMessages =
   $('#cancelDeleteMessages')
-
 export const confirmDeleteMessages =
   $('#confirmDeleteMessages')
 

@@ -415,8 +415,12 @@ async function openGroupInfo() {
 
 function closeGroupInfo() {
   if (!groupInfoModal) return
+
   closeGroupInfoMenu()
   closeAddMembers()
+  closeRemoveMembers()
+  closeRemoveMembersConfirm()
+
   groupInfoModal.classList.add('hidden')
   groupInfoModal.classList.remove('flex')
 }
@@ -514,19 +518,24 @@ function updateGroupInfoMenu() {
 }
 
 function handleGroupAction(action) {
-    if (action === 'edit-info') {
-      openEditGroupModal()
-      return
-    }
-
-    if (action === 'add-admin') {
-      openAddMembers()
-      return
-    }
-
-    // Les étapes suivantes viendront ici.
-    console.log('Action de groupe :', action)
+  if (action === 'edit-info') {
+    openEditGroupModal()
+    return
   }
+
+  if (action === 'add-admin') {
+    openAddMembers()
+    return
+  }
+
+  if (action === 'remove-member') {
+    openRemoveMembers()
+    return
+  }
+
+  // Les autres actions seront implémentées ensuite.
+  console.log('Action de groupe :', action)
+}
 
 
 
@@ -713,6 +722,261 @@ async function confirmAddMembers() {
     updateAddMembersUI()
   }
 }
+
+
+// ==================================================
+// RETIRER DES MEMBRES DU GROUPE
+// ==================================================
+
+const removeMembersSection = $('#removeMembersSection')
+const removeMembersSelectedCount = $('#removeMembersSelectedCount')
+const removeMembersSearch = $('#removeMembersSearch')
+const removeMembersList = $('#removeMembersList')
+
+const cancelRemoveMembersButton = $('#cancelRemoveMembers')
+const confirmRemoveMembersButton = $('#confirmRemoveMembers')
+
+const removeMembersConfirmModal = $('#removeMembersConfirmModal')
+const removeMembersConfirmMessage = $('#removeMembersConfirmMessage')
+const removeMembersConfirmError = $('#removeMembersConfirmError')
+
+const cancelRemoveMembersConfirmButton = $('#cancelRemoveMembersConfirm')
+const validateRemoveMembersButton = $('#validateRemoveMembers')
+
+const selectedRemoveMemberIds = new Set()
+
+let isRemovingMembers = false
+
+const REMOVE_MEMBERS_BUTTON_HTML =
+  '<i class="fa-solid fa-user-minus" aria-hidden="true"></i><span>Retirer</span>'
+
+const VALIDATE_REMOVE_BUTTON_HTML =
+  '<i class="fa-solid fa-trash-can" aria-hidden="true"></i><span>Confirmer</span>'
+
+// Afficher une erreur dans la fenêtre de confirmation
+function showRemoveMembersConfirmError(message) {
+  if (!removeMembersConfirmError) return
+
+  removeMembersConfirmError.textContent = message
+  removeMembersConfirmError.classList.toggle('hidden', !message)
+}
+
+// Mettre à jour le compteur et le bouton Retirer
+function updateRemoveMembersUI() {
+  if (removeMembersSelectedCount) {
+    removeMembersSelectedCount.textContent = String(
+      selectedRemoveMemberIds.size
+    )
+  }
+
+  if (confirmRemoveMembersButton) {
+    confirmRemoveMembersButton.disabled =
+      isRemovingMembers || selectedRemoveMemberIds.size === 0
+  }
+}
+
+// Afficher les membres pouvant être retirés
+function renderRemoveMembersList(query = '') {
+  if (!removeMembersList || !state.groupInfo) return
+
+  const normalizedQuery = query.trim().toLowerCase()
+
+  // Seuls les membres classiques peuvent être sélectionnés
+  const members = state.groupInfo.members
+    .filter((member) => member.roleId === 2)
+    .filter(
+      (member) =>
+        (member.fullName || '').toLowerCase().includes(normalizedQuery) ||
+        (member.username || '').toLowerCase().includes(normalizedQuery)
+    )
+    .sort((a, b) =>
+      (a.fullName || '').localeCompare(b.fullName || '', 'fr')
+    )
+
+  removeMembersList.replaceChildren()
+
+  if (!members.length) {
+    const empty = document.createElement('p')
+
+    empty.className = 'py-4 text-center text-sm text-gray-500'
+    empty.textContent = normalizedQuery
+      ? 'Aucun membre trouvé.'
+      : 'Aucun membre ne peut être retiré.'
+
+    removeMembersList.appendChild(empty)
+    return
+  }
+
+  members.forEach((member) => {
+    const label = document.createElement('label')
+
+    label.className =
+      'flex w-full cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors hover:bg-red-50'
+
+    const checkbox = document.createElement('input')
+
+    checkbox.type = 'checkbox'
+    checkbox.className =
+      'h-4 w-4 shrink-0 cursor-pointer accent-red-600'
+
+    checkbox.checked = selectedRemoveMemberIds.has(Number(member.id))
+
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        selectedRemoveMemberIds.add(Number(member.id))
+      } else {
+        selectedRemoveMemberIds.delete(Number(member.id))
+      }
+
+      updateRemoveMembersUI()
+    })
+
+    // Réutiliser l'affichage des avatars et des noms
+    const userItem = createUserElement(member)
+
+    label.append(checkbox, ...userItem.childNodes)
+    removeMembersList.appendChild(label)
+  })
+}
+
+// Ouvrir la section de sélection
+function openRemoveMembers() {
+  if (!state.groupInfo || state.groupInfo.myRole !== 'admin') return
+  if (!groupInfoMembersSection || !removeMembersSection) return
+
+  selectedRemoveMemberIds.clear()
+  removeMembersSearch.value = ''
+
+  showGroupInfoError('')
+
+  groupInfoMembersSection.classList.add('hidden')
+  groupInfoMembersSection.classList.remove('flex')
+
+  addMembersSection.classList.add('hidden')
+  addMembersSection.classList.remove('flex')
+
+  removeMembersSection.classList.remove('hidden')
+  removeMembersSection.classList.add('flex')
+
+  renderRemoveMembersList()
+  updateRemoveMembersUI()
+}
+
+// Revenir à la liste normale des membres
+function closeRemoveMembers() {
+  if (isRemovingMembers) return
+
+  if (!groupInfoMembersSection || !removeMembersSection) return
+
+  removeMembersSection.classList.add('hidden')
+  removeMembersSection.classList.remove('flex')
+
+  groupInfoMembersSection.classList.remove('hidden')
+  groupInfoMembersSection.classList.add('flex')
+
+  selectedRemoveMemberIds.clear()
+  removeMembersSearch.value = ''
+
+  updateRemoveMembersUI()
+  showGroupInfoError('')
+}
+
+// Ouvrir la fenêtre de confirmation
+function openRemoveMembersConfirm() {
+  if (!selectedRemoveMemberIds.size || isRemovingMembers) return
+
+  const count = selectedRemoveMemberIds.size
+
+  removeMembersConfirmMessage.textContent =
+    count === 1
+      ? 'Voulez-vous vraiment retirer ce membre du groupe ?'
+      : `Voulez-vous vraiment retirer ces ${count} membres du groupe ?`
+
+  showRemoveMembersConfirmError('')
+
+  removeMembersConfirmModal.classList.remove('hidden')
+  removeMembersConfirmModal.classList.add('flex')
+}
+
+// Fermer la fenêtre de confirmation
+function closeRemoveMembersConfirm() {
+  if (isRemovingMembers) return
+
+  removeMembersConfirmModal.classList.add('hidden')
+  removeMembersConfirmModal.classList.remove('flex')
+
+  showRemoveMembersConfirmError('')
+}
+
+// Envoyer la demande de retrait au serveur
+async function confirmRemoveMembers() {
+  if (
+    isRemovingMembers ||
+    !selectedRemoveMemberIds.size ||
+    !state.groupInfo
+  ) {
+    return
+  }
+
+  const conversationId = state.selectedConversationId
+
+  const memberIds = Array.from(selectedRemoveMemberIds)
+
+  isRemovingMembers = true
+
+  showRemoveMembersConfirmError('')
+
+  validateRemoveMembersButton.disabled = true
+  validateRemoveMembersButton.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Retrait...</span>'
+
+  try {
+    await api(`/conversations/${conversationId}/group/members`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        memberIds,
+      }),
+    })
+
+    // Recharger les informations du groupe
+    const result = await api(`/conversations/${conversationId}/group`)
+
+    state.groupInfo = result.data
+
+    // Fermer les fenêtres et réinitialiser la sélection
+    isRemovingMembers = false
+
+    closeRemoveMembersConfirm()
+    closeRemoveMembers()
+
+    // Afficher la nouvelle liste des membres
+    groupInfoSearch.value = ''
+    renderGroupInfoMembers()
+
+    // Actualiser la liste des conversations
+    await loadConversations(true)
+
+  } catch (error) {
+    if (error.message === 'SESSION_EXPIRED') {
+      window.location.reload()
+      return
+    }
+
+    showRemoveMembersConfirmError(
+      error.message.startsWith('REQUEST_FAILED')
+        ? 'Impossible de retirer les membres. Réessaie.'
+        : error.message
+    )
+  } finally {
+    isRemovingMembers = false
+
+    validateRemoveMembersButton.disabled = false
+    validateRemoveMembersButton.innerHTML = VALIDATE_REMOVE_BUTTON_HTML
+
+    updateRemoveMembersUI()
+  }
+}
+
 
 // ==================================================
 // MODIFIER LE NOM ET LA DESCRIPTION DU GROUPE
@@ -953,5 +1217,28 @@ export function setupGroups() {
   addMembersSearch?.addEventListener('input', () => {
     renderAddMembersList(addMembersSearch.value)
   })
+
+  // Retirer des membres
+  cancelRemoveMembersButton?.addEventListener('click', closeRemoveMembers)
+
+  confirmRemoveMembersButton?.addEventListener(
+    'click',
+    openRemoveMembersConfirm
+  )
+
+  removeMembersSearch?.addEventListener('input', () => {
+    renderRemoveMembersList(removeMembersSearch.value)
+  })
+
+  // Confirmation du retrait
+  cancelRemoveMembersConfirmButton?.addEventListener(
+    'click',
+    closeRemoveMembersConfirm
+  )
+
+  validateRemoveMembersButton?.addEventListener(
+    'click',
+    confirmRemoveMembers
+  )
 
 }

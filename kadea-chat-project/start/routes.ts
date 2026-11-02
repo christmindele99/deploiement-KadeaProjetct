@@ -208,6 +208,13 @@ router.get('/conversations/:id/group', [GroupsController, 'show'])
 router.patch('/conversations/:id/group', [GroupsController, 'update'])
 router.post('/conversations/:id/group/members', [GroupsController, 'addMembers'])
 router
+  .delete('/conversations/:id/group/members', [
+    GroupsController,
+    'removeMembers',
+  ])
+  .use(middleware.sessionAuth())
+
+router
   .patch('/conversations/:id/group/avatar', [GroupsController, 'updateAvatar'])
   .use(middleware.sessionAuth())
 
