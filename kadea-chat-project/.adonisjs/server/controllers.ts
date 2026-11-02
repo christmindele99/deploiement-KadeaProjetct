@@ -11,10 +11,10 @@ export const controllers = {
   Logins: () => import('#controllers/logins_controller'),
   Logouts: () => import('#controllers/logouts_controller'),
   Messages: () => import('#controllers/messages_controller'),
+  Presence: () => import('#controllers/presence_controller'),
   Profiles: () => import('#controllers/profiles_controller'),
   Registers: () => import('#controllers/registers_controller'),
   ResetPasswords: () => import('#controllers/reset_passwords_controller'),
   Users: () => import('#controllers/users_controller'),
   VerifyEmails: () => import('#controllers/verify_emails_controller'),
-  Presence: () => import('#controllers/presence_controller'),
 }

@@ -162,9 +162,10 @@
         id="changeGroupAvatarButton"
         aria-label="Modifier la photo du groupe"
         title="Modifier la photo du groupe"
-        class="absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-brand-blue text-white shadow-md transition hover:brightness-110">
+        class="absolute bottom-0 right-0 hidden h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-brand-blue text-white shadow-md transition hover:brightness-110">
         <i class="fa-solid fa-camera text-sm text-white"></i>
       </button>
+      <input type="file" id="groupAvatarInput" class="hidden" accept="image/*">
     </div>
 
     <h3 id="groupInfoName"

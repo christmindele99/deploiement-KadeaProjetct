@@ -207,22 +207,16 @@ async function createGroup() {
 // ==================================================
 
 const groupInfoModal = $('#groupInfoModal')
-
 const closeGroupInfoButton = $('#closeGroupInfo')
-
 const groupInfoAvatar = $('#groupInfoAvatar')
-
 const groupInfoName = $('#groupInfoName')
-
 const groupInfoDescription = $('#groupInfoDescription')
-
 const groupInfoMembersCount = $('#groupInfoMembersCount')
-
 const groupInfoSearch = $('#groupInfoSearch')
-
 const groupInfoMembers = $('#groupInfoMembers')
-
 const groupInfoError = $('#groupInfoError')
+const changeGroupAvatarButton = $('#changeGroupAvatarButton')
+const groupAvatarInput = $('#groupAvatarInput')
 
 function showGroupInfoError(message) {
   if (!groupInfoError) return
@@ -427,14 +421,80 @@ function closeGroupInfo() {
   groupInfoModal.classList.remove('flex')
 }
 
+
+function getCsrfToken() {
+  const token = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('XSRF-TOKEN='))
+  return token ? decodeURIComponent(token.split('=')[1]) : null
+}
+
+async function changeGroupAvatar(file) {
+  if (!state.groupInfo || state.groupInfo.myRole !== 'admin') return
+  showGroupInfoError('')
+
+  // Vérifier que c'est une image de 5 Mo maximum
+  if (!file.type.startsWith('image/')) {
+    showGroupInfoError('Veuillez sélectionner une image valide.')
+    return
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    showGroupInfoError('La photo ne doit pas dépasser 5 Mo.')
+    return
+  }
+
+  const conversationId = state.selectedConversationId
+  const cameraIcon = changeGroupAvatarButton?.querySelector('i')
+
+  changeGroupAvatarButton.disabled = true
+  cameraIcon?.classList.replace('fa-camera', 'fa-spinner')
+  cameraIcon?.classList.add('fa-spin')
+
+  try {
+    const formData = new FormData()
+    formData.append('avatar', file)
+    const headers = { Accept: 'application/json' }
+    const csrfToken = getCsrfToken()
+    if (csrfToken) {
+      headers['X-XSRF-TOKEN'] = csrfToken
+    }
+    const response = await fetch(`/conversations/${conversationId}/group/avatar`, {
+      method: 'PATCH',
+      headers,
+      credentials: 'same-origin',
+      body: formData,
+    })
+    const result = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      throw new Error(result.message || "Impossible d'enregistrer la photo.")
+    }
+
+    state.groupInfo.group.avatar = result.data.avatar
+
+    renderGroupInfoHeader(
+      state.groupInfo.group.name,
+      state.groupInfo.group.description,
+      state.groupInfo.group.avatar
+    )
+
+    // Met à jour la liste et l'en-tête du chat
+    await loadConversations(true)
+  } catch (error) {
+    showGroupInfoError(error.message || 'Une erreur est survenue.')
+  } finally {
+    changeGroupAvatarButton.disabled = false
+    cameraIcon?.classList.remove('fa-spin')
+    cameraIcon?.classList.replace('fa-spinner', 'fa-camera')
+  }
+}
+
 // ==================================================
 // MENU DES OPTIONS DU GROUPE (ADMIN)
 // ==================================================
 
 const groupInfoMenuWrapper = $('#groupInfoMenuWrapper')
-
 const groupInfoMenuButton = $('#groupInfoMenuButton')
-
 const groupInfoMenu = $('#groupInfoMenu')
 
 function closeGroupInfoMenu() {
@@ -445,6 +505,8 @@ function updateGroupInfoMenu() {
   const isAdmin = state.groupInfo?.myRole === 'admin'
 
   groupInfoMenuWrapper?.classList.toggle('hidden', !isAdmin)
+  changeGroupAvatarButton?.classList.toggle('hidden', !isAdmin)
+  changeGroupAvatarButton?.classList.toggle('flex', isAdmin)
 
   if (!isAdmin) {
     closeGroupInfoMenu()
@@ -801,6 +863,21 @@ export function setupGroups() {
   $('#chatHeaderAvatar')?.addEventListener('click', openGroupInfo)
 
   $('#chatHeaderAvatarFallback')?.addEventListener('click', openGroupInfo)
+
+    changeGroupAvatarButton?.addEventListener('click', () => {
+    groupAvatarInput?.click()
+  })
+
+  groupAvatarInput?.addEventListener('change', (event) => {
+    const file = event.target.files?.[0]
+
+    // Permet de choisir deux fois de suite le même fichier
+    groupAvatarInput.value = ''
+
+    if (file) {
+      changeGroupAvatar(file)
+    }
+  })
 
   closeGroupInfoButton?.addEventListener('click', closeGroupInfo)
 

@@ -18,4 +18,14 @@ export default class CloudinaryService {
       transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }],
     })
   }
+
+  static async uploadGroupAvatar(filePath: string, groupId: number) {
+    return cloudinary.uploader.upload(filePath, {
+      folder: 'kadea-chat/group-avatars',
+      public_id: `group_${groupId}`,
+      overwrite: true,
+      invalidate: true,
+      transformation: [{ width: 400, height: 400, crop: 'fill' }],
+    })
+  }
 }

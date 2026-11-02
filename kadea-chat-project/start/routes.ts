@@ -207,6 +207,9 @@ router.post('/groups', [GroupsController, 'store'])
 router.get('/conversations/:id/group', [GroupsController, 'show'])
 router.patch('/conversations/:id/group', [GroupsController, 'update'])
 router.post('/conversations/:id/group/members', [GroupsController, 'addMembers'])
+router
+  .patch('/conversations/:id/group/avatar', [GroupsController, 'updateAvatar'])
+  .use(middleware.sessionAuth())
 
 router.post('/presence/ping', [PresenceController, 'ping']).use(middleware.sessionAuth())
 router.get('/presence/:id', [PresenceController, 'show']).use(middleware.sessionAuth())

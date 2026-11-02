@@ -97,6 +97,7 @@ export default class ConversationsController {
                   id: group.id,
                   name: group.name,
                   description: group.description,
+                  avatar: group.avatarUrl,
                 }
               : null,
           }

@@ -43,6 +43,7 @@ export type ScannedRoutes = {
     'groups.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.update_avatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
     'presence.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
@@ -113,6 +114,7 @@ export type ScannedRoutes = {
     'profile.changePassword': { paramsTuple?: []; params?: {} }
     'profiles.update_avatar': { paramsTuple?: []; params?: {} }
     'groups.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'groups.update_avatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'conversations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

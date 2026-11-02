@@ -646,10 +646,11 @@ function createConversationElement(conversation) {
       ? 'bg-[#29ff9d] text-[#075e8d]'
       : 'bg-[#075e8d] text-white')
 
-  if (user?.avatar) {
-    const img = document.createElement('img')
+    const avatarUrl = user?.avatar || conversation.group?.avatar
 
-    img.src = user.avatar
+  if (avatarUrl) {
+    const img = document.createElement('img')
+    img.src = avatarUrl
     img.alt = ''
     img.className = 'h-full w-full object-cover'
 
@@ -657,7 +658,9 @@ function createConversationElement(conversation) {
       'error',
       () => {
         img.remove()
-        avatar.textContent = getUserInitials(user)
+        avatar.textContent = user
+          ? getUserInitials(user)
+          : getUserInitials({ fullName: conversation.group?.name })
       },
       { once: true }
     )

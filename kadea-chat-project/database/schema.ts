@@ -36,8 +36,10 @@ export class ConversationSchema extends BaseModel {
 }
 
 export class GroupSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'name', 'updatedAt'] as const
+  static $columns = ['avatarUrl', 'createdAt', 'description', 'id', 'name', 'updatedAt'] as const
   $columns = GroupSchema.$columns
+  @column()
+  declare avatarUrl: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
