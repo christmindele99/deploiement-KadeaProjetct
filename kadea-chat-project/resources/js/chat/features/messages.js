@@ -581,19 +581,21 @@ wrapper.style.cssText =
   }
 
 
-    // Statut du message : seulement mes messages, en conversation privée
+    // Statut du message : mes messages uniquement
+  // Conversation privée : envoyé / reçu / lu ; groupe : toujours un seul trait gris
   const isPrivateConversation = !getConversationById(state.selectedConversationId)?.groupId
 
-  if (mine && isPrivateConversation && !isDeleted) {
+  if (mine && !isDeleted) {
     const tick = document.createElement('i')
-
     tick.dataset.messageStatusTick = ''
     tick.setAttribute('aria-hidden', 'true')
-    paintStatusTick(tick, getMessageStatusId(message))
-
+    paintStatusTick(
+      tick,
+      isPrivateConversation ? getMessageStatusId(message) : MESSAGE_STATUS.SENT
+    )
     time.appendChild(tick)
   }
-  
+
 
   if (isDeleted && !mine) {
       footer.style.justifyContent = 'flex-end'
