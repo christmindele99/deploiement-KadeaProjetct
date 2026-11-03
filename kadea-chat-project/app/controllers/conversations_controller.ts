@@ -4,6 +4,7 @@ import Membership from '#models/membership'
 import User from '#models/user'
 import Message from '#models/message'
 import Group from '#models/group'
+import MessageStatusService from '#services/message_status_service'
 
 export default class ConversationsController {
   /**
@@ -178,6 +179,8 @@ export default class ConversationsController {
       .where('conversationId', conversationId)
       .update({ last_read_at: new Date() })
 
+    // Les messages de l'autre personne deviennent "Lu" (conversations privées)
+    await MessageStatusService.markReadIn(conversationId, userId)
     return response.ok({
       data: conversation,
     })

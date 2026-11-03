@@ -424,6 +424,57 @@ function createAuthorNameElement(message) {
   return name
 }
 
+// Statuts des messages : 1 = Envoyé, 2 = Reçu, 3 = Lu
+const MESSAGE_STATUS = { SENT: 1, RECEIVED: 2, READ: 3 }
+
+function getMessageStatusId(message) {
+  return Number(
+    message.messageStatusId ?? message.message_status_id ?? MESSAGE_STATUS.SENT
+  )
+}
+
+// Dessine le(s) trait(s) selon le statut
+function paintStatusTick(tick, statusId) {
+  const labels = { 1: 'Envoyé', 2: 'Reçu', 3: 'Lu' }
+
+  tick.dataset.status = String(statusId)
+  tick.title = labels[statusId] || 'Envoyé'
+  tick.setAttribute('aria-label', tick.title)
+
+  tick.className =
+    'fa-solid text-[10px] ' +
+    (statusId === MESSAGE_STATUS.SENT ? 'fa-check' : 'fa-check-double')
+
+  // Gris pour envoyé et reçu, bleu pour lu
+  tick.style.color = statusId === MESSAGE_STATUS.READ ? '#38bdf8' : '#cbd5e1'
+}
+
+// Appelée par realtime.js quand le serveur annonce un changement de statut
+export function applyMessageStatus(conversationId, messageIds, statusId) {
+  const ids = new Set(messageIds.map(Number))
+
+  state.currentMessages = state.currentMessages.map((message) =>
+    ids.has(getMessageId(message)) && getMessageStatusId(message) < statusId
+      ? { ...message, messageStatusId: statusId }
+      : message
+  )
+
+  if (Number(state.selectedConversationId) !== Number(conversationId)) {
+    return
+  }
+
+  ids.forEach((id) => {
+    const tick = messageList.querySelector(
+      `[data-message-row][data-message-id="${id}"] [data-message-status-tick]`
+    )
+
+    // On ne revient jamais en arrière (Lu ne redevient pas Reçu)
+    if (tick && Number(tick.dataset.status) < statusId) {
+      paintStatusTick(tick, statusId)
+    }
+  })
+}
+
 function createMessageBubble(message, index) {
   const mine = isMyMessage(message)
   const messageId = getMessageId(message)
@@ -529,7 +580,22 @@ wrapper.style.cssText =
     time.appendChild(edited)
   }
 
-    if (isDeleted && !mine) {
+
+    // Statut du message : seulement mes messages, en conversation privée
+  const isPrivateConversation = !getConversationById(state.selectedConversationId)?.groupId
+
+  if (mine && isPrivateConversation && !isDeleted) {
+    const tick = document.createElement('i')
+
+    tick.dataset.messageStatusTick = ''
+    tick.setAttribute('aria-hidden', 'true')
+    paintStatusTick(tick, getMessageStatusId(message))
+
+    time.appendChild(tick)
+  }
+  
+
+  if (isDeleted && !mine) {
       footer.style.justifyContent = 'flex-end'
       footer.append(time)
     } else {

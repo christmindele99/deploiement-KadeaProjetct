@@ -3,6 +3,8 @@ import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import transmit from '@adonisjs/transmit/services/main'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { isUserOnline } from '#controllers/presence_controller'
+import { MESSAGE_STATUS } from '#services/message_status_service'
 
 import Conversation from '#models/conversation'
 import Membership from '#models/membership'
@@ -333,6 +335,7 @@ export default class MessagesController {
             conversationId: conversation.id,
             content: content.trim(),
             deletedAt: null,
+            messageStatusId: MESSAGE_STATUS.SENT,
           },
           { client: trx }
         )
@@ -424,7 +427,22 @@ export default class MessagesController {
     message.editedAt = DateTime.now()
     await message.save()
 
-    const data = message.serialize()
+          // Si le destinataire est déjà en ligne, le message est directement "Reçu"
+      const sentConversation = await Conversation.find(message.conversationId)
+
+      if (sentConversation && !sentConversation.groupId && sentConversation.pairKey) {
+        const peerId = sentConversation.pairKey
+          .split(':')
+          .map(Number)
+          .find((id) => id !== userId)
+
+        if (peerId && isUserOnline(peerId)) {
+          message.messageStatusId = MESSAGE_STATUS.RECEIVED
+          await message.save()
+        }
+      }
+
+      const data = message.serialize()
 
     await this.publish(
       Number(message.conversationId),

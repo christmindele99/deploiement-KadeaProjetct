@@ -71,8 +71,17 @@ export class MembershipSchema extends BaseModel {
   declare userId: number
 }
 
+export class MessageStatusSchema extends BaseModel {
+  static $columns = ['id', 'status'] as const
+  $columns = MessageStatusSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare status: string
+}
+
 export class MessageSchema extends BaseModel {
-  static $columns = ['authorId', 'content', 'conversationId', 'createdAt', 'deletedAt', 'editedAt', 'id'] as const
+  static $columns = ['authorId', 'content', 'conversationId', 'createdAt', 'deletedAt', 'editedAt', 'id', 'messageStatusId'] as const
   $columns = MessageSchema.$columns
   @column()
   declare authorId: number
@@ -88,6 +97,8 @@ export class MessageSchema extends BaseModel {
   declare editedAt: DateTime | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare messageStatusId: number
 }
 
 export class RoleSchema extends BaseModel {

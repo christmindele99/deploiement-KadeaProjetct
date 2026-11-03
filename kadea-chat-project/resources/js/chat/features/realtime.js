@@ -1,6 +1,6 @@
 import { Transmit } from '@adonisjs/transmit-client'
 import { countedUnreadMessageIds, loadConversations, markConversationAsRead, setUnreadCount, updateConversationPreview, updateLastMessageAfterDeletion } from './conversations.js'
-import { renderMessages } from './messages.js'
+import { applyMessageStatus, renderMessages } from './messages.js'
 import { conversationSubscriptions, selectedMessageIds, state } from './state.js'
 import { getConversationById, getCurrentUserId, getMessageConversationId, getMessageId, hasMessage, isMyMessage, upsertMessage } from './utils.js'
 
@@ -133,6 +133,15 @@ function handleRealtimePayload(payload) {
 
   if (eventType === 'message.deleted') {
     handleMessageDeleted(message)
+    return
+  }
+
+
+    if (eventType === 'message.status') {
+    if (message?.messageIds) {
+      applyMessageStatus(message.conversationId, message.messageIds, message.statusId)
+    }
+
     return
   }
 
