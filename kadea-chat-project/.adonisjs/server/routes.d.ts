@@ -47,6 +47,7 @@ export type ScannedRoutes = {
     'groups.update_avatar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
     'presence.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'presence.typing': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   GET: {
@@ -106,6 +107,7 @@ export type ScannedRoutes = {
     'groups.store': { paramsTuple?: []; params?: {} }
     'groups.add_members': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'presence.ping': { paramsTuple?: []; params?: {} }
+    'presence.typing': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'logout.destroy': { paramsTuple?: []; params?: {} }
   }
   PATCH: {

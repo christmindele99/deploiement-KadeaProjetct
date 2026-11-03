@@ -2,6 +2,7 @@ import { Transmit } from '@adonisjs/transmit-client'
 import { countedUnreadMessageIds, loadConversations, markConversationAsRead, setUnreadCount, updateConversationPreview, updateLastMessageAfterDeletion } from './conversations.js'
 import { applyMessageStatus, renderMessages } from './messages.js'
 import { conversationSubscriptions, selectedMessageIds, state } from './state.js'
+import { hideTypingIndicator, showTypingIndicator } from './typing.js'
 import { getConversationById, getCurrentUserId, getMessageConversationId, getMessageId, hasMessage, isMyMessage, upsertMessage } from './utils.js'
 
 // ==================================================
@@ -23,6 +24,11 @@ function handleMessageCreated(message) {
     conversationId <= 0
   ) {
     return
+  }
+
+  // Le message de l'autre personne est arrivé : plus besoin de "en train d'écrire"
+    if (!isMyMessage(message)) {
+    hideTypingIndicator(conversationId)
   }
 
   const alreadyExists = hasMessage(messageId)
@@ -140,6 +146,14 @@ function handleRealtimePayload(payload) {
     if (eventType === 'message.status') {
     if (message?.messageIds) {
       applyMessageStatus(message.conversationId, message.messageIds, message.statusId)
+    }
+
+    return
+  }
+
+  if (eventType === 'user.typing') {
+    if (message?.conversationId) {
+      showTypingIndicator(message.conversationId, message.name)
     }
 
     return

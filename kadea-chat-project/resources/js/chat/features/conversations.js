@@ -1,5 +1,6 @@
 import { cancelEditingMessage, closeDeleteMessagesConfirmation, closeMessageMenu, exitMessageSelectionMode, hideMessageActions, loadMessages } from './messages.js'
 import { refreshPeerPresence } from './presence.js'
+import { hideTypingIndicator } from './typing.js'
 import { subscribeToConversation, unsubscribeFromConversation } from './realtime.js'
 import { cancelConversationSelection, cancelDeleteConfirmButton, chatContent, chatItems, chatSearch, closeDeleteConfirmButton, conversationList, conversationSelectionCount, conversationSelectionHeader, deleteConfirmButton, deleteConfirmMessage, deleteConfirmModal, deleteConfirmTitle, deleteConversationsError, deleteMessagesConfirmModal, deleteSelectedConversationsButton, emptyChatState, mainPanel, messageInput, messageList, mobileBackToChats, mobileNavigation, newChatContacts, selectedConversationIds, state } from './state.js'
 import { closeNewChatModal } from './users.js'
@@ -1109,6 +1110,7 @@ export async function selectConversation(conversationId) {
   }
 
   updateChatHeaderForGroup(conversation)
+  hideTypingIndicator()
   refreshPeerPresence()
 
   emptyChatState.classList.add('hidden')
@@ -1171,6 +1173,7 @@ function startConversationWithUser(user) {
   }
 
   updateChatHeaderForGroup(null)
+  hideTypingIndicator()
   refreshPeerPresence()
 
   emptyChatState.classList.add('hidden')

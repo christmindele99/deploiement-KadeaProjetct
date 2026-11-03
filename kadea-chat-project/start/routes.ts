@@ -220,6 +220,7 @@ router
 
 router.post('/presence/ping', [PresenceController, 'ping']).use(middleware.sessionAuth())
 router.get('/presence/:id', [PresenceController, 'show']).use(middleware.sessionAuth())
+router.post('/conversations/:id/typing', [PresenceController, 'typing']).use(middleware.sessionAuth())
 
 // Déconnexion de l'utilisateur
 router
