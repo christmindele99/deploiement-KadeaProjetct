@@ -22,17 +22,9 @@ export function showPasswordMessage(message, type = 'success') {
   )
 
   if (type === 'success') {
-    passwordMessage.classList.add(
-      'border-emerald-200',
-      'bg-emerald-50',
-      'text-emerald-700'
-    )
+    passwordMessage.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-700')
   } else {
-    passwordMessage.classList.add(
-      'border-red-200',
-      'bg-red-50',
-      'text-red-700'
-    )
+    passwordMessage.classList.add('border-red-200', 'bg-red-50', 'text-red-700')
   }
 }
 
@@ -41,19 +33,15 @@ export function showPasswordMessage(message, type = 'success') {
 // ============================================================
 
 export function getRequestHeaders() {
-  const csrfCookie = document.cookie
-    .split('; ')
-    .find((cookie) => cookie.startsWith('XSRF-TOKEN='))
+  const csrfCookie = document.cookie.split('; ').find((cookie) => cookie.startsWith('XSRF-TOKEN='))
 
   const headers = {
     'Content-Type': 'application/json',
-    Accept: 'application/json',
+    'Accept': 'application/json',
   }
 
   if (csrfCookie) {
-    headers['X-XSRF-TOKEN'] = decodeURIComponent(
-      csrfCookie.substring('XSRF-TOKEN='.length)
-    )
+    headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfCookie.substring('XSRF-TOKEN='.length))
   }
 
   return headers

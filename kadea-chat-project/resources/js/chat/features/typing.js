@@ -71,10 +71,7 @@ export function hideTypingIndicator(conversationId = null) {
     hideTypingInList(conversationId)
   }
 
-  if (
-    conversationId === null ||
-    Number(conversationId) === Number(state.selectedConversationId)
-  ) {
+  if (conversationId === null || Number(conversationId) === Number(state.selectedConversationId)) {
     $('#chatHeaderTyping')?.classList.add('hidden')
     $('#chatHeaderStatus')?.classList.remove('hidden')
   }
@@ -84,9 +81,7 @@ export function showTypingIndicator(conversationId, name) {
   const id = Number(conversationId)
   const conversation = getConversationById(id)
 
-  const label = conversation?.groupId
-    ? `${name} est en train d'écrire`
-    : "En train d'écrire"
+  const label = conversation?.groupId ? `${name} est en train d'écrire` : "En train d'écrire"
 
   // Dans la liste : visible même si la conversation n'est pas ouverte
   showTypingInList(id, label)
@@ -105,7 +100,10 @@ export function showTypingIndicator(conversationId, name) {
 
   // Sans nouveau signal pendant 4 secondes, l'indicateur disparaît
   clearTimeout(hideTimers.get(id))
-  hideTimers.set(id, setTimeout(() => hideTypingIndicator(id), TYPING_HIDE_DELAY_MS))
+  hideTimers.set(
+    id,
+    setTimeout(() => hideTypingIndicator(id), TYPING_HIDE_DELAY_MS)
+  )
 }
 
 // Envoie "je tape" au serveur pendant que l'utilisateur écrit

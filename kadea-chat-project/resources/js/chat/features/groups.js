@@ -89,8 +89,7 @@ function renderGroupMembers(query = '') {
     const checkbox = document.createElement('input')
 
     checkbox.type = 'checkbox'
-    checkbox.className =
-      'h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
+    checkbox.className = 'h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
     checkbox.checked = selectedGroupMemberIds.has(Number(user.id))
 
     checkbox.addEventListener('change', () => {
@@ -238,8 +237,7 @@ function showGroupInfoMessage(message) {
 
 function renderGroupInfoHeader(name, description, avatarUrl) {
   groupInfoName.textContent = name || 'Groupe'
-  groupInfoDescription.textContent =
-    description || 'Aucune description.'
+  groupInfoDescription.textContent = description || 'Aucune description.'
 
   groupInfoAvatar.replaceChildren()
   groupInfoAvatar.textContent = ''
@@ -353,9 +351,7 @@ function renderGroupInfoMembers(query = '') {
 
     badge.className =
       'shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ' +
-      (isAdmin
-        ? 'bg-emerald-500/15 text-emerald-700'
-        : 'bg-sky-500/15 text-sky-700')
+      (isAdmin ? 'bg-emerald-500/15 text-emerald-700' : 'bg-sky-500/15 text-sky-700')
 
     badge.textContent = isAdmin ? 'Admin' : 'Membre'
 
@@ -425,11 +421,8 @@ function closeGroupInfo() {
   groupInfoModal.classList.remove('flex')
 }
 
-
 function getCsrfToken() {
-  const token = document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('XSRF-TOKEN='))
+  const token = document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN='))
   return token ? decodeURIComponent(token.split('=')[1]) : null
 }
 
@@ -532,14 +525,16 @@ function handleGroupAction(action) {
     openRemoveMembers()
     return
   }
+  if (action === 'delete-group') {
+    openDeleteGroupConfirm()
+    return
+  }
 
   // Les autres actions seront implémentées ensuite.
   console.log('Action de groupe :', action)
 }
 
-
-
-  // ==================================================
+// ==================================================
 // AJOUTER DES MEMBRES AU GROUPE
 // ==================================================
 
@@ -571,17 +566,14 @@ function updateAddMembersUI() {
 
   // Le bouton Ajouter n'est cliquable que si au moins un utilisateur est coché
   if (confirmAddMembersButton) {
-    confirmAddMembersButton.disabled =
-      isAddingMembers || selectedNewMemberIds.size === 0
+    confirmAddMembersButton.disabled = isAddingMembers || selectedNewMemberIds.size === 0
   }
 }
 
 function renderAddMembersList(query = '') {
   if (!addMembersList || !state.groupInfo) return
 
-  const currentMemberIds = new Set(
-    state.groupInfo.members.map((member) => Number(member.id))
-  )
+  const currentMemberIds = new Set(state.groupInfo.members.map((member) => Number(member.id)))
 
   const normalizedQuery = query.trim().toLowerCase()
 
@@ -723,7 +715,6 @@ async function confirmAddMembers() {
   }
 }
 
-
 // ==================================================
 // RETIRER DES MEMBRES DU GROUPE
 // ==================================================
@@ -764,14 +755,11 @@ function showRemoveMembersConfirmError(message) {
 // Mettre à jour le compteur et le bouton Retirer
 function updateRemoveMembersUI() {
   if (removeMembersSelectedCount) {
-    removeMembersSelectedCount.textContent = String(
-      selectedRemoveMemberIds.size
-    )
+    removeMembersSelectedCount.textContent = String(selectedRemoveMemberIds.size)
   }
 
   if (confirmRemoveMembersButton) {
-    confirmRemoveMembersButton.disabled =
-      isRemovingMembers || selectedRemoveMemberIds.size === 0
+    confirmRemoveMembersButton.disabled = isRemovingMembers || selectedRemoveMemberIds.size === 0
   }
 }
 
@@ -789,9 +777,7 @@ function renderRemoveMembersList(query = '') {
         (member.fullName || '').toLowerCase().includes(normalizedQuery) ||
         (member.username || '').toLowerCase().includes(normalizedQuery)
     )
-    .sort((a, b) =>
-      (a.fullName || '').localeCompare(b.fullName || '', 'fr')
-    )
+    .sort((a, b) => (a.fullName || '').localeCompare(b.fullName || '', 'fr'))
 
   removeMembersList.replaceChildren()
 
@@ -816,8 +802,7 @@ function renderRemoveMembersList(query = '') {
     const checkbox = document.createElement('input')
 
     checkbox.type = 'checkbox'
-    checkbox.className =
-      'h-4 w-4 shrink-0 cursor-pointer accent-red-600'
+    checkbox.className = 'h-4 w-4 shrink-0 cursor-pointer accent-red-600'
 
     checkbox.checked = selectedRemoveMemberIds.has(Number(member.id))
 
@@ -910,11 +895,7 @@ function closeRemoveMembersConfirm() {
 
 // Envoyer la demande de retrait au serveur
 async function confirmRemoveMembers() {
-  if (
-    isRemovingMembers ||
-    !selectedRemoveMemberIds.size ||
-    !state.groupInfo
-  ) {
+  if (isRemovingMembers || !selectedRemoveMemberIds.size || !state.groupInfo) {
     return
   }
 
@@ -955,7 +936,6 @@ async function confirmRemoveMembers() {
 
     // Actualiser la liste des conversations
     await loadConversations(true)
-
   } catch (error) {
     if (error.message === 'SESSION_EXPIRED') {
       window.location.reload()
@@ -977,24 +957,105 @@ async function confirmRemoveMembers() {
   }
 }
 
-
 // ==================================================
 // MODIFIER LE NOM ET LA DESCRIPTION DU GROUPE
 // ==================================================
 
 const editGroupModal = $('#editGroupModal')
-
 const editGroupNameInput = $('#editGroupName')
-
 const editGroupDescriptionInput = $('#editGroupDescription')
-
 const editGroupError = $('#editGroupError')
-
 const saveEditGroupButton = $('#saveEditGroup')
-
 const cancelEditGroupButton = $('#cancelEditGroup')
-
 const closeEditGroupButton = $('#closeEditGroup')
+
+// ==================================================
+// SUPPRIMER LE GROUPE
+// ==================================================
+
+const deleteGroupConfirmModal = $('#deleteGroupConfirmModal')
+const cancelDeleteGroupButton = $('#cancelDeleteGroup')
+const confirmDeleteGroupButton = $('#confirmDeleteGroup')
+const deleteGroupConfirmError = $('#deleteGroupConfirmError')
+
+let isDeletingGroup = false
+
+const DELETE_GROUP_BUTTON_HTML =
+  '<i class="fa-solid fa-trash-can" aria-hidden="true"></i><span>Oui, supprimer</span>'
+
+function showDeleteGroupError(message) {
+  if (!deleteGroupConfirmError) return
+
+  deleteGroupConfirmError.textContent = message
+  deleteGroupConfirmError.classList.toggle('hidden', !message)
+}
+
+// Ouvrir la confirmation
+function openDeleteGroupConfirm() {
+  if (!state.groupInfo || state.groupInfo.myRole !== 'admin') return
+  if (!deleteGroupConfirmModal || isDeletingGroup) return
+
+  showDeleteGroupError('')
+
+  deleteGroupConfirmModal.classList.remove('hidden')
+  deleteGroupConfirmModal.classList.add('flex')
+}
+
+// Fermer la confirmation
+function closeDeleteGroupConfirm() {
+  if (isDeletingGroup || !deleteGroupConfirmModal) return
+
+  deleteGroupConfirmModal.classList.add('hidden')
+  deleteGroupConfirmModal.classList.remove('flex')
+
+  showDeleteGroupError('')
+}
+
+// Confirmer la suppression
+async function deleteGroup() {
+  if (isDeletingGroup || !state.groupInfo) return
+
+  if (state.groupInfo.myRole !== 'admin') return
+
+  const conversationId = Number(state.selectedConversationId)
+
+  if (!conversationId) return
+
+  isDeletingGroup = true
+
+  showDeleteGroupError('')
+
+  confirmDeleteGroupButton.disabled = true
+  cancelDeleteGroupButton.disabled = true
+
+  confirmDeleteGroupButton.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><span>Suppression...</span>'
+
+  try {
+    await api(`/conversations/${conversationId}/group`, {
+      method: 'DELETE',
+    })
+
+    // Le serveur a confirmé la suppression.
+    // Recharger l'application pour actualiser la liste des conversations.
+    window.location.reload()
+  } catch (error) {
+    if (error.message === 'SESSION_EXPIRED') {
+      window.location.reload()
+      return
+    }
+    showDeleteGroupError(
+      error.message.startsWith('REQUEST_FAILED')
+        ? 'Impossible de supprimer le groupe. Réessaie.'
+        : error.message
+    )
+  } finally {
+    isDeletingGroup = false
+    confirmDeleteGroupButton.disabled = false
+    cancelDeleteGroupButton.disabled = false
+    confirmDeleteGroupButton.innerHTML = DELETE_GROUP_BUTTON_HTML
+  }
+}
 
 function showEditGroupError(message) {
   if (!editGroupError) return
@@ -1128,7 +1189,7 @@ export function setupGroups() {
 
   $('#chatHeaderAvatarFallback')?.addEventListener('click', openGroupInfo)
 
-    changeGroupAvatarButton?.addEventListener('click', () => {
+  changeGroupAvatarButton?.addEventListener('click', () => {
     groupAvatarInput?.click()
   })
 
@@ -1156,11 +1217,7 @@ export function setupGroups() {
   })
 
   document.addEventListener('keydown', (event) => {
-    if (
-      event.key === 'Escape' &&
-      groupInfoModal &&
-      !groupInfoModal.classList.contains('hidden')
-    ) {
+    if (event.key === 'Escape' && groupInfoModal && !groupInfoModal.classList.contains('hidden')) {
       closeGroupInfo()
     }
   })
@@ -1188,10 +1245,7 @@ export function setupGroups() {
   })
 
   document.addEventListener('click', (event) => {
-    if (
-      event.target instanceof Element &&
-      !event.target.closest('#groupInfoMenuWrapper')
-    ) {
+    if (event.target instanceof Element && !event.target.closest('#groupInfoMenuWrapper')) {
       closeGroupInfoMenu()
     }
   })
@@ -1210,7 +1264,7 @@ export function setupGroups() {
     }
   })
 
-    cancelAddMembersButton?.addEventListener('click', closeAddMembers)
+  cancelAddMembersButton?.addEventListener('click', closeAddMembers)
 
   confirmAddMembersButton?.addEventListener('click', confirmAddMembers)
 
@@ -1221,24 +1275,35 @@ export function setupGroups() {
   // Retirer des membres
   cancelRemoveMembersButton?.addEventListener('click', closeRemoveMembers)
 
-  confirmRemoveMembersButton?.addEventListener(
-    'click',
-    openRemoveMembersConfirm
-  )
+  confirmRemoveMembersButton?.addEventListener('click', openRemoveMembersConfirm)
 
   removeMembersSearch?.addEventListener('input', () => {
     renderRemoveMembersList(removeMembersSearch.value)
   })
 
   // Confirmation du retrait
-  cancelRemoveMembersConfirmButton?.addEventListener(
-    'click',
-    closeRemoveMembersConfirm
-  )
+  cancelRemoveMembersConfirmButton?.addEventListener('click', closeRemoveMembersConfirm)
 
-  validateRemoveMembersButton?.addEventListener(
-    'click',
-    confirmRemoveMembers
-  )
+  validateRemoveMembersButton?.addEventListener('click', confirmRemoveMembers)
 
+  // Suppression du groupe
+  cancelDeleteGroupButton?.addEventListener('click', closeDeleteGroupConfirm)
+
+  confirmDeleteGroupButton?.addEventListener('click', deleteGroup)
+
+  deleteGroupConfirmModal?.addEventListener('click', (event) => {
+    if (event.target === deleteGroupConfirmModal) {
+      closeDeleteGroupConfirm()
+    }
+  })
+
+  document.addEventListener('keydown', (event) => {
+    if (
+      event.key === 'Escape' &&
+      deleteGroupConfirmModal &&
+      !deleteGroupConfirmModal.classList.contains('hidden')
+    ) {
+      closeDeleteGroupConfirm()
+    }
+  })
 }

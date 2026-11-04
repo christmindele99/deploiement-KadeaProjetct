@@ -186,8 +186,7 @@ export default class ConversationsController {
     })
   }
 
-
-    /**
+  /**
    * Ajouter ou retirer une conversation des favoris
    */
   async toggleFavorite({ params, session, response }: HttpContext) {

@@ -66,7 +66,10 @@ export default class MessageStatusService {
     if (!pending.length) return
 
     await Message.query()
-      .whereIn('id', pending.map((message) => message.id))
+      .whereIn(
+        'id',
+        pending.map((message) => message.id)
+      )
       .update({ message_status_id: MESSAGE_STATUS.RECEIVED })
 
     await this.notifyAuthors(
@@ -94,7 +97,10 @@ export default class MessageStatusService {
     if (!pending.length) return
 
     await Message.query()
-      .whereIn('id', pending.map((message) => message.id))
+      .whereIn(
+        'id',
+        pending.map((message) => message.id)
+      )
       .update({ message_status_id: MESSAGE_STATUS.READ })
 
     await this.notifyAuthors(

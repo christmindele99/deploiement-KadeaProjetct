@@ -25,10 +25,7 @@ export function setupProfileForm({
     // ------------------------------------------------------------
 
     if (fullName.length < 2) {
-      showMessage(
-        'Le nom complet doit contenir au moins 2 caractères.',
-        'error'
-      )
+      showMessage('Le nom complet doit contenir au moins 2 caractères.', 'error')
 
       fullnameInput.focus()
       return
@@ -39,10 +36,7 @@ export function setupProfileForm({
     // ------------------------------------------------------------
 
     if (username.length < 3) {
-      showMessage(
-        "Le nom d'utilisateur doit contenir au moins 3 caractères.",
-        'error'
-      )
+      showMessage("Le nom d'utilisateur doit contenir au moins 3 caractères.", 'error')
 
       usernameInput.focus()
       return
@@ -70,7 +64,7 @@ export function setupProfileForm({
 
       const headers = {
         'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       }
 
       if (csrfToken) {
@@ -96,9 +90,7 @@ export function setupProfileForm({
       // ----------------------------------------------------------
 
       if (!response.ok) {
-        throw new Error(
-          result.message || 'Impossible de modifier votre profil.'
-        )
+        throw new Error(result.message || 'Impossible de modifier votre profil.')
       }
 
       // ----------------------------------------------------------
@@ -130,8 +122,7 @@ export function setupProfileForm({
       }
 
       if (profileBio) {
-        profileBio.textContent =
-          updatedUser.bio || 'Aucune biographie renseignée.'
+        profileBio.textContent = updatedUser.bio || 'Aucune biographie renseignée.'
       }
 
       // ----------------------------------------------------------
@@ -144,10 +135,7 @@ export function setupProfileForm({
       // MESSAGE DE SUCCÈS
       // ----------------------------------------------------------
 
-      showMessage(
-        result.message || 'Votre profil a été mis à jour avec succès.',
-        'success'
-      )
+      showMessage(result.message || 'Votre profil a été mis à jour avec succès.', 'success')
     } catch (error) {
       console.error('Erreur lors de la modification du profil :', error)
 
@@ -156,8 +144,7 @@ export function setupProfileForm({
       if (submitButton) {
         submitButton.disabled = false
 
-        submitButton.textContent =
-          originalButtonText || 'Enregistrer les modifications'
+        submitButton.textContent = originalButtonText || 'Enregistrer les modifications'
       }
     }
   })

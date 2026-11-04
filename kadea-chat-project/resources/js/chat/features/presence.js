@@ -15,8 +15,7 @@ function renderPresence(online) {
   const dot = document.createElement('span')
 
   dot.className =
-    'inline-block h-2 w-2 shrink-0 rounded-full ' +
-    (online ? 'bg-[#29ff9d]' : 'bg-slate-400')
+    'inline-block h-2 w-2 shrink-0 rounded-full ' + (online ? 'bg-[#29ff9d]' : 'bg-slate-400')
 
   const label = document.createElement('span')
   label.textContent = online ? 'En ligne' : 'Hors ligne'

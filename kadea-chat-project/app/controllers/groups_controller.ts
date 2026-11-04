@@ -21,9 +21,7 @@ export default class GroupsController {
     const name = String(request.input('name', '')).trim()
     const rawDescription = request.input('description')
     const description =
-      typeof rawDescription === 'string' && rawDescription.trim()
-        ? rawDescription.trim()
-        : null
+      typeof rawDescription === 'string' && rawDescription.trim() ? rawDescription.trim() : null
     const rawMemberIds = request.input('memberIds')
 
     if (name.length < 2 || name.length > 100) {
@@ -38,9 +36,7 @@ export default class GroupsController {
 
     const memberIds = [
       ...new Set(
-        rawMemberIds
-          .map(Number)
-          .filter((id) => Number.isInteger(id) && id > 0 && id !== userId)
+        rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0 && id !== userId)
       ),
     ]
 
@@ -61,10 +57,7 @@ export default class GroupsController {
     const conversation = await db.transaction(async (trx) => {
       const group = await Group.create({ name, description }, { client: trx })
 
-      const newConversation = await Conversation.create(
-        { groupId: group.id },
-        { client: trx }
-      )
+      const newConversation = await Conversation.create({ groupId: group.id }, { client: trx })
 
       const now = DateTime.now()
 
@@ -107,7 +100,7 @@ export default class GroupsController {
     })
   }
 
-    async show({ params, session, response }: HttpContext) {
+  async show({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
     if (!userId) {
@@ -228,9 +221,7 @@ export default class GroupsController {
     const name = String(request.input('name', '')).trim()
     const rawDescription = request.input('description')
     const description =
-      typeof rawDescription === 'string' && rawDescription.trim()
-        ? rawDescription.trim()
-        : null
+      typeof rawDescription === 'string' && rawDescription.trim() ? rawDescription.trim() : null
 
     if (name.length < 2 || name.length > 100) {
       return response.badRequest({
@@ -313,9 +304,7 @@ export default class GroupsController {
     }
 
     const memberIds = [
-      ...new Set(
-        rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)
-      ),
+      ...new Set(rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)),
     ]
 
     if (memberIds.length < 1) {
@@ -367,130 +356,193 @@ export default class GroupsController {
     })
   }
 
-
   async removeMembers({ params, session, request, response }: HttpContext) {
-  const userId = Number(session.get('userId'))
+    const userId = Number(session.get('userId'))
 
-  if (!userId) {
-    return response.unauthorized({
-      message: 'Vous devez être connecté.',
+    if (!userId) {
+      return response.unauthorized({
+        message: 'Vous devez être connecté.',
+      })
+    }
+
+    const conversationId = Number(params.id)
+
+    if (!Number.isInteger(conversationId) || conversationId <= 0) {
+      return response.badRequest({
+        message: 'Identifiant de conversation invalide.',
+      })
+    }
+
+    // Vérifier que l'utilisateur connecté est membre du groupe
+    const myMembership = await Membership.query()
+      .where('userId', userId)
+      .where('conversationId', conversationId)
+      .first()
+
+    if (!myMembership) {
+      return response.notFound({
+        message: 'Groupe introuvable.',
+      })
+    }
+
+    // Seuls les administrateurs peuvent retirer des membres
+    if (myMembership.roleId !== 1) {
+      return response.forbidden({
+        message: 'Seuls les admins peuvent retirer des membres.',
+      })
+    }
+
+    // Vérifier que la conversation est bien un groupe
+    const conversation = await Conversation.find(conversationId)
+
+    if (!conversation || !conversation.groupId) {
+      return response.notFound({
+        message: 'Groupe introuvable.',
+      })
+    }
+
+    const rawMemberIds = request.input('memberIds')
+
+    if (!Array.isArray(rawMemberIds)) {
+      return response.badRequest({
+        message: 'La liste des membres est invalide.',
+      })
+    }
+
+    const memberIds = [
+      ...new Set(rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)),
+    ]
+
+    if (memberIds.length < 1) {
+      return response.badRequest({
+        message: 'Sélectionne au moins un membre.',
+      })
+    }
+
+    // Empêcher l'administrateur de se retirer lui-même
+    if (memberIds.includes(userId)) {
+      return response.badRequest({
+        message: 'Tu ne peux pas te retirer toi-même du groupe.',
+      })
+    }
+
+    // Vérifier que tous les utilisateurs sélectionnés
+    // sont bien des membres classiques de ce groupe
+    const memberships = await Membership.query()
+      .where('conversationId', conversationId)
+      .whereIn('userId', memberIds)
+      .where('roleId', 2)
+
+    if (memberships.length !== memberIds.length) {
+      return response.badRequest({
+        message: 'Certains utilisateurs ne sont pas des membres retirables de ce groupe.',
+      })
+    }
+
+    // Supprimer uniquement les appartenances au groupe
+    await Membership.query()
+      .where('conversationId', conversationId)
+      .whereIn('userId', memberIds)
+      .where('roleId', 2)
+      .delete()
+
+    // Actualiser la liste de conversations des utilisateurs retirés
+    for (const id of memberIds) {
+      transmit.broadcast(`users/${id}`, {
+        event: 'user.notification',
+        data: { conversationId },
+      })
+    }
+
+    // Actualiser les informations chez les membres restants
+    const remainingMemberships = await Membership.query().where('conversationId', conversationId)
+
+    for (const membership of remainingMemberships) {
+      transmit.broadcast(`users/${membership.userId}`, {
+        event: 'user.notification',
+        data: { conversationId },
+      })
+    }
+
+    return response.ok({
+      message: 'Membres retirés du groupe avec succès.',
+      data: {
+        removedCount: memberIds.length,
+      },
     })
   }
 
-  const conversationId = Number(params.id)
+  async destroy({ params, session, response }: HttpContext) {
+    const userId = Number(session.get('userId'))
+    if (!userId) {
+      return response.unauthorized({
+        message: 'Vous devez être connecté.',
+      })
+    }
+    const conversationId = Number(params.id)
+    if (!Number.isInteger(conversationId) || conversationId <= 0) {
+      return response.badRequest({
+        message: 'Identifiant de conversation invalide.',
+      })
+    }
+    // Vérifier que l'utilisateur est membre du groupe
+    const myMembership = await Membership.query()
+      .where('userId', userId)
+      .where('conversationId', conversationId)
+      .first()
+    if (!myMembership) {
+      return response.notFound({
+        message: 'Groupe introuvable.',
+      })
+    }
+    // Seul l'administrateur peut supprimer le groupe
+    if (myMembership.roleId !== 1) {
+      return response.forbidden({
+        message: 'Seul l’administrateur peut supprimer ce groupe.',
+      })
+    }
 
-  if (!Number.isInteger(conversationId) || conversationId <= 0) {
-    return response.badRequest({
-      message: 'Identifiant de conversation invalide.',
+    const conversation = await Conversation.find(conversationId)
+
+    if (!conversation || !conversation.groupId) {
+      return response.notFound({
+        message: 'Groupe introuvable.',
+      })
+    }
+    const group = await Group.find(conversation.groupId)
+    if (!group) {
+      return response.notFound({
+        message: 'Groupe introuvable.',
+      })
+    }
+    // Récupérer les membres avant la suppression
+    const memberships = await Membership.query().where('conversationId', conversationId)
+
+    const memberIds = [...new Set(memberships.map((membership) => membership.userId))]
+    // Suppression complète dans une transaction
+    await db.transaction(async (trx) => {
+      // Supprimer les messages de la conversation
+      await trx.from('messages').where('conversation_id', conversationId).delete()
+      // Supprimer les appartenances des membres
+      await trx.from('memberships').where('conversation_id', conversationId).delete()
+      // Supprimer la conversation
+      await Conversation.query({ client: trx }).where('id', conversationId).delete()
+      // Supprimer le groupe
+      await Group.query({ client: trx }).where('id', group.id).delete()
+    })
+    // Informer tous les anciens membres
+    for (const id of memberIds) {
+      transmit.broadcast(`users/${id}`, {
+        event: 'user.notification',
+        data: { conversationId },
+      })
+    }
+    return response.ok({
+      message: 'Le groupe a été supprimé avec succès.',
     })
   }
 
-  // Vérifier que l'utilisateur connecté est membre du groupe
-  const myMembership = await Membership.query()
-    .where('userId', userId)
-    .where('conversationId', conversationId)
-    .first()
-
-  if (!myMembership) {
-    return response.notFound({
-      message: 'Groupe introuvable.',
-    })
-  }
-
-  // Seuls les administrateurs peuvent retirer des membres
-  if (myMembership.roleId !== 1) {
-    return response.forbidden({
-      message: 'Seuls les admins peuvent retirer des membres.',
-    })
-  }
-
-  // Vérifier que la conversation est bien un groupe
-  const conversation = await Conversation.find(conversationId)
-
-  if (!conversation || !conversation.groupId) {
-    return response.notFound({
-      message: 'Groupe introuvable.',
-    })
-  }
-
-  const rawMemberIds = request.input('memberIds')
-
-  if (!Array.isArray(rawMemberIds)) {
-    return response.badRequest({
-      message: 'La liste des membres est invalide.',
-    })
-  }
-
-  const memberIds = [
-    ...new Set(
-      rawMemberIds
-        .map(Number)
-        .filter((id) => Number.isInteger(id) && id > 0)
-    ),
-  ]
-
-  if (memberIds.length < 1) {
-    return response.badRequest({
-      message: 'Sélectionne au moins un membre.',
-    })
-  }
-
-  // Empêcher l'administrateur de se retirer lui-même
-  if (memberIds.includes(userId)) {
-    return response.badRequest({
-      message: 'Tu ne peux pas te retirer toi-même du groupe.',
-    })
-  }
-
-  // Vérifier que tous les utilisateurs sélectionnés
-  // sont bien des membres classiques de ce groupe
-  const memberships = await Membership.query()
-    .where('conversationId', conversationId)
-    .whereIn('userId', memberIds)
-    .where('roleId', 2)
-
-  if (memberships.length !== memberIds.length) {
-    return response.badRequest({
-      message: 'Certains utilisateurs ne sont pas des membres retirables de ce groupe.',
-    })
-  }
-
-  // Supprimer uniquement les appartenances au groupe
-  await Membership.query()
-    .where('conversationId', conversationId)
-    .whereIn('userId', memberIds)
-    .where('roleId', 2)
-    .delete()
-
-  // Actualiser la liste de conversations des utilisateurs retirés
-  for (const id of memberIds) {
-    transmit.broadcast(`users/${id}`, {
-      event: 'user.notification',
-      data: { conversationId },
-    })
-  }
-
-  // Actualiser les informations chez les membres restants
-  const remainingMemberships = await Membership.query()
-    .where('conversationId', conversationId)
-
-  for (const membership of remainingMemberships) {
-    transmit.broadcast(`users/${membership.userId}`, {
-      event: 'user.notification',
-      data: { conversationId },
-    })
-  }
-
-  return response.ok({
-    message: 'Membres retirés du groupe avec succès.',
-    data: {
-      removedCount: memberIds.length,
-    },
-  })
-}
-
-
-    async updateAvatar({ params, session, request, response }: HttpContext) {
+  async updateAvatar({ params, session, request, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
     if (!userId) {

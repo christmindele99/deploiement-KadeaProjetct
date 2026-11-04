@@ -26,55 +26,33 @@ export const usersSearch = $('#usersSearch')
 // SÉLECTION DES CONVERSATIONS
 // ==================================================
 
-export const conversationSelectionHeader =
-  $('#conversationSelectionHeader')
-export const conversationSelectionCount =
-  $('#conversationSelectionCount')
-export const cancelConversationSelection =
-  $('#cancelConversationSelection')
-export const deleteSelectedConversationsButton =
-  $('#deleteSelectedConversationsButton')
-export const deleteConfirmModal =
-  $('#deleteConversationsConfirmModal')
-export const deleteConfirmTitle =
-  $('#deleteConversationsConfirmTitle')
-export const deleteConfirmMessage =
-  $('#deleteConversationsConfirmMessage')
-export const deleteConfirmButton =
-  $('#confirmDeleteConversations')
-export const closeDeleteConfirmButton =
-  $('#closeDeleteConversationsConfirm')
-export const cancelDeleteConfirmButton =
-  $('#cancelDeleteConversations')
-export const deleteConversationsError =
-  $('#deleteConversationsError')
+export const conversationSelectionHeader = $('#conversationSelectionHeader')
+export const conversationSelectionCount = $('#conversationSelectionCount')
+export const cancelConversationSelection = $('#cancelConversationSelection')
+export const deleteSelectedConversationsButton = $('#deleteSelectedConversationsButton')
+export const deleteConfirmModal = $('#deleteConversationsConfirmModal')
+export const deleteConfirmTitle = $('#deleteConversationsConfirmTitle')
+export const deleteConfirmMessage = $('#deleteConversationsConfirmMessage')
+export const deleteConfirmButton = $('#confirmDeleteConversations')
+export const closeDeleteConfirmButton = $('#closeDeleteConversationsConfirm')
+export const cancelDeleteConfirmButton = $('#cancelDeleteConversations')
+export const deleteConversationsError = $('#deleteConversationsError')
 
 // ==================================================
 // SÉLECTION DES MESSAGES
 // ==================================================
 
-export const messageSelectionHeader =
-  $('#messageSelectionHeader')
-export const messageSelectionCount =
-  $('#messageSelectionCount')
-export const cancelMessageSelection =
-  $('#cancelMessageSelection')
-export const deleteSelectedMessagesButton =
-  $('#deleteSelectedMessagesButton')
-export const deleteMessagesConfirmModal =
-  $('#deleteMessagesConfirmModal')
-export const deleteMessagesConfirmTitle =
-  $('#deleteMessagesConfirmTitle')
-export const deleteMessagesConfirmMessage =
-  $('#deleteMessagesConfirmMessage')
-export const deleteMessagesError =
-  $('#deleteMessagesError')
-export const closeDeleteMessagesConfirm =
-  $('#closeDeleteMessagesConfirm')
-export const cancelDeleteMessages =
-  $('#cancelDeleteMessages')
-export const confirmDeleteMessages =
-  $('#confirmDeleteMessages')
+export const messageSelectionHeader = $('#messageSelectionHeader')
+export const messageSelectionCount = $('#messageSelectionCount')
+export const cancelMessageSelection = $('#cancelMessageSelection')
+export const deleteSelectedMessagesButton = $('#deleteSelectedMessagesButton')
+export const deleteMessagesConfirmModal = $('#deleteMessagesConfirmModal')
+export const deleteMessagesConfirmTitle = $('#deleteMessagesConfirmTitle')
+export const deleteMessagesConfirmMessage = $('#deleteMessagesConfirmMessage')
+export const deleteMessagesError = $('#deleteMessagesError')
+export const closeDeleteMessagesConfirm = $('#closeDeleteMessagesConfirm')
+export const cancelDeleteMessages = $('#cancelDeleteMessages')
+export const confirmDeleteMessages = $('#confirmDeleteMessages')
 
 // ---------- Variables d'état ----------
 
@@ -105,7 +83,7 @@ export const state = {
   creatingGroup: false,
   groupInfo: null,
   savingGroupInfo: false,
-  usersMode: false
+  usersMode: false,
 }
 
 export const conversationSubscriptions = new Map()

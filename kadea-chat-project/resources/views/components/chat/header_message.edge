@@ -1,24 +1,30 @@
-<header class="app-panel flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-3 py-3 sm:px-5 sm:py-4 lg:px-7">
-    <div class="flex min-w-0 items-center gap-2 sm:gap-3">
-        <button type="button" id="mobileBackToChats"
-            aria-label="Retour aux conversations"
-            title="Retour aux conversations"
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-brand-blue transition hover:bg-emerald-50 md:hidden">
-            <i class="fa-solid fa-arrow-left text-lg"></i>
-        </button>
-        <img id="chatHeaderAvatar"
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
-            alt="Alice B."
-            class="h-10 w-10 shrink-0 rounded-full object-cover sm:h-11 sm:w-11">
-                    <div id="chatHeaderAvatarFallback"
-                        class="hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[#29ff9d] text-sm font-semibold text-[#075e8d] sm:h-11 sm:w-11">
-                    </div>
-        <div class="min-w-0">
-            <h2 id="chatHeaderName" class="truncate text-sm font-semibold text-brand-blue">
-            </h2>
-            <p id="chatHeaderStatus" class="mt-0.5 truncate text-xs text-slate-500">
-            </p>
-            <p id="chatHeaderTyping" class="mt-0.5 hidden truncate text-xs text-emerald-600"></p>
-        </div>
+<header
+  class="app-panel flex shrink-0 items-center justify-between border-b border-slate-200 bg-white px-3 py-3 sm:px-5 sm:py-4 lg:px-7"
+>
+  <div class="flex min-w-0 items-center gap-2 sm:gap-3">
+    <button
+      type="button"
+      id="mobileBackToChats"
+      aria-label="Retour aux conversations"
+      title="Retour aux conversations"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-brand-blue transition hover:bg-emerald-50 md:hidden"
+    >
+      <i class="fa-solid fa-arrow-left text-lg"></i>
+    </button>
+    <img
+      id="chatHeaderAvatar"
+      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
+      alt="Alice B."
+      class="h-10 w-10 shrink-0 rounded-full object-cover sm:h-11 sm:w-11"
+    />
+    <div
+      id="chatHeaderAvatarFallback"
+      class="hidden h-10 w-10 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-[#29ff9d] text-sm font-semibold text-[#075e8d] sm:h-11 sm:w-11"
+    ></div>
+    <div class="min-w-0">
+      <h2 id="chatHeaderName" class="truncate text-sm font-semibold text-brand-blue"></h2>
+      <p id="chatHeaderStatus" class="mt-0.5 truncate text-xs text-slate-500"></p>
+      <p id="chatHeaderTyping" class="mt-0.5 hidden truncate text-xs text-emerald-600"></p>
     </div>
+  </div>
 </header>

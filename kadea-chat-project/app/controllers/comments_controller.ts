@@ -29,21 +29,21 @@ export default class CommentsController {
       })
     }
     await Comment.create({ userId, rating, content })
-        try {
-        const user = await User.find(userId)
+    try {
+      const user = await User.find(userId)
 
-        await mail.send((message) => {
-            message
-            .to(env.get('MAIL_FROM_ADDRESS'))
-            .subject(`Nouveau commentaire Kadea Chat (${rating}/6 étoiles)`)
-            .text(
-                `De : ${user?.fullName ?? 'Utilisateur inconnu'} (${user?.email ?? 'e-mail inconnu'})\n` +
-                `Note : ${rating}/6\n\n${content}`
-            )
-        })
-        } catch (error) {
-        console.error("Impossible d'envoyer l'e-mail du commentaire :", error)
-        }
+      await mail.send((message) => {
+        message
+          .to(env.get('MAIL_FROM_ADDRESS'))
+          .subject(`Nouveau commentaire Kadea Chat (${rating}/6 étoiles)`)
+          .text(
+            `De : ${user?.fullName ?? 'Utilisateur inconnu'} (${user?.email ?? 'e-mail inconnu'})\n` +
+              `Note : ${rating}/6\n\n${content}`
+          )
+      })
+    } catch (error) {
+      console.error("Impossible d'envoyer l'e-mail du commentaire :", error)
+    }
 
     return response.status(201).json({
       message: 'Merci pour votre commentaire !',

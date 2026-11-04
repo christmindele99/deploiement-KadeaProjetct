@@ -13,8 +13,7 @@ export function setupChangePassword() {
     const modal = document.createElement('div')
 
     modal.id = 'changePasswordModal'
-    modal.className =
-      'fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 py-6'
+    modal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 py-6'
 
     modal.innerHTML = `
       <div
@@ -159,8 +158,7 @@ export function setupChangePassword() {
           form.prepend(errorElement)
         }
 
-        errorElement.textContent =
-          'Les nouveaux mots de passe ne correspondent pas.'
+        errorElement.textContent = 'Les nouveaux mots de passe ne correspondent pas.'
         errorElement.classList.remove('hidden')
         return
       }
@@ -192,9 +190,7 @@ export function setupChangePassword() {
         const data = await response.json().catch(() => ({}))
 
         if (!response.ok) {
-          throw new Error(
-            data.message || 'Impossible de modifier le mot de passe.'
-          )
+          throw new Error(data.message || 'Impossible de modifier le mot de passe.')
         }
 
         closeModal()
@@ -210,9 +206,7 @@ export function setupChangePassword() {
         submitButton.innerHTML = originalContent
 
         const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Impossible de modifier le mot de passe.'
+          error instanceof Error ? error.message : 'Impossible de modifier le mot de passe.'
 
         if (!errorElement) {
           errorElement = document.createElement('p')

@@ -251,10 +251,7 @@ export function setupHelp() {
 
     if (privacyPolicyButton) {
       privacyPolicyButton.addEventListener('click', () => {
-        showHelpSection(
-          '/politique-confidentialite',
-          'Politique de confidentialite'
-        )
+        showHelpSection('/politique-confidentialite', 'Politique de confidentialite')
       })
     }
 

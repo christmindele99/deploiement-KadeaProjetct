@@ -67,10 +67,7 @@ export default class VerifyEmailController {
     const token = crypto.randomBytes(32).toString('hex')
 
     // Seul le hash du jeton est enregistré en base de données.
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
     await UserToken.create({
       userId: user.id,
@@ -87,10 +84,7 @@ export default class VerifyEmailController {
     try {
       // Envoyer le nouveau lien par e-mail.
       await mail.send((message) => {
-        message
-          .to(user.email)
-          .subject('Confirmez votre adresse e-mail - Kadea Chat')
-          .html(`
+        message.to(user.email).subject('Confirmez votre adresse e-mail - Kadea Chat').html(`
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
               <h2 style="color: #075e8d;">Bienvenue sur Kadea Chat !</h2>
 
@@ -125,10 +119,7 @@ export default class VerifyEmailController {
 
       console.error('Erreur lors du renvoi du lien de confirmation :', error)
 
-      session.flash(
-        'error',
-        'Impossible d’envoyer l’e-mail pour le moment. Veuillez réessayer.'
-      )
+      session.flash('error', 'Impossible d’envoyer l’e-mail pour le moment. Veuillez réessayer.')
 
       return response.redirect().toRoute('verify-email.show')
     }
@@ -147,10 +138,7 @@ export default class VerifyEmailController {
   async confirm({ params, response, view }: HttpContext) {
     const { token } = params
 
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
     const userToken = await UserToken.query()
       .where('tokenHash', tokenHash)
@@ -158,29 +146,25 @@ export default class VerifyEmailController {
       .first()
 
     if (!userToken) {
-      return response.status(400).send(
-        'Ce lien de vérification est invalide ou a déjà été utilisé.'
-      )
+      return response
+        .status(400)
+        .send('Ce lien de vérification est invalide ou a déjà été utilisé.')
     }
 
     if (userToken.usedAt) {
-      return response.status(400).send(
-        'Ce lien de vérification a déjà été utilisé.'
-      )
+      return response.status(400).send('Ce lien de vérification a déjà été utilisé.')
     }
 
     if (userToken.expiresAt.toMillis() <= DateTime.now().toMillis()) {
-      return response.status(400).send(
-        'Ce lien de vérification a expiré. Veuillez demander un nouveau lien.'
-      )
+      return response
+        .status(400)
+        .send('Ce lien de vérification a expiré. Veuillez demander un nouveau lien.')
     }
 
     const user = await User.find(userToken.userId)
 
     if (!user) {
-      return response.status(400).send(
-        'Impossible de retrouver le compte associé à ce lien.'
-      )
+      return response.status(400).send('Impossible de retrouver le compte associé à ce lien.')
     }
 
     if (!user.emailVerifiedAt) {

@@ -1,10 +1,59 @@
-import { cancelEditingMessage, closeDeleteMessagesConfirmation, closeMessageMenu, exitMessageSelectionMode, hideMessageActions, loadMessages } from './messages.js'
+import {
+  cancelEditingMessage,
+  closeDeleteMessagesConfirmation,
+  closeMessageMenu,
+  exitMessageSelectionMode,
+  hideMessageActions,
+  loadMessages,
+} from './messages.js'
 import { refreshPeerPresence } from './presence.js'
 import { hideTypingIndicator } from './typing.js'
 import { subscribeToConversation, unsubscribeFromConversation } from './realtime.js'
-import { cancelConversationSelection, cancelDeleteConfirmButton, chatContent, chatItems, chatSearch, closeDeleteConfirmButton, conversationList, conversationSelectionCount, conversationSelectionHeader, deleteConfirmButton, deleteConfirmMessage, deleteConfirmModal, deleteConfirmTitle, deleteConversationsError, deleteMessagesConfirmModal, deleteSelectedConversationsButton, emptyChatState, mainPanel, messageInput, messageList, mobileBackToChats, mobileNavigation, newChatContacts, selectedConversationIds, state } from './state.js'
+import {
+  cancelConversationSelection,
+  cancelDeleteConfirmButton,
+  chatContent,
+  chatItems,
+  chatSearch,
+  closeDeleteConfirmButton,
+  conversationList,
+  conversationSelectionCount,
+  conversationSelectionHeader,
+  deleteConfirmButton,
+  deleteConfirmMessage,
+  deleteConfirmModal,
+  deleteConfirmTitle,
+  deleteConversationsError,
+  deleteMessagesConfirmModal,
+  deleteSelectedConversationsButton,
+  emptyChatState,
+  mainPanel,
+  messageInput,
+  messageList,
+  mobileBackToChats,
+  mobileNavigation,
+  newChatContacts,
+  selectedConversationIds,
+  state,
+} from './state.js'
 import { closeNewChatModal } from './users.js'
-import { $, api, formatTime, getConversationById, getConversationName, getConversationUser, getCurrentUserId, getData, getMessageConversationId, getMessageDateTimestamp, getMessageDateValue, getMessageText, getUserInitials, isMobile, sortMessages } from './utils.js'
+import {
+  $,
+  api,
+  formatTime,
+  getConversationById,
+  getConversationName,
+  getConversationUser,
+  getCurrentUserId,
+  getData,
+  getMessageConversationId,
+  getMessageDateTimestamp,
+  getMessageDateValue,
+  getMessageText,
+  getUserInitials,
+  isMobile,
+  sortMessages,
+} from './utils.js'
 
 // ==================================================
 // LAYOUT
@@ -73,9 +122,7 @@ export function initializeLayout() {
 function closeConversationMenu() {
   state.openConversationMenuId = null
 
-  document
-    .querySelectorAll('[data-conversation-menu]')
-    .forEach((menu) => menu.remove())
+  document.querySelectorAll('[data-conversation-menu]').forEach((menu) => menu.remove())
 }
 
 function createConversationMenu(conversationId) {
@@ -96,8 +143,7 @@ function createConversationMenu(conversationId) {
     'flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-red-50 hover:text-red-600'
 
   const deleteIcon = document.createElement('i')
-  deleteIcon.className =
-    'fa-solid fa-trash w-5 text-center text-red-500'
+  deleteIcon.className = 'fa-solid fa-trash w-5 text-center text-red-500'
 
   const deleteText = document.createElement('span')
   deleteText.textContent = 'Supprimer la conversation'
@@ -113,14 +159,13 @@ function createConversationMenu(conversationId) {
     'flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-brand-blue'
 
   const selectIcon = document.createElement('i')
-  selectIcon.className =
-    'fa-solid fa-check w-5 text-center text-brand-blue'
+  selectIcon.className = 'fa-solid fa-check w-5 text-center text-brand-blue'
 
   const selectText = document.createElement('span')
   selectText.textContent = 'Sélectionner les conversations'
   selectButton.append(selectIcon, selectText)
 
-      const isFavorite = Boolean(getConversationById(conversationId)?.favorite)
+  const isFavorite = Boolean(getConversationById(conversationId)?.favorite)
 
   const favoriteButton = document.createElement('button')
 
@@ -135,9 +180,7 @@ function createConversationMenu(conversationId) {
   favoriteIcon.className = 'fa-solid fa-star w-5 text-center text-amber-400'
 
   const favoriteText = document.createElement('span')
-  favoriteText.textContent = isFavorite
-    ? 'Retirer des favoris'
-    : 'Ajouter aux favoris'
+  favoriteText.textContent = isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'
 
   favoriteButton.append(favoriteIcon, favoriteText)
   menu.append(favoriteButton, deleteButton, selectButton)
@@ -175,74 +218,43 @@ function openConversationMenu(conversationId, actionsButton) {
 // ==================================================
 
 function updateSelectionUI() {
-  conversationList
-    .querySelectorAll('.chat-item')
-    .forEach((item) => {
-      const conversationId = Number(
-        item.dataset.conversationId
-      )
+  conversationList.querySelectorAll('.chat-item').forEach((item) => {
+    const conversationId = Number(item.dataset.conversationId)
 
-      const checkbox = item.querySelector(
-        '[data-conversation-checkbox]'
-      )
+    const checkbox = item.querySelector('[data-conversation-checkbox]')
 
-      const actionsButton = item.querySelector(
-        '[data-conversation-actions]'
-      )
+    const actionsButton = item.querySelector('[data-conversation-actions]')
 
-      const isSelected = selectedConversationIds.has(
-        conversationId
-      )
+    const isSelected = selectedConversationIds.has(conversationId)
 
-      if (checkbox) {
-        checkbox.checked = isSelected
+    if (checkbox) {
+      checkbox.checked = isSelected
 
-        checkbox.classList.toggle(
-          'hidden',
-          !state.conversationSelectionMode
-        )
-      }
+      checkbox.classList.toggle('hidden', !state.conversationSelectionMode)
+    }
 
-      item.classList.toggle(
-        'bg-slate-50',
-        state.conversationSelectionMode && isSelected
-      )
+    item.classList.toggle('bg-slate-50', state.conversationSelectionMode && isSelected)
 
-      if (actionsButton) {
-        actionsButton.classList.toggle(
-          'hidden',
-          state.conversationSelectionMode
-        )
+    if (actionsButton) {
+      actionsButton.classList.toggle('hidden', state.conversationSelectionMode)
 
-        actionsButton.classList.toggle(
-          'flex',
-          !state.conversationSelectionMode
-        )
-      }
-    })
+      actionsButton.classList.toggle('flex', !state.conversationSelectionMode)
+    }
+  })
 
   if (conversationSelectionHeader) {
-    conversationSelectionHeader.classList.toggle(
-      'hidden',
-      !state.conversationSelectionMode
-    )
+    conversationSelectionHeader.classList.toggle('hidden', !state.conversationSelectionMode)
 
-    conversationSelectionHeader.classList.toggle(
-      'flex',
-      state.conversationSelectionMode
-    )
+    conversationSelectionHeader.classList.toggle('flex', state.conversationSelectionMode)
   }
 
   if (conversationSelectionCount) {
-    conversationSelectionCount.textContent = String(
-      selectedConversationIds.size
-    )
+    conversationSelectionCount.textContent = String(selectedConversationIds.size)
   }
 
   if (deleteSelectedConversationsButton) {
     deleteSelectedConversationsButton.disabled =
-      selectedConversationIds.size === 0 ||
-      state.deletingConversations
+      selectedConversationIds.size === 0 || state.deletingConversations
   }
 }
 
@@ -288,21 +300,12 @@ function getSelectedConversationIds() {
 // ==================================================
 
 function showDeleteConfirmation(ids) {
-  if (
-    !deleteConfirmModal ||
-    !deleteConfirmTitle ||
-    !deleteConfirmMessage ||
-    !deleteConfirmButton
-  ) {
+  if (!deleteConfirmModal || !deleteConfirmTitle || !deleteConfirmMessage || !deleteConfirmButton) {
     return
   }
 
   const validIds = [
-    ...new Set(
-      ids
-        .map(Number)
-        .filter((id) => Number.isFinite(id) && id > 0)
-    ),
+    ...new Set(ids.map(Number).filter((id) => Number.isFinite(id) && id > 0)),
   ].filter((id) => getConversationById(id))
 
   if (!validIds.length || state.deletingConversations) {
@@ -320,17 +323,13 @@ function showDeleteConfirmation(ids) {
     const conversation = getConversationById(validIds[0])
     const name = getConversationName(conversation)
 
-    deleteConfirmTitle.textContent =
-      'Supprimer la conversation'
+    deleteConfirmTitle.textContent = 'Supprimer la conversation'
 
-    deleteConfirmMessage.textContent =
-      `Veux-tu vraiment supprimer la conversation avec ${name} ? Cette action est irréversible.`
+    deleteConfirmMessage.textContent = `Veux-tu vraiment supprimer la conversation avec ${name} ? Cette action est irréversible.`
   } else {
-    deleteConfirmTitle.textContent =
-      'Supprimer les conversations'
+    deleteConfirmTitle.textContent = 'Supprimer les conversations'
 
-    deleteConfirmMessage.textContent =
-      `Veux-tu vraiment supprimer les ${validIds.length} conversations sélectionnées ? Cette action est irréversible.`
+    deleteConfirmMessage.textContent = `Veux-tu vraiment supprimer les ${validIds.length} conversations sélectionnées ? Cette action est irréversible.`
   }
 
   deleteConfirmButton.disabled = false
@@ -362,10 +361,7 @@ function closeDeleteConfirmation() {
 // ==================================================
 
 async function confirmDeleteConversations() {
-  if (
-    state.deletingConversations ||
-    !state.pendingDeleteConversationIds.length
-  ) {
+  if (state.deletingConversations || !state.pendingDeleteConversationIds.length) {
     return
   }
 
@@ -413,8 +409,7 @@ async function confirmDeleteConversations() {
 
     if (deletedIds.length) {
       state.conversations = state.conversations.filter(
-        (conversation) =>
-          !deletedIds.includes(Number(conversation.id))
+        (conversation) => !deletedIds.includes(Number(conversation.id))
       )
 
       deletedIds.forEach((id) => {
@@ -442,13 +437,11 @@ async function confirmDeleteConversations() {
       state.pendingDeleteConversationIds = failedIds
 
       if (deleteConfirmTitle) {
-        deleteConfirmTitle.textContent =
-          'Suppression incomplète'
+        deleteConfirmTitle.textContent = 'Suppression incomplète'
       }
 
       if (deleteConfirmMessage) {
-        deleteConfirmMessage.textContent =
-          `${deletedIds.length} conversation(s) supprimée(s). ${failedIds.length} conversation(s) n'ont pas pu être supprimées.`
+        deleteConfirmMessage.textContent = `${deletedIds.length} conversation(s) supprimée(s). ${failedIds.length} conversation(s) n'ont pas pu être supprimées.`
       }
 
       if (deleteConversationsError) {
@@ -481,10 +474,7 @@ async function confirmDeleteConversations() {
     if (deleteConfirmButton) {
       deleteConfirmButton.disabled = false
 
-      if (
-        !failedIds.length &&
-        state.pendingDeleteConversationIds.length === 0
-      ) {
+      if (!failedIds.length && state.pendingDeleteConversationIds.length === 0) {
         deleteConfirmButton.innerHTML =
           '<i class="fa-solid fa-trash-can" aria-hidden="true"></i><span>Supprimer</span>'
       }
@@ -561,9 +551,7 @@ function setFavoriteUI(conversationId, favorite) {
 
   item.dataset.favorite = favorite ? 'true' : 'false'
 
-  item
-    .querySelector('[data-favorite-star]')
-    ?.classList.toggle('hidden', !favorite)
+  item.querySelector('[data-favorite-star]')?.classList.toggle('hidden', !favorite)
 
   applyCurrentFilter()
 }
@@ -606,18 +594,14 @@ function createConversationElement(conversation) {
   item.dataset.conversationId = String(conversation.id)
   item.dataset.unread = String(Number(conversation.unreadCount || 0))
 
-  item.dataset.chatType = conversation.groupId
-    ? 'group'
-    : 'private'
+  item.dataset.chatType = conversation.groupId ? 'group' : 'private'
 
-  item.dataset.favorite = conversation.favorite
-    ? 'true'
-    : 'false'
+  item.dataset.favorite = conversation.favorite ? 'true' : 'false'
 
   item.setAttribute('aria-selected', 'false')
 
   item.className =
-  'chat-item group relative flex w-full select-none items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50'
+    'chat-item group relative flex w-full select-none items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50'
 
   const checkbox = document.createElement('input')
 
@@ -627,9 +611,7 @@ function createConversationElement(conversation) {
   checkbox.className =
     'conversation-checkbox hidden h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
 
-  checkbox.checked = selectedConversationIds.has(
-    Number(conversation.id)
-  )
+  checkbox.checked = selectedConversationIds.has(Number(conversation.id))
 
   checkbox.addEventListener('click', (event) => {
     event.stopPropagation()
@@ -641,13 +623,11 @@ function createConversationElement(conversation) {
 
   const avatar = document.createElement('div')
 
-    avatar.className =
+  avatar.className =
     'flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-semibold ' +
-    (conversation.groupId
-      ? 'bg-[#29ff9d] text-[#075e8d]'
-      : 'bg-[#075e8d] text-white')
+    (conversation.groupId ? 'bg-[#29ff9d] text-[#075e8d]' : 'bg-[#075e8d] text-white')
 
-    const avatarUrl = user?.avatar || conversation.group?.avatar
+  const avatarUrl = user?.avatar || conversation.group?.avatar
 
   if (avatarUrl) {
     const img = document.createElement('img')
@@ -668,11 +648,11 @@ function createConversationElement(conversation) {
 
     avatar.appendChild(img)
   } else {
-      avatar.textContent = user
+    avatar.textContent = user
       ? getUserInitials(user)
       : conversation.group
         ? getUserInitials({ fullName: conversation.group.name })
-      : 'KC'
+        : 'KC'
   }
 
   const details = document.createElement('div')
@@ -682,13 +662,11 @@ function createConversationElement(conversation) {
   top.className = 'flex items-start justify-between gap-2'
 
   const name = document.createElement('p')
-  name.className =
-    'truncate text-sm font-semibold text-brand-blue'
+  name.className = 'truncate text-sm font-semibold text-brand-blue'
   name.textContent = getConversationName(conversation)
 
   const timeContainer = document.createElement('div')
-  timeContainer.className =
-    'relative flex shrink-0 flex-col items-end'
+  timeContainer.className = 'relative flex shrink-0 flex-col items-end'
 
   const time = document.createElement('span')
   time.className = 'conversation-time text-xs text-slate-400'
@@ -702,15 +680,12 @@ function createConversationElement(conversation) {
   actionsButton.type = 'button'
   actionsButton.dataset.conversationActions = String(conversation.id)
 
-  actionsButton.setAttribute(
-    'aria-label',
-    'Options de la conversation'
-  )
+  actionsButton.setAttribute('aria-label', 'Options de la conversation')
 
   actionsButton.title = 'Options de la conversation'
 
   actionsButton.className =
-  'conversation-actions-button pointer-events-none absolute right-8 top-full z-10 flex h-5 w-5 items-center justify-center bg-transparent text-[#075e8d] opacity-0 transition md:pointer-events-auto md:focus:opacity-100 md:group-hover:opacity-100'
+    'conversation-actions-button pointer-events-none absolute right-8 top-full z-10 flex h-5 w-5 items-center justify-center bg-transparent text-[#075e8d] opacity-0 transition md:pointer-events-auto md:focus:opacity-100 md:group-hover:opacity-100'
 
   const actionsIcon = document.createElement('i')
   actionsIcon.className = 'fa-solid fa-chevron-down text-[10px]'
@@ -722,8 +697,7 @@ function createConversationElement(conversation) {
   top.append(name, timeContainer)
 
   const preview = document.createElement('span')
-  preview.className =
-    'block truncate text-xs text-slate-500'
+  preview.className = 'block truncate text-xs text-slate-500'
 
   preview.textContent = conversation.lastMessage
     ? getMessageText(conversation.lastMessage)
@@ -742,8 +716,7 @@ function createConversationElement(conversation) {
   star.dataset.favoriteStar = ''
   star.setAttribute('aria-hidden', 'true')
   star.className =
-    'fa-solid fa-star shrink-0 text-xs text-amber-400 ' +
-    (conversation.favorite ? '' : 'hidden')
+    'fa-solid fa-star shrink-0 text-xs text-amber-400 ' + (conversation.favorite ? '' : 'hidden')
 
   preview.classList.add('min-w-0', 'flex-1')
 
@@ -754,7 +727,7 @@ function createConversationElement(conversation) {
   details.append(top, bottom)
   item.append(checkbox, avatar, details)
 
-      // ----- Appui prolongé (mobile) -----
+  // ----- Appui prolongé (mobile) -----
   item.style.webkitTouchCallout = 'none'
 
   let longPressTimer = null
@@ -772,8 +745,7 @@ function createConversationElement(conversation) {
     if (
       event.pointerType === 'mouse' ||
       state.conversationSelectionMode ||
-      (event.target instanceof Element &&
-        event.target.closest('[data-conversation-menu]'))
+      (event.target instanceof Element && event.target.closest('[data-conversation-menu]'))
     ) {
       return
     }
@@ -798,10 +770,7 @@ function createConversationElement(conversation) {
   item.addEventListener('pointermove', (event) => {
     if (!longPressTimer) return
 
-    if (
-      Math.abs(event.clientX - pressStartX) > 10 ||
-      Math.abs(event.clientY - pressStartY) > 10
-    ) {
+    if (Math.abs(event.clientX - pressStartX) > 10 || Math.abs(event.clientY - pressStartY) > 10) {
       cancelLongPress()
     }
   })
@@ -822,19 +791,11 @@ function createConversationElement(conversation) {
 
 function sortConversations(conversationListData) {
   return [...conversationListData].sort((a, b) => {
-    const dateA = a.lastMessage
-      ? getMessageDateTimestamp(a.lastMessage)
-      : 0
+    const dateA = a.lastMessage ? getMessageDateTimestamp(a.lastMessage) : 0
 
-    const dateB = b.lastMessage
-      ? getMessageDateTimestamp(b.lastMessage)
-      : 0
+    const dateB = b.lastMessage ? getMessageDateTimestamp(b.lastMessage) : 0
 
-    if (
-      Number.isFinite(dateA) &&
-      Number.isFinite(dateB) &&
-      dateA !== dateB
-    ) {
+    if (Number.isFinite(dateA) && Number.isFinite(dateB) && dateA !== dateB) {
       return dateB - dateA
     }
 
@@ -873,10 +834,7 @@ export async function loadConversations(force = false) {
     newConversations.forEach((conversation) => {
       const oldConversation = getConversationById(conversation.id)
 
-      if (
-        !conversation.lastMessage &&
-        oldConversation?.lastMessage
-      ) {
+      if (!conversation.lastMessage && oldConversation?.lastMessage) {
         conversation.lastMessage = oldConversation.lastMessage
       }
     })
@@ -889,9 +847,7 @@ export async function loadConversations(force = false) {
       openConversation.unreadCount = 0
     }
 
-    const existingIds = new Set(
-      state.conversations.map((conversation) => Number(conversation.id))
-    )
+    const existingIds = new Set(state.conversations.map((conversation) => Number(conversation.id)))
 
     selectedConversationIds.forEach((id) => {
       if (!existingIds.has(id)) {
@@ -907,14 +863,13 @@ export async function loadConversations(force = false) {
       headerNameElement.textContent = getConversationName(openConversation)
     }
 
-      if (openConversation) {
+    if (openConversation) {
       updateChatHeaderForGroup(openConversation)
     }
 
     if (state.selectedConversationId !== null) {
       const selectedConversation = state.conversations.find(
-        (conversation) =>
-          Number(conversation.id) === Number(state.selectedConversationId)
+        (conversation) => Number(conversation.id) === Number(state.selectedConversationId)
       )
 
       if (!selectedConversation) {
@@ -961,15 +916,11 @@ export function updateConversationPreview(conversationId, message) {
   const time = item.querySelector('.conversation-time')
 
   if (preview) {
-    preview.textContent = message
-      ? getMessageText(message)
-      : 'Aucun message'
+    preview.textContent = message ? getMessageText(message) : 'Aucun message'
   }
 
   if (time) {
-    time.textContent = message
-      ? formatTime(getMessageDateValue(message))
-      : ''
+    time.textContent = message ? formatTime(getMessageDateValue(message)) : ''
   }
 
   if (chatItems) {
@@ -989,16 +940,13 @@ export function updateLastMessageAfterDeletion(conversationId) {
   const remainingMessages = sortMessages(
     state.currentMessages.filter(
       (message) =>
-        getMessageConversationId(message) ===
-          Number(conversationId) ||
+        getMessageConversationId(message) === Number(conversationId) ||
         !getMessageConversationId(message)
     )
   )
 
   const lastMessage =
-    remainingMessages.length > 0
-      ? remainingMessages[remainingMessages.length - 1]
-      : null
+    remainingMessages.length > 0 ? remainingMessages[remainingMessages.length - 1] : null
 
   conversation.lastMessage = lastMessage
 
@@ -1008,8 +956,6 @@ export function updateLastMessageAfterDeletion(conversationId) {
 // ==================================================
 // OUVERTURE D'UNE CONVERSATION
 // ==================================================
-
-
 
 // En-tête d'un groupe : photo (ou initiales) à gauche, nom et description à droite
 function updateChatHeaderForGroup(conversation) {
@@ -1028,14 +974,12 @@ function updateChatHeaderForGroup(conversation) {
     return
   }
 
-  const groupName =
-    conversation.group?.name || getConversationName(conversation)
+  const groupName = conversation.group?.name || getConversationName(conversation)
 
   const groupAvatar = conversation.group?.avatar
 
   if (headerStatus) {
-    headerStatus.textContent =
-      conversation.group?.description || 'Aucune description'
+    headerStatus.textContent = conversation.group?.description || 'Aucune description'
   }
 
   if (groupAvatar && headerAvatar) {
@@ -1054,7 +998,6 @@ function updateChatHeaderForGroup(conversation) {
   }
 }
 
-
 export async function selectConversation(conversationId) {
   if (state.conversationSelectionMode) {
     toggleConversationSelection(conversationId)
@@ -1071,16 +1014,12 @@ export async function selectConversation(conversationId) {
   state.selectedRecipient = null
   state.currentMessages = []
 
-  conversationList
-    .querySelectorAll('.chat-item')
-    .forEach((item) => {
-      const isActive =
-        Number(item.dataset.conversationId) ===
-        Number(conversation.id)
+  conversationList.querySelectorAll('.chat-item').forEach((item) => {
+    const isActive = Number(item.dataset.conversationId) === Number(conversation.id)
 
-      item.classList.toggle('is-active', isActive)
-      item.setAttribute('aria-selected', String(isActive))
-    })
+    item.classList.toggle('is-active', isActive)
+    item.setAttribute('aria-selected', String(isActive))
+  })
 
   const headerName = $('#chatHeaderName')
   const headerAvatar = $('#chatHeaderAvatar')
@@ -1105,7 +1044,7 @@ export async function selectConversation(conversationId) {
     }
   }
 
-    if (headerStatus) {
+  if (headerStatus) {
     headerStatus.textContent = ''
   }
 
@@ -1140,20 +1079,17 @@ function startConversationWithUser(user) {
   state.selectedRecipient = user
   state.currentMessages = []
 
-  conversationList
-    .querySelectorAll('.chat-item')
-    .forEach((item) => {
-      item.classList.remove('is-active')
-      item.setAttribute('aria-selected', 'false')
-    })
+  conversationList.querySelectorAll('.chat-item').forEach((item) => {
+    item.classList.remove('is-active')
+    item.setAttribute('aria-selected', 'false')
+  })
 
   const headerName = $('#chatHeaderName')
   const headerAvatar = $('#chatHeaderAvatar')
   const headerStatus = $('#chatHeaderStatus')
 
   if (headerName) {
-    headerName.textContent =
-      user.fullName || user.username || 'Utilisateur'
+    headerName.textContent = user.fullName || user.username || 'Utilisateur'
   }
 
   if (headerAvatar) {
@@ -1188,7 +1124,6 @@ function startConversationWithUser(user) {
   })
 }
 
-
 export function openChatWithUser(user) {
   const existing = state.conversations.find((conversation) => {
     if (conversation.groupId) {
@@ -1214,25 +1149,21 @@ export function openChatWithUser(user) {
 // ==================================================
 
 function applyCurrentFilter() {
-  const activeFilter =
-    $('[data-chat-filter].is-active')?.dataset.chatFilter ||
-    'all'
+  const activeFilter = $('[data-chat-filter].is-active')?.dataset.chatFilter || 'all'
 
-  conversationList
-    .querySelectorAll('.chat-item')
-    .forEach((item) => {
-      const unread = Number(item.dataset.unread || 0) > 0
-      const group = item.dataset.chatType === 'group'
-      const favorite = item.dataset.favorite === 'true'
+  conversationList.querySelectorAll('.chat-item').forEach((item) => {
+    const unread = Number(item.dataset.unread || 0) > 0
+    const group = item.dataset.chatType === 'group'
+    const favorite = item.dataset.favorite === 'true'
 
-      const matches =
-        activeFilter === 'all' ||
-        (activeFilter === 'unread' && unread) ||
-        (activeFilter === 'groups' && group) ||
-        (activeFilter === 'favorites' && favorite)
+    const matches =
+      activeFilter === 'all' ||
+      (activeFilter === 'unread' && unread) ||
+      (activeFilter === 'groups' && group) ||
+      (activeFilter === 'favorites' && favorite)
 
-      item.classList.toggle('hidden', !matches)
-    })
+    item.classList.toggle('hidden', !matches)
+  })
 }
 
 // ==================================================
@@ -1240,51 +1171,35 @@ function applyCurrentFilter() {
 // ==================================================
 
 export function setActiveNavigation(section) {
-  document
-    .querySelectorAll('[data-section]')
-    .forEach((button) => {
-      const isActive = button.dataset.section === section
+  document.querySelectorAll('[data-section]').forEach((button) => {
+    const isActive = button.dataset.section === section
 
-      const isMobileNav =
-        button.classList.contains('mobile-nav-item')
+    const isMobileNav = button.classList.contains('mobile-nav-item')
 
-      const isDesktopNav =
-        button.classList.contains('nav-item')
+    const isDesktopNav = button.classList.contains('nav-item')
 
-      if (!isMobileNav && !isDesktopNav) {
-        return
-      }
+    if (!isMobileNav && !isDesktopNav) {
+      return
+    }
 
-      button.classList.toggle('is-active', isActive)
-      button.classList.toggle('bg-[#29ff9d]', isActive)
-      button.classList.toggle('text-[#075e8d]', isActive)
-      button.classList.toggle('bg-transparent', !isActive)
-      button.classList.toggle('hover:bg-[#29ff9d]', isActive)
-      button.classList.toggle('hover:bg-transparent', !isActive)
+    button.classList.toggle('is-active', isActive)
+    button.classList.toggle('bg-[#29ff9d]', isActive)
+    button.classList.toggle('text-[#075e8d]', isActive)
+    button.classList.toggle('bg-transparent', !isActive)
+    button.classList.toggle('hover:bg-[#29ff9d]', isActive)
+    button.classList.toggle('hover:bg-transparent', !isActive)
 
-      button.setAttribute(
-        'aria-current',
-        isActive ? 'page' : 'false'
-      )
-    })
+    button.setAttribute('aria-current', isActive ? 'page' : 'false')
+  })
 }
 
 // Branche les écouteurs d'événements de cette fonctionnalité
 export function setupConversations() {
-  cancelConversationSelection?.addEventListener(
-    'click',
-    exitConversationSelectionMode
-  )
+  cancelConversationSelection?.addEventListener('click', exitConversationSelectionMode)
 
-  closeDeleteConfirmButton?.addEventListener(
-    'click',
-    closeDeleteConfirmation
-  )
+  closeDeleteConfirmButton?.addEventListener('click', closeDeleteConfirmation)
 
-  cancelDeleteConfirmButton?.addEventListener(
-    'click',
-    closeDeleteConfirmation
-  )
+  cancelDeleteConfirmButton?.addEventListener('click', closeDeleteConfirmation)
 
   deleteConfirmModal?.addEventListener('click', (event) => {
     if (event.target === deleteConfirmModal) {
@@ -1292,10 +1207,7 @@ export function setupConversations() {
     }
   })
 
-  deleteConfirmButton?.addEventListener(
-    'click',
-    confirmDeleteConversations
-  )
+  deleteConfirmButton?.addEventListener('click', confirmDeleteConversations)
 
   newChatContacts?.addEventListener('click', (event) => {
     const target = event.target
@@ -1310,14 +1222,9 @@ export function setupConversations() {
       return
     }
 
-    const user = state.registeredUsers.find(
-      (item) => String(item.id) === button.dataset.startChat
-    )
+    const user = state.registeredUsers.find((item) => String(item.id) === button.dataset.startChat)
 
-    if (
-      !user ||
-      Number(user.id) === Number(getCurrentUserId())
-    ) {
+    if (!user || Number(user.id) === Number(getCurrentUserId())) {
       return
     }
 
@@ -1341,25 +1248,19 @@ export function setupConversations() {
       return
     }
 
-    const checkbox = target.closest(
-      '[data-conversation-checkbox]'
-    )
+    const checkbox = target.closest('[data-conversation-checkbox]')
 
     if (checkbox && conversationList.contains(checkbox)) {
       event.stopPropagation()
       return
     }
 
-    const actionsButton = target.closest(
-      '[data-conversation-actions]'
-    )
+    const actionsButton = target.closest('[data-conversation-actions]')
 
     if (actionsButton && conversationList.contains(actionsButton)) {
       event.stopPropagation()
 
-      const conversationId = Number(
-        actionsButton.dataset.conversationActions
-      )
+      const conversationId = Number(actionsButton.dataset.conversationActions)
 
       if (!Number.isInteger(conversationId) || conversationId <= 0) {
         return
@@ -1374,9 +1275,7 @@ export function setupConversations() {
       return
     }
 
-    const menuAction = target.closest(
-      '[data-conversation-menu-action]'
-    )
+    const menuAction = target.closest('[data-conversation-menu-action]')
 
     if (menuAction && conversationList.contains(menuAction)) {
       event.stopPropagation()
@@ -1385,7 +1284,7 @@ export function setupConversations() {
       const conversationId = Number(menuAction.dataset.conversationId)
 
       closeConversationMenu()
-      
+
       if (action === 'favorite') {
         toggleFavorite(conversationId)
         return
@@ -1402,9 +1301,7 @@ export function setupConversations() {
       }
     }
 
-    const item = target.closest(
-      '.chat-item[data-conversation-id]'
-    )
+    const item = target.closest('.chat-item[data-conversation-id]')
 
     if (!item) {
       return
@@ -1420,12 +1317,9 @@ export function setupConversations() {
     selectConversation(conversationId)
   })
 
-  deleteSelectedConversationsButton?.addEventListener(
-    'click',
-    () => {
-      showDeleteConfirmation(getSelectedConversationIds())
-    }
-  )
+  deleteSelectedConversationsButton?.addEventListener('click', () => {
+    showDeleteConfirmation(getSelectedConversationIds())
+  })
 
   // ==================================================
   // RECHERCHE DES CONVERSATIONS
@@ -1434,61 +1328,44 @@ export function setupConversations() {
   chatSearch?.addEventListener('input', () => {
     const query = chatSearch.value.trim().toLowerCase()
 
-    conversationList
-      .querySelectorAll('.chat-item')
-      .forEach((item) => {
-        item.classList.toggle(
-          'hidden',
-          !item.textContent.toLowerCase().includes(query)
-        )
-      })
+    conversationList.querySelectorAll('.chat-item').forEach((item) => {
+      item.classList.toggle('hidden', !item.textContent.toLowerCase().includes(query))
+    })
   })
 
-  document
-    .querySelectorAll('[data-chat-filter]')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        document
-          .querySelectorAll('[data-chat-filter]')
-          .forEach((other) => {
-            other.classList.remove('is-active')
-            other.setAttribute('aria-pressed', 'false')
-          })
-
-        button.classList.add('is-active')
-        button.setAttribute('aria-pressed', 'true')
-
-        applyCurrentFilter()
+  document.querySelectorAll('[data-chat-filter]').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('[data-chat-filter]').forEach((other) => {
+        other.classList.remove('is-active')
+        other.setAttribute('aria-pressed', 'false')
       })
+
+      button.classList.add('is-active')
+      button.setAttribute('aria-pressed', 'true')
+
+      applyCurrentFilter()
     })
+  })
 
   // ==================================================
   // NAVIGATION
   // ==================================================
 
-  mobileBackToChats?.addEventListener(
-    'click',
-    showConversationList
-  )
+  mobileBackToChats?.addEventListener('click', showConversationList)
 
-  document
-    .querySelectorAll('[data-section="chats"]')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        hideMessageActions()
+  document.querySelectorAll('[data-section="chats"]').forEach((button) => {
+    button.addEventListener('click', () => {
+      hideMessageActions()
 
-        if (isMobile()) {
-          showConversationList()
-        } else if (
-          state.selectedConversationId === null &&
-          !state.selectedRecipient
-        ) {
-          emptyChatState.classList.remove('hidden')
-          chatContent.classList.add('hidden')
-          chatContent.classList.remove('flex')
-        }
-      })
+      if (isMobile()) {
+        showConversationList()
+      } else if (state.selectedConversationId === null && !state.selectedRecipient) {
+        emptyChatState.classList.remove('hidden')
+        chatContent.classList.add('hidden')
+        chatContent.classList.remove('flex')
+      }
     })
+  })
 
   // ==================================================
   // FERMETURE DES MENUS AU CLIC EXTÉRIEUR
@@ -1508,10 +1385,7 @@ export function setupConversations() {
       closeConversationMenu()
     }
 
-    if (
-      !target.closest('[data-message-options]') &&
-      !target.closest('[data-message-menu]')
-    ) {
+    if (!target.closest('[data-message-options]') && !target.closest('[data-message-menu]')) {
       closeMessageMenu()
     }
   })
@@ -1525,18 +1399,12 @@ export function setupConversations() {
       return
     }
 
-    if (
-      deleteConfirmModal &&
-      !deleteConfirmModal.classList.contains('hidden')
-    ) {
+    if (deleteConfirmModal && !deleteConfirmModal.classList.contains('hidden')) {
       closeDeleteConfirmation()
       return
     }
 
-    if (
-      deleteMessagesConfirmModal &&
-      !deleteMessagesConfirmModal.classList.contains('hidden')
-    ) {
+    if (deleteMessagesConfirmModal && !deleteMessagesConfirmModal.classList.contains('hidden')) {
       closeDeleteMessagesConfirmation()
       return
     }
@@ -1558,10 +1426,7 @@ export function setupConversations() {
     hideMessageActions()
 
     if (isMobile()) {
-      if (
-        state.selectedConversationId !== null ||
-        state.selectedRecipient
-      ) {
+      if (state.selectedConversationId !== null || state.selectedRecipient) {
         showChatPanel()
       } else {
         showConversationList()
@@ -1574,12 +1439,9 @@ export function setupConversations() {
     }
   })
 
-  document
-    .querySelectorAll('[data-section]')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        setActiveNavigation(button.dataset.section)
-      })
+  document.querySelectorAll('[data-section]').forEach((button) => {
+    button.addEventListener('click', () => {
+      setActiveNavigation(button.dataset.section)
     })
-
+  })
 }

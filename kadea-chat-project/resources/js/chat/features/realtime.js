@@ -1,9 +1,24 @@
 import { Transmit } from '@adonisjs/transmit-client'
-import { countedUnreadMessageIds, loadConversations, markConversationAsRead, setUnreadCount, updateConversationPreview, updateLastMessageAfterDeletion } from './conversations.js'
+import {
+  countedUnreadMessageIds,
+  loadConversations,
+  markConversationAsRead,
+  setUnreadCount,
+  updateConversationPreview,
+  updateLastMessageAfterDeletion,
+} from './conversations.js'
 import { applyMessageStatus, renderMessages } from './messages.js'
 import { conversationSubscriptions, selectedMessageIds, state } from './state.js'
 import { hideTypingIndicator, showTypingIndicator } from './typing.js'
-import { getConversationById, getCurrentUserId, getMessageConversationId, getMessageId, hasMessage, isMyMessage, upsertMessage } from './utils.js'
+import {
+  getConversationById,
+  getCurrentUserId,
+  getMessageConversationId,
+  getMessageId,
+  hasMessage,
+  isMyMessage,
+  upsertMessage,
+} from './utils.js'
 
 // ==================================================
 // ÉVÉNEMENTS DES MESSAGES EN TEMPS RÉEL
@@ -27,7 +42,7 @@ function handleMessageCreated(message) {
   }
 
   // Le message de l'autre personne est arrivé : plus besoin de "en train d'écrire"
-    if (!isMyMessage(message)) {
+  if (!isMyMessage(message)) {
     hideTypingIndicator(conversationId)
   }
 
@@ -49,10 +64,7 @@ function handleMessageCreated(message) {
       if (Number(state.selectedConversationId) === conversationId) {
         markConversationAsRead(conversationId)
       } else {
-        setUnreadCount(
-          conversationId,
-          Number(conversation.unreadCount || 0) + 1
-        )
+        setUnreadCount(conversationId, Number(conversation.unreadCount || 0) + 1)
       }
     }
   } else {
@@ -78,10 +90,7 @@ export function handleMessageUpdated(message) {
 
   const conversation = getConversationById(conversationId)
 
-  if (
-    conversation?.lastMessage &&
-    getMessageId(conversation.lastMessage) === messageId
-  ) {
+  if (conversation?.lastMessage && getMessageId(conversation.lastMessage) === messageId) {
     updateConversationPreview(conversationId, message)
   }
 }
@@ -92,16 +101,14 @@ function handleMessageDeleted(message) {
   }
 
   const messageId = Number(message.id)
-  const conversationId = Number(
-    message.conversationId ?? message.conversation_id
-  )
+  const conversationId = Number(message.conversationId ?? message.conversation_id)
 
   if (!messageId || !conversationId) {
     return
   }
 
   if (Number(state.selectedConversationId) === conversationId) {
-      state.currentMessages = message.removed
+    state.currentMessages = message.removed
       ? state.currentMessages.filter((item) => getMessageId(item) !== messageId)
       : state.currentMessages.map((item) =>
           getMessageId(item) === messageId
@@ -142,8 +149,7 @@ function handleRealtimePayload(payload) {
     return
   }
 
-
-    if (eventType === 'message.status') {
+  if (eventType === 'message.status') {
     if (message?.messageIds) {
       applyMessageStatus(message.conversationId, message.messageIds, message.statusId)
     }
@@ -224,9 +230,7 @@ export async function subscribeToConversation(conversationId) {
     return
   }
 
-  const subscription = state.transmit.subscription(
-    `conversations/${id}/messages`
-  )
+  const subscription = state.transmit.subscription(`conversations/${id}/messages`)
 
   const unsubscribe = subscription.onMessage((payload) => {
     handleRealtimePayload(payload)

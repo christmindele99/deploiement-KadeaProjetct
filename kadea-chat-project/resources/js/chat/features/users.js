@@ -1,5 +1,21 @@
-import { exitConversationSelectionMode, openChatWithUser, setActiveNavigation } from './conversations.js'
-import { app, closeNewChatButton, contactSearch, mobileNewChatButton, newChatContacts, newChatModal, openNewChatButton, state, usersButton, usersPanelList, usersSearch } from './state.js'
+import {
+  exitConversationSelectionMode,
+  openChatWithUser,
+  setActiveNavigation,
+} from './conversations.js'
+import {
+  app,
+  closeNewChatButton,
+  contactSearch,
+  mobileNewChatButton,
+  newChatContacts,
+  newChatModal,
+  openNewChatButton,
+  state,
+  usersButton,
+  usersPanelList,
+  usersSearch,
+} from './state.js'
 import { api, getCurrentUserId, getData, getUserInitials, isMobile } from './utils.js'
 
 // ==================================================
@@ -67,24 +83,18 @@ export function createUserElement(user) {
   details.className = 'min-w-0 flex-1'
 
   const name = document.createElement('p')
-  name.className =
-    'truncate text-sm font-semibold text-slate-800'
-  name.textContent =
-    user.fullName || user.username || 'Utilisateur'
+  name.className = 'truncate text-sm font-semibold text-slate-800'
+  name.textContent = user.fullName || user.username || 'Utilisateur'
 
   const username = document.createElement('p')
-  username.className =
-    'truncate text-xs text-slate-500'
-  username.textContent = user.username
-    ? `@${user.username}`
-    : ''
+  username.className = 'truncate text-xs text-slate-500'
+  username.textContent = user.username ? `@${user.username}` : ''
 
   details.append(name, username)
 
   if (user.bio) {
     const bio = document.createElement('p')
-    bio.className =
-      'mt-1 truncate text-xs text-slate-400'
+    bio.className = 'mt-1 truncate text-xs text-slate-400'
     bio.textContent = user.bio
     details.appendChild(bio)
   }
@@ -108,10 +118,7 @@ function renderUsersList(container, query = '') {
       const fullName = (user.fullName || '').toLowerCase()
       const username = (user.username || '').toLowerCase()
 
-      return (
-        fullName.includes(normalizedQuery) ||
-        username.includes(normalizedQuery)
-      )
+      return fullName.includes(normalizedQuery) || username.includes(normalizedQuery)
     })
 
   container.replaceChildren()
@@ -155,10 +162,7 @@ export async function loadRegisteredUsers() {
     renderRegisteredUsers(contactSearch?.value || '')
   } catch (error) {
     if (error.message !== 'SESSION_EXPIRED') {
-      showUsersMessage(
-        'Impossible de charger les utilisateurs.',
-        true
-      )
+      showUsersMessage('Impossible de charger les utilisateurs.', true)
     } else {
       window.location.reload()
     }
@@ -186,7 +190,6 @@ export function closeNewChatModal() {
   newChatModal.classList.add('hidden')
   newChatModal.classList.remove('flex')
 }
-
 
 // ==================================================
 // MODE UTILISATEURS (desktop)
@@ -222,20 +225,11 @@ function exitUsersMode() {
 
 // Branche les écouteurs d'événements de cette fonctionnalité
 export function setupUsers() {
-  openNewChatButton?.addEventListener(
-    'click',
-    openNewChatModal
-  )
+  openNewChatButton?.addEventListener('click', openNewChatModal)
 
-  mobileNewChatButton?.addEventListener(
-    'click',
-    openNewChatModal
-  )
+  mobileNewChatButton?.addEventListener('click', openNewChatModal)
 
-  closeNewChatButton?.addEventListener(
-    'click',
-    closeNewChatModal
-  )
+  closeNewChatButton?.addEventListener('click', closeNewChatModal)
 
   newChatModal?.addEventListener('click', (event) => {
     if (event.target === newChatModal) {
@@ -247,8 +241,8 @@ export function setupUsers() {
     renderRegisteredUsers(contactSearch.value)
   })
 
-    // ----- Mode Utilisateurs (desktop) -----
-    usersButton?.addEventListener('click', (event) => {
+  // ----- Mode Utilisateurs (desktop) -----
+  usersButton?.addEventListener('click', (event) => {
     // Sur la page du chat on reste sur la page ; ailleurs le lien mène à /chat#users
     event.preventDefault()
     enterUsersMode()
@@ -271,9 +265,7 @@ export function setupUsers() {
       return
     }
 
-    const user = state.registeredUsers.find(
-      (item) => String(item.id) === button.dataset.startChat
-    )
+    const user = state.registeredUsers.find((item) => String(item.id) === button.dataset.startChat)
 
     if (!user || Number(user.id) === Number(getCurrentUserId())) {
       return
@@ -284,18 +276,16 @@ export function setupUsers() {
   })
 
   // Icône Chats : revenir aux conversations sans recharger la page
-  document
-    .querySelectorAll('[data-section="chats"]')
-    .forEach((link) => {
-      link.addEventListener('click', (event) => {
-        if (!state.usersMode) {
-          return
-        }
+  document.querySelectorAll('[data-section="chats"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (!state.usersMode) {
+        return
+      }
 
-        event.preventDefault()
-        exitUsersMode()
-      })
+      event.preventDefault()
+      exitUsersMode()
     })
+  })
 
   // Si la fenêtre devient mobile, on quitte le mode Utilisateurs
   window.addEventListener('resize', () => {
@@ -303,5 +293,4 @@ export function setupUsers() {
       exitUsersMode()
     }
   })
-
 }

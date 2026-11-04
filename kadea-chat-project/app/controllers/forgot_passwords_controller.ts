@@ -18,11 +18,10 @@ export default class ForgotPasswordsController {
    * Traite la demande de réinitialisation du mot de passe
    */
   async store({ request, response, session }: HttpContext) {
-    const wantsJson =
-    request.header('accept')?.includes('application/json') ?? false
+    const wantsJson = request.header('accept')?.includes('application/json') ?? false
     const email = request.input('email')
     console.log('EMAIL REÇU :', email)
-  console.log('BODY REÇU :', request.all())
+    console.log('BODY REÇU :', request.all())
 
     // 1. Vérifier l'adresse e-mail
     if (typeof email !== 'string' || !email.trim()) {
@@ -67,10 +66,7 @@ export default class ForgotPasswordsController {
     const token = crypto.randomBytes(32).toString('hex')
 
     // Stocker uniquement le hash du token en base de données
-    const tokenHash = crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex')
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
     // 5. Enregistrer le token avec une expiration d'une heure
     await UserToken.create({
@@ -81,16 +77,12 @@ export default class ForgotPasswordsController {
     })
 
     // 6. Construire le lien de réinitialisation
-    const resetUrl =
-      `${env.get('APP_URL')}/reset-password/${token}`
+    const resetUrl = `${env.get('APP_URL')}/reset-password/${token}`
 
     // 7. Envoyer l'e-mail
     try {
       await mail.send((message) => {
-        message
-          .to(user.email)
-          .subject('Réinitialisation du mot de passe - Kadea Chat')
-          .html(`
+        message.to(user.email).subject('Réinitialisation du mot de passe - Kadea Chat').html(`
             <!DOCTYPE html>
             <html lang="fr">
               <head>

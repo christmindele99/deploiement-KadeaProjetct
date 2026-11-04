@@ -1,7 +1,5 @@
 function getCsrfToken() {
-  const cookie = document.cookie
-    .split('; ')
-    .find((item) => item.startsWith('XSRF-TOKEN='))
+  const cookie = document.cookie.split('; ').find((item) => item.startsWith('XSRF-TOKEN='))
 
   return cookie ? decodeURIComponent(cookie.substring('XSRF-TOKEN='.length)) : ''
 }
@@ -11,7 +9,7 @@ export async function sendComment({ rating, comment }) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Accept': 'application/json',
       'X-XSRF-TOKEN': getCsrfToken(),
     },
     credentials: 'same-origin',
@@ -38,9 +36,7 @@ export function showFlash(message, type = 'success') {
   flash.setAttribute('role', 'status')
   flash.className =
     'fixed left-1/2 top-5 z-[100] flex max-w-[90vw] -translate-x-1/2 items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold text-white shadow-lg backdrop-blur-md transition-opacity duration-300 ' +
-    (isSuccess
-      ? 'border-emerald-400 bg-emerald-600/85'
-      : 'border-red-400 bg-red-600/85')
+    (isSuccess ? 'border-emerald-400 bg-emerald-600/85' : 'border-red-400 bg-red-600/85')
 
   flash.innerHTML = `
     <i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>

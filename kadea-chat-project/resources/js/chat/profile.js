@@ -61,9 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
 
   function getCsrfToken() {
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('XSRF-TOKEN='))
+    const token = document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN='))
 
     if (!token) {
       return null
@@ -101,12 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'border-emerald-200'
       )
     } else {
-      profileMessage.classList.add(
-        'bg-red-50',
-        'text-red-700',
-        'border',
-        'border-red-200'
-      )
+      profileMessage.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200')
     }
 
     setTimeout(() => {

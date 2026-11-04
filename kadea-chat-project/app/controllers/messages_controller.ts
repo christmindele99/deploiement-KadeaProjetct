@@ -21,14 +21,11 @@ export default class MessagesController {
     type: string,
     data: Record<string, any>
   ) {
-    await transmit.broadcast(
-      `conversations/${conversationId}/messages`,
-      {
-        type,
-        data,
-        message: data,
-      }
-    )
+    await transmit.broadcast(`conversations/${conversationId}/messages`, {
+      type,
+      data,
+      message: data,
+    })
   }
 
   /**
@@ -36,21 +33,10 @@ export default class MessagesController {
    * Utile lorsqu'un utilisateur n'est pas encore abonné
    * au canal de cette conversation.
    */
-  private async notifyMembers(
-    conversationId: number,
-    type: string,
-    data: Record<string, any>
-  ) {
-    const memberships = await Membership.query()
-      .where('conversationId', conversationId)
+  private async notifyMembers(conversationId: number, type: string, data: Record<string, any>) {
+    const memberships = await Membership.query().where('conversationId', conversationId)
 
-    const userIds = [
-      ...new Set(
-        memberships.map((membership) =>
-          Number(membership.userId)
-        )
-      ),
-    ]
+    const userIds = [...new Set(memberships.map((membership) => Number(membership.userId)))]
 
     await Promise.all(
       userIds.map(async (userId) => {
@@ -75,36 +61,21 @@ export default class MessagesController {
     notifyUsers = true
   ) {
     try {
-      await this.broadcastConversation(
-        conversationId,
-        type,
-        data
-      )
+      await this.broadcastConversation(conversationId, type, data)
 
       if (notifyUsers) {
-        await this.notifyMembers(
-          conversationId,
-          type,
-          data
-        )
+        await this.notifyMembers(conversationId, type, data)
       }
     } catch (error) {
-      console.error(
-        'Kadea Chat : erreur de diffusion temps réel.',
-        error
-      )
+      console.error('Kadea Chat : erreur de diffusion temps réel.', error)
     }
   }
 
-
-    /**
+  /**
    * Recréer la participation d'un utilisateur qui a supprimé
    * une conversation privée de sa liste.
    */
-  private async restorePairMemberships(
-    conversation: Conversation,
-    trx: TransactionClientContract
-  ) {
+  private async restorePairMemberships(conversation: Conversation, trx: TransactionClientContract) {
     if (conversation.groupId || !conversation.pairKey) {
       return
     }
@@ -147,10 +118,7 @@ export default class MessagesController {
       })
     }
 
-    if (
-      !Number.isInteger(conversationId) ||
-      conversationId <= 0
-    ) {
+    if (!Number.isInteger(conversationId) || conversationId <= 0) {
       return response.badRequest({
         message: 'Identifiant de conversation invalide.',
       })
@@ -167,8 +135,7 @@ export default class MessagesController {
       })
     }
 
-    const messagesQuery = Message.query()
-      .where('conversationId', conversationId)
+    const messagesQuery = Message.query().where('conversationId', conversationId)
 
     if (membership.clearedAt) {
       messagesQuery.where('createdAt', '>=', membership.clearedAt.toJSDate())
@@ -197,9 +164,7 @@ export default class MessagesController {
 
     const content = request.input('content')
     const recipientId = Number(request.input('recipientId'))
-    const conversationId = Number(
-      params.id ?? request.input('conversationId') ?? 0
-    )
+    const conversationId = Number(params.id ?? request.input('conversationId') ?? 0)
 
     if (typeof content !== 'string' || !content.trim()) {
       return response.badRequest({
@@ -207,10 +172,7 @@ export default class MessagesController {
       })
     }
 
-    if (
-      conversationId < 0 ||
-      !Number.isInteger(conversationId)
-    ) {
+    if (conversationId < 0 || !Number.isInteger(conversationId)) {
       return response.badRequest({
         message: 'Identifiant de conversation invalide.',
       })
@@ -242,11 +204,7 @@ export default class MessagesController {
           conversation = foundConversation
           await this.restorePairMemberships(conversation, trx)
         } else {
-          if (
-            !Number.isInteger(recipientId) ||
-            recipientId <= 0 ||
-            recipientId === userId
-          ) {
+          if (!Number.isInteger(recipientId) || recipientId <= 0 || recipientId === userId) {
             throw new Error('INVALID_RECIPIENT')
           }
 
@@ -258,9 +216,7 @@ export default class MessagesController {
             throw new Error('RECIPIENT_NOT_FOUND')
           }
 
-          const pairKey = [userId, recipientId]
-            .sort((a, b) => a - b)
-            .join(':')
+          const pairKey = [userId, recipientId].sort((a, b) => a - b).join(':')
 
           const existingConversation = await Conversation.query({
             client: trx,
@@ -343,38 +299,25 @@ export default class MessagesController {
 
       const data = message.serialize()
 
-      await this.publish(
-        Number(message.conversationId),
-        'message.created',
-        data
-      )
+      await this.publish(Number(message.conversationId), 'message.created', data)
 
       return response.created({
         data,
       })
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === 'CONVERSATION_NOT_FOUND'
-      ) {
+      if (error instanceof Error && error.message === 'CONVERSATION_NOT_FOUND') {
         return response.notFound({
           message: 'Conversation introuvable.',
         })
       }
 
-      if (
-        error instanceof Error &&
-        error.message === 'INVALID_RECIPIENT'
-      ) {
+      if (error instanceof Error && error.message === 'INVALID_RECIPIENT') {
         return response.badRequest({
           message: 'Le destinataire est invalide.',
         })
       }
 
-      if (
-        error instanceof Error &&
-        error.message === 'RECIPIENT_NOT_FOUND'
-      ) {
+      if (error instanceof Error && error.message === 'RECIPIENT_NOT_FOUND') {
         return response.notFound({
           message: 'Destinataire introuvable ou non vérifié.',
         })
@@ -427,28 +370,24 @@ export default class MessagesController {
     message.editedAt = DateTime.now()
     await message.save()
 
-          // Si le destinataire est déjà en ligne, le message est directement "Reçu"
-      const sentConversation = await Conversation.find(message.conversationId)
+    // Si le destinataire est déjà en ligne, le message est directement "Reçu"
+    const sentConversation = await Conversation.find(message.conversationId)
 
-      if (sentConversation && !sentConversation.groupId && sentConversation.pairKey) {
-        const peerId = sentConversation.pairKey
-          .split(':')
-          .map(Number)
-          .find((id) => id !== userId)
+    if (sentConversation && !sentConversation.groupId && sentConversation.pairKey) {
+      const peerId = sentConversation.pairKey
+        .split(':')
+        .map(Number)
+        .find((id) => id !== userId)
 
-        if (peerId && isUserOnline(peerId)) {
-          message.messageStatusId = MESSAGE_STATUS.RECEIVED
-          await message.save()
-        }
+      if (peerId && isUserOnline(peerId)) {
+        message.messageStatusId = MESSAGE_STATUS.RECEIVED
+        await message.save()
       }
+    }
 
-      const data = message.serialize()
+    const data = message.serialize()
 
-    await this.publish(
-      Number(message.conversationId),
-      'message.updated',
-      data
-    )
+    await this.publish(Number(message.conversationId), 'message.updated', data)
 
     return response.ok({
       data,
@@ -474,10 +413,7 @@ export default class MessagesController {
       })
     }
 
-    const message = await Message.query()
-      .where('id', messageId)
-      .where('authorId', userId)
-      .first()
+    const message = await Message.query().where('id', messageId).where('authorId', userId).first()
 
     if (!message) {
       return response.notFound({
@@ -506,15 +442,11 @@ export default class MessagesController {
 
     await message.save()
 
-    await this.publish(
+    await this.publish(conversationId, 'message.deleted', {
+      id: message.id,
       conversationId,
-      'message.deleted',
-      {
-        id: message.id,
-        conversationId,
-        deletedAt: message.deletedAt.toISO(),
-      }
-    )
+      deletedAt: message.deletedAt.toISO(),
+    })
 
     return response.ok({
       message: 'Message supprimé.',

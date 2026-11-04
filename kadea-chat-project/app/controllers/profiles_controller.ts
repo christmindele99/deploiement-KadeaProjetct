@@ -79,11 +79,7 @@ export default class ProfilesController {
     }
 
     // Vérifier la biographie
-    if (
-      bio !== undefined &&
-      bio !== null &&
-      typeof bio !== 'string'
-    ) {
+    if (bio !== undefined && bio !== null && typeof bio !== 'string') {
       return response.badRequest({
         message: 'La biographie est invalide.',
       })
@@ -110,8 +106,6 @@ export default class ProfilesController {
       },
     })
   }
-
-
 
   async updateAvatar({ request, response, session }: HttpContext) {
     const userId = session.get('userId')
@@ -217,10 +211,7 @@ export default class ProfilesController {
     }
 
     // Vérifier le mot de passe actuel
-    const currentPasswordIsValid = await hash.verify(
-      user.password,
-      currentPassword
-    )
+    const currentPasswordIsValid = await hash.verify(user.password, currentPassword)
 
     if (!currentPasswordIsValid) {
       return response.badRequest({

@@ -1,8 +1,21 @@
-import { initializeLayout, loadConversations, setActiveNavigation, setupConversations } from './features/conversations.js'
+import {
+  initializeLayout,
+  loadConversations,
+  setActiveNavigation,
+  setupConversations,
+} from './features/conversations.js'
 import { setupGroups } from './features/groups.js'
 import { setupMessages } from './features/messages.js'
 import { initializeTransmit } from './features/realtime.js'
-import { chatContent, conversationList, emptyChatState, mainPanel, messageForm, messageInput, messageList } from './features/state.js'
+import {
+  chatContent,
+  conversationList,
+  emptyChatState,
+  mainPanel,
+  messageForm,
+  messageInput,
+  messageList,
+} from './features/state.js'
 import { enterUsersMode, loadRegisteredUsers, setupUsers } from './features/users.js'
 import { startPresence } from './features/presence.js'
 import { setupTyping } from './features/typing.js'
@@ -32,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeLayout()
 
   setActiveNavigation('chats')
-    // Arrivée depuis une autre page (paramètres, profil) avec /chat#users
+  // Arrivée depuis une autre page (paramètres, profil) avec /chat#users
   if (window.location.hash === '#users') {
     enterUsersMode()
     setActiveNavigation('users')
@@ -41,5 +54,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRegisteredUsers()
   loadConversations()
   initializeTransmit()
-    startPresence()
+  startPresence()
 })

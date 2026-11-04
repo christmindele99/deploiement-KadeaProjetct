@@ -1,7 +1,43 @@
-import { loadConversations, updateConversationPreview, updateLastMessageAfterDeletion } from './conversations.js'
+import {
+  loadConversations,
+  updateConversationPreview,
+  updateLastMessageAfterDeletion,
+} from './conversations.js'
 import { handleMessageUpdated, subscribeToConversation } from './realtime.js'
-import { cancelDeleteMessages, cancelMessageSelection, closeDeleteMessagesConfirm, confirmDeleteMessages, deleteMessagesConfirmMessage, deleteMessagesConfirmModal, deleteMessagesConfirmTitle, deleteMessagesError, deleteSelectedMessagesButton, messageForm, messageInput, messageList, messageSelectionCount, messageSelectionHeader, selectedMessageIds, state } from './state.js'
-import { api, formatDate, formatTime, getConversationById, getConversationUser, getData, getMessageDateValue, getMessageId, getMessageText, hasMessage, isMobile, isMyMessage, sortMessages, upsertMessage, } from './utils.js'
+import {
+  cancelDeleteMessages,
+  cancelMessageSelection,
+  closeDeleteMessagesConfirm,
+  confirmDeleteMessages,
+  deleteMessagesConfirmMessage,
+  deleteMessagesConfirmModal,
+  deleteMessagesConfirmTitle,
+  deleteMessagesError,
+  deleteSelectedMessagesButton,
+  messageForm,
+  messageInput,
+  messageList,
+  messageSelectionCount,
+  messageSelectionHeader,
+  selectedMessageIds,
+  state,
+} from './state.js'
+import {
+  api,
+  formatDate,
+  formatTime,
+  getConversationById,
+  getConversationUser,
+  getData,
+  getMessageDateValue,
+  getMessageId,
+  getMessageText,
+  hasMessage,
+  isMobile,
+  isMyMessage,
+  sortMessages,
+  upsertMessage,
+} from './utils.js'
 
 // ==================================================
 // MENU D'ACTIONS DES MESSAGES
@@ -10,19 +46,15 @@ import { api, formatDate, formatTime, getConversationById, getConversationUser, 
 export function closeMessageMenu() {
   state.openMessageMenuId = null
 
-  messageList
-    .querySelectorAll('[data-message-menu]')
-    .forEach((menu) => menu.remove())
+  messageList.querySelectorAll('[data-message-menu]').forEach((menu) => menu.remove())
 }
 
 export function hideMessageActions() {
   closeMessageMenu()
 
-  messageList
-    .querySelectorAll('[data-message-row]')
-    .forEach((row) => {
-      row.classList.remove('message-selected')
-    })
+  messageList.querySelectorAll('[data-message-row]').forEach((row) => {
+    row.classList.remove('message-selected')
+  })
 }
 
 function createMessageMenu(messageId) {
@@ -35,9 +67,7 @@ function createMessageMenu(messageId) {
 
   menu.style.top = '100%'
 
-  const row = messageList.querySelector(
-    `[data-message-row][data-message-id="${messageId}"]`
-  )
+  const row = messageList.querySelector(`[data-message-row][data-message-id="${messageId}"]`)
 
   const mine = row?.dataset.messageSender === 'me'
 
@@ -58,8 +88,7 @@ function createMessageMenu(messageId) {
     'flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-red-50 hover:text-red-600'
 
   const deleteIcon = document.createElement('i')
-  deleteIcon.className =
-    'fa-solid fa-trash-can w-5 text-center text-red-500'
+  deleteIcon.className = 'fa-solid fa-trash-can w-5 text-center text-red-500'
 
   const deleteText = document.createElement('span')
   deleteText.textContent = 'Supprimer le message'
@@ -77,8 +106,7 @@ function createMessageMenu(messageId) {
     'flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-[#075e8d]'
 
   const selectIcon = document.createElement('i')
-  selectIcon.className =
-    'fa-solid fa-check w-5 text-center text-[#075e8d]'
+  selectIcon.className = 'fa-solid fa-check w-5 text-center text-[#075e8d]'
 
   const selectText = document.createElement('span')
   selectText.textContent = 'Sélectionner les messages'
@@ -95,8 +123,7 @@ function createMessageMenu(messageId) {
     'flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-slate-600 transition hover:bg-slate-50'
 
   const cancelIcon = document.createElement('i')
-  cancelIcon.className =
-    'fa-solid fa-xmark w-5 text-center text-slate-400'
+  cancelIcon.className = 'fa-solid fa-xmark w-5 text-center text-slate-400'
 
   const cancelText = document.createElement('span')
   cancelText.textContent = 'Annuler'
@@ -106,9 +133,7 @@ function createMessageMenu(messageId) {
   menu.append(deleteButton, selectButton)
 
   // Modifier le message (seulement pour mes propres messages)
-  const messageData = state.currentMessages.find(
-    (item) => getMessageId(item) === Number(messageId)
-  )
+  const messageData = state.currentMessages.find((item) => getMessageId(item) === Number(messageId))
 
   if (mine && messageData && !messageData.deletedAt) {
     const editButton = document.createElement('button')
@@ -121,8 +146,7 @@ function createMessageMenu(messageId) {
       'flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 transition hover:bg-slate-50 hover:text-[#075e8d]'
 
     const editIcon = document.createElement('i')
-    editIcon.className =
-      'fa-solid fa-pen w-5 text-center text-[#075e8d]'
+    editIcon.className = 'fa-solid fa-pen w-5 text-center text-[#075e8d]'
 
     const editText = document.createElement('span')
     editText.textContent = 'Modifier le message'
@@ -161,63 +185,41 @@ function openMessageMenu(messageId, actionsButton) {
 // ==================================================
 
 function updateMessageSelectionUI() {
-  messageList
-    .querySelectorAll('[data-message-row]')
-    .forEach((row) => {
-      const messageId = Number(row.dataset.messageId)
+  messageList.querySelectorAll('[data-message-row]').forEach((row) => {
+    const messageId = Number(row.dataset.messageId)
 
-      // La case à cocher se trouve dans le conteneur
-      // extérieur de la bulle, pas dans la bulle elle-même.
-      const checkbox = row.parentElement?.querySelector(
-        '[data-message-checkbox]'
-      )
+    // La case à cocher se trouve dans le conteneur
+    // extérieur de la bulle, pas dans la bulle elle-même.
+    const checkbox = row.parentElement?.querySelector('[data-message-checkbox]')
 
-      const actionsButton = row.querySelector(
-        '[data-message-options]'
-      )
+    const actionsButton = row.querySelector('[data-message-options]')
 
-      const isSelected = selectedMessageIds.has(messageId)
+    const isSelected = selectedMessageIds.has(messageId)
 
-      if (checkbox) {
-        checkbox.checked = isSelected
-        checkbox.classList.toggle(
-          'hidden',
-          !state.messageSelectionMode
-        )
-      }
+    if (checkbox) {
+      checkbox.checked = isSelected
+      checkbox.classList.toggle('hidden', !state.messageSelectionMode)
+    }
 
-      row.classList.toggle(
-        'message-selected',
-        state.messageSelectionMode && isSelected
-      )
+    row.classList.toggle('message-selected', state.messageSelectionMode && isSelected)
 
-      if (actionsButton) {
-        actionsButton.style.display = state.messageSelectionMode ? 'none' : 'flex'
-      }
-    })
+    if (actionsButton) {
+      actionsButton.style.display = state.messageSelectionMode ? 'none' : 'flex'
+    }
+  })
 
   if (messageSelectionHeader) {
-    messageSelectionHeader.classList.toggle(
-      'hidden',
-      !state.messageSelectionMode
-    )
+    messageSelectionHeader.classList.toggle('hidden', !state.messageSelectionMode)
 
-    messageSelectionHeader.classList.toggle(
-      'flex',
-      state.messageSelectionMode
-    )
+    messageSelectionHeader.classList.toggle('flex', state.messageSelectionMode)
   }
 
   if (messageSelectionCount) {
-    messageSelectionCount.textContent = String(
-      selectedMessageIds.size
-    )
+    messageSelectionCount.textContent = String(selectedMessageIds.size)
   }
 
   if (deleteSelectedMessagesButton) {
-    deleteSelectedMessagesButton.disabled =
-      selectedMessageIds.size === 0 ||
-      state.deletingMessages
+    deleteSelectedMessagesButton.disabled = selectedMessageIds.size === 0 || state.deletingMessages
   }
 }
 
@@ -227,10 +229,7 @@ function enterMessageSelectionMode(initialMessageId = null) {
   state.messageSelectionMode = true
   selectedMessageIds.clear()
 
-  if (
-    initialMessageId !== null &&
-    hasMessage(initialMessageId)
-  ) {
+  if (initialMessageId !== null && hasMessage(initialMessageId)) {
     selectedMessageIds.add(Number(initialMessageId))
   }
 
@@ -269,9 +268,7 @@ function getSelectedMessageIds() {
 let defaultMessagePlaceholder = ''
 
 function setEditingUI(isEditing) {
-  messageInput.placeholder = isEditing
-    ? 'Modifier le message...'
-    : defaultMessagePlaceholder
+  messageInput.placeholder = isEditing ? 'Modifier le message...' : defaultMessagePlaceholder
 
   const sendIcon = messageForm.querySelector('button[type="submit"] i')
 
@@ -284,9 +281,7 @@ function setEditingUI(isEditing) {
 // ==================================================
 
 function startEditingMessage(messageId) {
-  const message = state.currentMessages.find(
-    (item) => getMessageId(item) === Number(messageId)
-  )
+  const message = state.currentMessages.find((item) => getMessageId(item) === Number(messageId))
 
   if (!message || message.deletedAt || !isMyMessage(message)) {
     return
@@ -300,10 +295,7 @@ function startEditingMessage(messageId) {
   messageInput.value = message.content ?? ''
   messageInput.focus()
 
-  messageInput.setSelectionRange(
-    messageInput.value.length,
-    messageInput.value.length
-  )
+  messageInput.setSelectionRange(messageInput.value.length, messageInput.value.length)
 }
 
 export function cancelEditingMessage() {
@@ -319,9 +311,7 @@ export function cancelEditingMessage() {
 async function submitMessageEdit(content) {
   const messageId = state.editingMessageId
 
-  const original = state.currentMessages.find(
-    (item) => getMessageId(item) === messageId
-  )
+  const original = state.currentMessages.find((item) => getMessageId(item) === messageId)
 
   // Rien n'a changé : on quitte simplement le mode édition
   if (!original || original.content === content) {
@@ -362,7 +352,6 @@ async function submitMessageEdit(content) {
 // MESSAGES : MENU, CASES À COCHER ET BULLES
 // ==================================================
 
-
 // Membres du groupe ouvert (id -> membre), pour retrouver le nom des auteurs
 let groupMembersById = new Map()
 
@@ -376,9 +365,7 @@ async function loadGroupMembers(conversationId) {
   try {
     const result = await api(`/conversations/${conversationId}/group`)
 
-    groupMembersById = new Map(
-      result.data.members.map((member) => [Number(member.id), member])
-    )
+    groupMembersById = new Map(result.data.members.map((member) => [Number(member.id), member]))
   } catch (error) {
     if (error.message === 'SESSION_EXPIRED') {
       window.location.reload()
@@ -386,40 +373,27 @@ async function loadGroupMembers(conversationId) {
   }
 }
 
-
 // Couleurs du nom de l'auteur : chaque utilisateur garde toujours la même
-const AUTHOR_NAME_COLORS = [
-  '#0f766e',
-  '#b45309',
-  '#7e22ce',
-  '#be123c',
-  '#1d4ed8',
-  '#15803d',
-]
+const AUTHOR_NAME_COLORS = ['#0f766e', '#b45309', '#7e22ce', '#be123c', '#1d4ed8', '#15803d']
 
 function createAuthorNameElement(message) {
   const authorId = Number(message.authorId ?? message.author_id)
 
   const author =
-  groupMembersById.get(authorId) ||
-  state.registeredUsers.find((user) => Number(user.id) === authorId)
+    groupMembersById.get(authorId) ||
+    state.registeredUsers.find((user) => Number(user.id) === authorId)
 
-  const colorIndex = Number.isFinite(authorId)
-    ? authorId % AUTHOR_NAME_COLORS.length
-    : 0
+  const colorIndex = Number.isFinite(authorId) ? authorId % AUTHOR_NAME_COLORS.length : 0
 
   const name = document.createElement('p')
 
   name.style.cssText =
-    'margin:0 0 4px 0;font-size:12px;font-weight:600;line-height:1.3;' +
-    'color:#29ff9d;'
+    'margin:0 0 4px 0;font-size:12px;font-weight:600;line-height:1.3;' + 'color:#29ff9d;'
 
   name.style.setProperty('color', '#29ff9d', 'important')
 
   name.textContent =
-  author?.fullName ||
-  author?.username ||
-  (isMyMessage(message) ? 'Vous' : 'Utilisateur')
+    author?.fullName || author?.username || (isMyMessage(message) ? 'Vous' : 'Utilisateur')
 
   return name
 }
@@ -428,9 +402,7 @@ function createAuthorNameElement(message) {
 const MESSAGE_STATUS = { SENT: 1, RECEIVED: 2, READ: 3 }
 
 function getMessageStatusId(message) {
-  return Number(
-    message.messageStatusId ?? message.message_status_id ?? MESSAGE_STATUS.SENT
-  )
+  return Number(message.messageStatusId ?? message.message_status_id ?? MESSAGE_STATUS.SENT)
 }
 
 // Dessine le(s) trait(s) selon le statut
@@ -442,8 +414,7 @@ function paintStatusTick(tick, statusId) {
   tick.setAttribute('aria-label', tick.title)
 
   tick.className =
-    'fa-solid text-[10px] ' +
-    (statusId === MESSAGE_STATUS.SENT ? 'fa-check' : 'fa-check-double')
+    'fa-solid text-[10px] ' + (statusId === MESSAGE_STATUS.SENT ? 'fa-check' : 'fa-check-double')
 
   // Gris pour envoyé et reçu, bleu pour lu
   tick.style.color = statusId === MESSAGE_STATUS.READ ? '#38bdf8' : '#cbd5e1'
@@ -480,32 +451,28 @@ function createMessageBubble(message, index) {
   const messageId = getMessageId(message)
 
   const wrapper = document.createElement('div')
-  
-wrapper.style.cssText =
-  'position:relative;display:flex;flex-direction:column;' +
-  'width:fit-content;max-width:70%;min-width:0;' +
-  `align-items:${mine ? 'flex-end' : 'flex-start'};`
 
+  wrapper.style.cssText =
+    'position:relative;display:flex;flex-direction:column;' +
+    'width:fit-content;max-width:70%;min-width:0;' +
+    `align-items:${mine ? 'flex-end' : 'flex-start'};`
 
   wrapper.dataset.messageRow = ''
   wrapper.dataset.messageIndex = String(index)
   wrapper.dataset.messageId = String(messageId)
   wrapper.dataset.messageSender = mine ? 'me' : 'them'
 
-  wrapper.className =
-  'group max-md:select-none [-webkit-touch-callout:none]'
+  wrapper.className = 'group max-md:select-none [-webkit-touch-callout:none]'
 
   const bubble = document.createElement('div')
 
   bubble.style.cssText =
-  'box-sizing:border-box;width:fit-content;max-width:100%;' +
-  'padding:12px 16px;overflow-wrap:anywhere;word-break:break-word;' +
+    'box-sizing:border-box;width:fit-content;max-width:100%;' +
+    'padding:12px 16px;overflow-wrap:anywhere;word-break:break-word;' +
     'box-shadow:0 1px 3px rgba(0,0,0,.08);' +
-    (
-      mine
-        ? 'background:#075e8d;color:#fff;border-radius:16px 0 16px 16px;'
-        : 'background:#f1f5f9;color:#075e8d;border-radius:0 16px 16px 16px;'
-    )
+    (mine
+      ? 'background:#075e8d;color:#fff;border-radius:16px 0 16px 16px;'
+      : 'background:#f1f5f9;color:#075e8d;border-radius:0 16px 16px 16px;')
 
   const text = document.createElement('p')
 
@@ -516,7 +483,7 @@ wrapper.style.cssText =
 
   text.textContent = getMessageText(message)
 
-      const isDeleted = Boolean(message.deletedAt)
+  const isDeleted = Boolean(message.deletedAt)
 
   if (isDeleted) {
     text.style.fontStyle = 'italic'
@@ -536,16 +503,13 @@ wrapper.style.cssText =
   actionsButton.type = 'button'
   actionsButton.dataset.messageOptions = String(messageId)
 
-  actionsButton.setAttribute(
-    'aria-label',
-    'Options du message'
-  )
+  actionsButton.setAttribute('aria-label', 'Options du message')
 
   actionsButton.title = 'Options du message'
 
   actionsButton.className =
-  'pointer-events-none flex h-6 w-6 shrink-0 items-center justify-center bg-transparent opacity-0 transition md:pointer-events-auto md:focus:opacity-100 md:group-hover:opacity-100 ' +
-  (mine ? 'text-white' : 'text-[#075e8d]')
+    'pointer-events-none flex h-6 w-6 shrink-0 items-center justify-center bg-transparent opacity-0 transition md:pointer-events-auto md:focus:opacity-100 md:group-hover:opacity-100 ' +
+    (mine ? 'text-white' : 'text-[#075e8d]')
 
   const actionsIcon = document.createElement('i')
   actionsIcon.className = 'fa-solid fa-chevron-down text-xs'
@@ -561,15 +525,9 @@ wrapper.style.cssText =
     'flex-wrap:wrap;gap:4px;margin:0;font-size:10px;' +
     'text-align:right;min-width:0;'
 
-  time.style.color = mine
-    ? 'rgba(255,255,255,.75)'
-    : '#64748b'
+  time.style.color = mine ? 'rgba(255,255,255,.75)' : '#64748b'
 
-  time.appendChild(
-    document.createTextNode(
-      formatTime(getMessageDateValue(message))
-    )
-  )
+  time.appendChild(document.createTextNode(formatTime(getMessageDateValue(message))))
 
   if (message.editedAt || message.edited) {
     const edited = document.createElement('span')
@@ -580,8 +538,7 @@ wrapper.style.cssText =
     time.appendChild(edited)
   }
 
-
-    // Statut du message : mes messages uniquement
+  // Statut du message : mes messages uniquement
   // Conversation privée : envoyé / reçu / lu ; groupe : toujours un seul trait gris
   const isPrivateConversation = !getConversationById(state.selectedConversationId)?.groupId
 
@@ -589,31 +546,25 @@ wrapper.style.cssText =
     const tick = document.createElement('i')
     tick.dataset.messageStatusTick = ''
     tick.setAttribute('aria-hidden', 'true')
-    paintStatusTick(
-      tick,
-      isPrivateConversation ? getMessageStatusId(message) : MESSAGE_STATUS.SENT
-    )
+    paintStatusTick(tick, isPrivateConversation ? getMessageStatusId(message) : MESSAGE_STATUS.SENT)
     time.appendChild(tick)
   }
 
-
   if (isDeleted && !mine) {
-      footer.style.justifyContent = 'flex-end'
-      footer.append(time)
-    } else {
-      footer.append(actionsButton, time)
-    }
-  
-      // Conversation de groupe : le nom de l'auteur apparaît au-dessus du message
-    const isGroupConversation = Boolean(
-      getConversationById(state.selectedConversationId)?.groupId
-    )
+    footer.style.justifyContent = 'flex-end'
+    footer.append(time)
+  } else {
+    footer.append(actionsButton, time)
+  }
 
-    if (isGroupConversation) {
-      bubble.append(createAuthorNameElement(message), text, footer)
-    } else {
-      bubble.append(text, footer)
-    }
+  // Conversation de groupe : le nom de l'auteur apparaît au-dessus du message
+  const isGroupConversation = Boolean(getConversationById(state.selectedConversationId)?.groupId)
+
+  if (isGroupConversation) {
+    bubble.append(createAuthorNameElement(message), text, footer)
+  } else {
+    bubble.append(text, footer)
+  }
 
   // Case à cocher pour la sélection multiple.
   const checkbox = document.createElement('input')
@@ -621,17 +572,13 @@ wrapper.style.cssText =
   checkbox.type = 'checkbox'
   checkbox.dataset.messageCheckbox = String(messageId)
 
-  checkbox.setAttribute(
-    'aria-label',
-    `Sélectionner le message ${messageId}`
-  )
+  checkbox.setAttribute('aria-label', `Sélectionner le message ${messageId}`)
 
-  checkbox.className =
-    'message-checkbox hidden h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
+  checkbox.className = 'message-checkbox hidden h-4 w-4 shrink-0 cursor-pointer accent-[#075e8d]'
 
   checkbox.checked = selectedMessageIds.has(messageId)
 
-      // ----- Appui prolongé (mobile) -----
+  // ----- Appui prolongé (mobile) -----
   let longPressTimer = null
   let pressStartX = 0
   let pressStartY = 0
@@ -648,8 +595,7 @@ wrapper.style.cssText =
       event.pointerType === 'mouse' ||
       state.messageSelectionMode ||
       (isDeleted && !mine) ||
-      (event.target instanceof Element &&
-        event.target.closest('[data-message-menu]'))
+      (event.target instanceof Element && event.target.closest('[data-message-menu]'))
     ) {
       return
     }
@@ -674,10 +620,7 @@ wrapper.style.cssText =
   wrapper.addEventListener('pointermove', (event) => {
     if (!longPressTimer) return
 
-    if (
-      Math.abs(event.clientX - pressStartX) > 10 ||
-      Math.abs(event.clientY - pressStartY) > 10
-    ) {
+    if (Math.abs(event.clientX - pressStartX) > 10 || Math.abs(event.clientY - pressStartY) > 10) {
       cancelLongPress()
     }
   })
@@ -707,9 +650,7 @@ export function renderMessages(shouldScroll = true) {
   state.currentMessages = sortMessages(state.currentMessages)
 
   // Supprime de la sélection les messages qui n'existent plus.
-  const currentIds = new Set(
-    state.currentMessages.map((message) => getMessageId(message))
-  )
+  const currentIds = new Set(state.currentMessages.map((message) => getMessageId(message)))
 
   selectedMessageIds.forEach((id) => {
     if (!currentIds.has(id)) {
@@ -729,8 +670,7 @@ export function renderMessages(shouldScroll = true) {
 
       const dateRow = document.createElement('div')
 
-      dateRow.style.cssText =
-        'display:flex;justify-content:center;width:100%;margin:12px 0;'
+      dateRow.style.cssText = 'display:flex;justify-content:center;width:100%;margin:12px 0;'
 
       const dateSpan = document.createElement('span')
 
@@ -748,10 +688,7 @@ export function renderMessages(shouldScroll = true) {
       'display:flex;width:100%;min-width:0;align-items:center;gap:10px;' +
       `justify-content:${isMyMessage(message) ? 'flex-end' : 'flex-start'};`
 
-    const { wrapper, checkbox } = createMessageBubble(
-      message,
-      index
-    )
+    const { wrapper, checkbox } = createMessageBubble(message, index)
 
     checkbox.addEventListener('click', (event) => {
       event.stopPropagation()
@@ -791,22 +728,14 @@ export async function loadMessages(conversationId) {
   const requestedConversationId = Number(conversationId)
 
   try {
-    const result = await api(
-      `/conversations/${requestedConversationId}/messages`
-    )
+    const result = await api(`/conversations/${requestedConversationId}/messages`)
 
-    if (
-      Number(state.selectedConversationId) !==
-      requestedConversationId
-    ) {
+    if (Number(state.selectedConversationId) !== requestedConversationId) {
       return
     }
 
     await loadGroupMembers(requestedConversationId)
-    if (
-      Number(state.selectedConversationId) !==
-      requestedConversationId
-    ) {
+    if (Number(state.selectedConversationId) !== requestedConversationId) {
       return
     }
 
@@ -830,7 +759,7 @@ export async function loadMessages(conversationId) {
 // ==================================================
 
 async function sendMessage() {
-      if (state.sendingMessage) {
+  if (state.sendingMessage) {
     return
   }
 
@@ -851,10 +780,7 @@ async function sendMessage() {
     return
   }
 
-  if (
-    state.selectedConversationId === null &&
-    !state.selectedRecipient
-  ) {
+  if (state.selectedConversationId === null && !state.selectedRecipient) {
     return
   }
 
@@ -873,13 +799,10 @@ async function sendMessage() {
         }),
       })
     } else {
-      result = await api(
-        `/conversations/${state.selectedConversationId}/messages`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ content }),
-        }
-      )
+      result = await api(`/conversations/${state.selectedConversationId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      })
     }
 
     const message = result?.data ?? result
@@ -895,17 +818,15 @@ async function sendMessage() {
 
       await loadConversations(true)
 
-      const createdConversation = state.conversations.find(
-        (conversation) => {
-          if (conversation.groupId) {
-            return false
-          }
-
-          const peer = getConversationUser(conversation)
-
-          return peer && Number(peer.id) === peerId
+      const createdConversation = state.conversations.find((conversation) => {
+        if (conversation.groupId) {
+          return false
         }
-      )
+
+        const peer = getConversationUser(conversation)
+
+        return peer && Number(peer.id) === peerId
+      })
 
       if (!createdConversation) {
         return
@@ -950,11 +871,7 @@ function showDeleteMessagesConfirmation(ids) {
   }
 
   const validIds = [
-    ...new Set(
-      ids
-        .map(Number)
-        .filter((id) => Number.isFinite(id) && id > 0)
-    ),
+    ...new Set(ids.map(Number).filter((id) => Number.isFinite(id) && id > 0)),
   ].filter((id) => hasMessage(id))
 
   if (!validIds.length || state.deletingMessages) {
@@ -969,17 +886,14 @@ function showDeleteMessagesConfirmation(ids) {
   }
 
   if (validIds.length === 1) {
-    deleteMessagesConfirmTitle.textContent =
-      'Supprimer le message'
+    deleteMessagesConfirmTitle.textContent = 'Supprimer le message'
 
     deleteMessagesConfirmMessage.textContent =
       'Veux-tu vraiment supprimer ce message ? Cette action est irréversible.'
   } else {
-    deleteMessagesConfirmTitle.textContent =
-      'Supprimer les messages'
+    deleteMessagesConfirmTitle.textContent = 'Supprimer les messages'
 
-    deleteMessagesConfirmMessage.textContent =
-      `Veux-tu vraiment supprimer les ${validIds.length} messages sélectionnés ? Cette action est irréversible.`
+    deleteMessagesConfirmMessage.textContent = `Veux-tu vraiment supprimer les ${validIds.length} messages sélectionnés ? Cette action est irréversible.`
   }
 
   confirmDeleteMessages.disabled = false
@@ -991,10 +905,7 @@ function showDeleteMessagesConfirmation(ids) {
 }
 
 export function closeDeleteMessagesConfirmation() {
-  if (
-    !deleteMessagesConfirmModal ||
-    state.deletingMessages
-  ) {
+  if (!deleteMessagesConfirmModal || state.deletingMessages) {
     return
   }
 
@@ -1014,22 +925,17 @@ export function closeDeleteMessagesConfirmation() {
 // ==================================================
 
 async function confirmDeleteMessagesAction() {
-  if (
-    state.deletingMessages ||
-    !state.pendingDeleteMessageIds.length
-  ) {
+  if (state.deletingMessages || !state.pendingDeleteMessageIds.length) {
     return
   }
 
   const ids = [...state.pendingDeleteMessageIds]
 
-    const alreadyDeletedIds = new Set(
+  const alreadyDeletedIds = new Set(
     ids
       .map(Number)
       .filter((id) =>
-        state.currentMessages.some(
-          (message) => getMessageId(message) === id && message.deletedAt
-        )
+        state.currentMessages.some((message) => getMessageId(message) === id && message.deletedAt)
       )
   )
 
@@ -1055,9 +961,7 @@ async function confirmDeleteMessagesAction() {
 
   try {
     for (const messageId of ids) {
-      const message = state.currentMessages.find(
-        (item) => getMessageId(item) === Number(messageId)
-      )
+      const message = state.currentMessages.find((item) => getMessageId(item) === Number(messageId))
 
       if (!message) {
         deletedIds.push(Number(messageId))
@@ -1082,7 +986,8 @@ async function confirmDeleteMessagesAction() {
     }
 
     if (deletedIds.length) {
-        state.currentMessages = state.currentMessages.filter(
+      state.currentMessages = state.currentMessages
+        .filter(
           (message) =>
             !(
               deletedIds.includes(getMessageId(message)) &&
@@ -1102,9 +1007,7 @@ async function confirmDeleteMessagesAction() {
       renderMessages(true)
 
       if (state.selectedConversationId !== null) {
-        updateLastMessageAfterDeletion(
-          state.selectedConversationId
-        )
+        updateLastMessageAfterDeletion(state.selectedConversationId)
       }
     }
 
@@ -1112,13 +1015,11 @@ async function confirmDeleteMessagesAction() {
       state.pendingDeleteMessageIds = failedIds
 
       if (deleteMessagesConfirmTitle) {
-        deleteMessagesConfirmTitle.textContent =
-          'Suppression incomplète'
+        deleteMessagesConfirmTitle.textContent = 'Suppression incomplète'
       }
 
       if (deleteMessagesConfirmMessage) {
-        deleteMessagesConfirmMessage.textContent =
-          `${deletedIds.length} message(s) supprimé(s). ${failedIds.length} message(s) n'ont pas pu être supprimés.`
+        deleteMessagesConfirmMessage.textContent = `${deletedIds.length} message(s) supprimé(s). ${failedIds.length} message(s) n'ont pas pu être supprimés.`
       }
 
       if (deleteMessagesError) {
@@ -1147,10 +1048,7 @@ async function confirmDeleteMessagesAction() {
     if (confirmDeleteMessages) {
       confirmDeleteMessages.disabled = false
 
-      if (
-        !failedIds.length &&
-        state.pendingDeleteMessageIds.length === 0
-      ) {
+      if (!failedIds.length && state.pendingDeleteMessageIds.length === 0) {
         confirmDeleteMessages.innerHTML =
           '<i class="fa-solid fa-trash-can" aria-hidden="true"></i><span>Supprimer</span>'
       }
@@ -1164,49 +1062,28 @@ async function confirmDeleteMessagesAction() {
 export function setupMessages() {
   defaultMessagePlaceholder = messageInput?.placeholder
 
-
-  cancelMessageSelection?.addEventListener(
-    'click',
-    exitMessageSelectionMode
-  )
+  cancelMessageSelection?.addEventListener('click', exitMessageSelectionMode)
 
   messageForm.addEventListener('submit', (event) => {
     event.preventDefault()
     sendMessage()
   })
 
-  closeDeleteMessagesConfirm?.addEventListener(
-    'click',
-    closeDeleteMessagesConfirmation
-  )
+  closeDeleteMessagesConfirm?.addEventListener('click', closeDeleteMessagesConfirmation)
 
-  cancelDeleteMessages?.addEventListener(
-    'click',
-    closeDeleteMessagesConfirmation
-  )
+  cancelDeleteMessages?.addEventListener('click', closeDeleteMessagesConfirmation)
 
-  deleteMessagesConfirmModal?.addEventListener(
-    'click',
-    (event) => {
-      if (event.target === deleteMessagesConfirmModal) {
-        closeDeleteMessagesConfirmation()
-      }
+  deleteMessagesConfirmModal?.addEventListener('click', (event) => {
+    if (event.target === deleteMessagesConfirmModal) {
+      closeDeleteMessagesConfirmation()
     }
-  )
+  })
 
-  confirmDeleteMessages?.addEventListener(
-    'click',
-    confirmDeleteMessagesAction
-  )
+  confirmDeleteMessages?.addEventListener('click', confirmDeleteMessagesAction)
 
-  deleteSelectedMessagesButton?.addEventListener(
-    'click',
-    () => {
-      showDeleteMessagesConfirmation(
-        getSelectedMessageIds()
-      )
-    }
-  )
+  deleteSelectedMessagesButton?.addEventListener('click', () => {
+    showDeleteMessagesConfirmation(getSelectedMessageIds())
+  })
 
   // ==================================================
   // CLICS SUR LES MESSAGES
@@ -1226,43 +1103,29 @@ export function setupMessages() {
     }
 
     // Case à cocher d'un message.
-    const checkbox = target.closest(
-      '[data-message-checkbox]'
-    )
+    const checkbox = target.closest('[data-message-checkbox]')
 
     if (checkbox && messageList.contains(checkbox)) {
       event.stopPropagation()
 
-      toggleMessageSelection(
-        checkbox.dataset.messageCheckbox
-      )
+      toggleMessageSelection(checkbox.dataset.messageCheckbox)
 
       return
     }
 
     // Flèche du menu d'un message.
-    const actionsButton = target.closest(
-      '[data-message-options]'
-    )
+    const actionsButton = target.closest('[data-message-options]')
 
-    if (
-      actionsButton &&
-      messageList.contains(actionsButton)
-    ) {
+    if (actionsButton && messageList.contains(actionsButton)) {
       event.stopPropagation()
 
       if (state.messageSelectionMode) {
         return
       }
 
-      const messageId = Number(
-        actionsButton.dataset.messageOptions
-      )
+      const messageId = Number(actionsButton.dataset.messageOptions)
 
-      if (
-        !Number.isInteger(messageId) ||
-        messageId <= 0
-      ) {
+      if (!Number.isInteger(messageId) || messageId <= 0) {
         return
       }
 
@@ -1276,14 +1139,9 @@ export function setupMessages() {
     }
 
     // Actions du menu : supprimer, sélectionner ou annuler.
-    const menuAction = target.closest(
-      '[data-message-menu-action]'
-    )
+    const menuAction = target.closest('[data-message-menu-action]')
 
-    if (
-      menuAction &&
-      messageList.contains(menuAction)
-    ) {
+    if (menuAction && messageList.contains(menuAction)) {
       event.stopPropagation()
 
       const action = menuAction.dataset.messageMenuAction
@@ -1314,14 +1172,9 @@ export function setupMessages() {
     // En mode sélection, cliquer sur une bulle coche/décoche.
     const row = target.closest('[data-message-row]')
 
-    if (
-      row &&
-      messageList.contains(row) &&
-      state.messageSelectionMode
-    ) {
+    if (row && messageList.contains(row) && state.messageSelectionMode) {
       toggleMessageSelection(row.dataset.messageId)
       return
     }
   })
-
 }

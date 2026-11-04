@@ -21,8 +21,7 @@ export default class LoginsController {
    */
   async store({ request, response, session }: HttpContext) {
     // 1. Valider les données du formulaire
-    const { emailOrUsername, password } =
-      await request.validateUsing(loginValidator)
+    const { emailOrUsername, password } = await request.validateUsing(loginValidator)
 
     const identifier = emailOrUsername.trim()
 
@@ -34,26 +33,17 @@ export default class LoginsController {
 
     // 3. Vérifier que le compte existe
     if (!user) {
-      session.flash(
-        'errors.form',
-        'E-mail, nom d’utilisateur ou mot de passe incorrect.'
-      )
+      session.flash('errors.form', 'E-mail, nom d’utilisateur ou mot de passe incorrect.')
       session.flash('emailOrUsername', identifier)
 
       return response.redirect().toRoute('login.show')
     }
 
     // 4. Vérifier le mot de passe
-    const passwordIsValid = await hash.verify(
-      user.password,
-      password
-    )
+    const passwordIsValid = await hash.verify(user.password, password)
 
     if (!passwordIsValid) {
-      session.flash(
-        'errors.form',
-        'E-mail, nom d’utilisateur ou mot de passe incorrect.'
-      )
+      session.flash('errors.form', 'E-mail, nom d’utilisateur ou mot de passe incorrect.')
       session.flash('emailOrUsername', identifier)
 
       return response.redirect().toRoute('login.show')
@@ -74,10 +64,7 @@ export default class LoginsController {
       const token = crypto.randomBytes(32).toString('hex')
 
       // Stocker uniquement le hash du token
-      const tokenHash = crypto
-        .createHash('sha256')
-        .update(token)
-        .digest('hex')
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
       await UserToken.create({
         userId: user.id,
@@ -87,15 +74,11 @@ export default class LoginsController {
       })
 
       // Construire le lien de confirmation
-      const verificationUrl =
-        `${env.get('APP_URL')}/verify-email/${token}`
+      const verificationUrl = `${env.get('APP_URL')}/verify-email/${token}`
 
       // Envoyer un nouvel e-mail
       await mail.send((message) => {
-        message
-          .to(user.email)
-          .subject('Confirmez votre adresse e-mail - Kadea Chat')
-          .html(`
+        message.to(user.email).subject('Confirmez votre adresse e-mail - Kadea Chat').html(`
             <!DOCTYPE html>
             <html lang="fr">
               <head>

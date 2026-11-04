@@ -33,9 +33,7 @@ export function setupLogout() {
       }
 
       if (csrfCookie) {
-        headers['X-XSRF-TOKEN'] = decodeURIComponent(
-          csrfCookie.substring('XSRF-TOKEN='.length)
-        )
+        headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfCookie.substring('XSRF-TOKEN='.length))
       }
 
       // Envoyer la demande de déconnexion au serveur

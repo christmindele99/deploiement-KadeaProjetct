@@ -1,9 +1,4 @@
-export function setupAvatar({
-  avatarInput,
-  avatarPreview,
-  showMessage,
-  getCsrfToken,
-}) {
+export function setupAvatar({ avatarInput, avatarPreview, showMessage, getCsrfToken }) {
   if (!avatarInput || !avatarPreview) {
     return
   }
@@ -66,9 +61,7 @@ export function setupAvatar({
       const result = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(
-          result.message || "Impossible d'enregistrer la photo."
-        )
+        throw new Error(result.message || "Impossible d'enregistrer la photo.")
       }
 
       avatarPreview.src = result.data.avatar

@@ -24,7 +24,7 @@ export default class PresenceController {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
     }
 
-        const wasOnline = isUserOnline(userId)
+    const wasOnline = isUserOnline(userId)
 
     lastSeenByUser.set(userId, Date.now())
 
@@ -59,7 +59,7 @@ export default class PresenceController {
     return response.ok({ data: { userId: targetId, online } })
   }
 
-    async typing({ params, session, response }: HttpContext) {
+  async typing({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
     if (!userId) {

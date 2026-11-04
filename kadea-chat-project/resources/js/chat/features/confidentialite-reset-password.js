@@ -13,8 +13,7 @@ export function setupResetPassword() {
     const modal = document.createElement('div')
 
     modal.id = 'resetPasswordModal'
-    modal.className =
-      'fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 py-6'
+    modal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 py-6'
 
     modal.innerHTML = `
       <div
@@ -141,10 +140,7 @@ export function setupResetPassword() {
         const data = await response.json().catch(() => ({}))
 
         if (!response.ok) {
-          throw new Error(
-            data.message ||
-              'Impossible d’envoyer le lien de réinitialisation.'
-          )
+          throw new Error(data.message || 'Impossible d’envoyer le lien de réinitialisation.')
         }
 
         closeModal()
