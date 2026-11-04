@@ -12,7 +12,7 @@ export default defineConfig({
        */
       entryPoints: [
         'resources/css/app.css',
-        'resources/js/app.js',
+        'resources/js/home.js',
         'resources/js/auth/register.js',
         'resources/js/auth/reset_password.js',
         'resources/js/chat/index.js',
