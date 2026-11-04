@@ -1,134 +1,305 @@
-@layouts.marketing()
-  <div class="home">
-    <article class="prose-card">
-      <div class="pc-top">
-        <span class="pc-status mono tag" style="color: var(--ok);">
-          <span class="dot"></span>
-          Server ready
-        </span>
-      </div>
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kadea Chat, votre espace de messagerie instantanée. Discutez en privé, échangez en groupe et restez connectés.">
+    <title>Kadea Chat - Communiquez sans limites</title>
 
-      <div class="pc-lead">Welcome the power of a Hypermedia app.</div>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-      <p class="pc-para">
-        A lightweight foundation for building modern web interfaces. Straightforward, flexible, and true to the web's core simplicity.
-      </p>
+    <!-- Configuration Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#075e8d',
+                        'brand-accent': '#29ff9d',
+                        'brand-dark': '#011c38'
+                    }
+                }
+            }
+        }
+    </script>
 
-      <p class="pc-para">
-        This page is simply proof the engine started. Everything from here is yours to build.
-      </p>
+    <!-- Animations personnalisées -->
+    <style>
+        .reveal {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
 
-      <ul class="links">
-        <li>
-          <a class="lrow" href="https://docs.adonisjs.com" target="_blank" rel="noreferrer">
-            <span class="lrow__bullet"></span>
-            <span class="lrow__title">Documentation</span>
-            <span class="lrow__desc">Guides & API reference</span>
-            <span class="lrow__arrow">
-              @svg('lucide:arrow-up-right', { width: 16, height: 16 })
-            </span>
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-description {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transform: translateY(10px);
+            transition: all 0.35s ease;
+        }
+
+        .feature-card:hover .feature-description {
+            opacity: 1;
+            max-height: 150px;
+            transform: translateY(0);
+        }
+
+        @media (hover: none) {
+            .feature-description {
+                opacity: 1;
+                max-height: 150px;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal,
+            .feature-description,
+            .feature-card {
+                transition: none;
+            }
+
+            .reveal {
+                opacity: 1;
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-blue text-white antialiased">
+
+    <!-- ==========================================
+         NAVIGATION
+    =========================================== -->
+    <header class="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-brand-blue/95 backdrop-blur-xl">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-2 py-4 sm:px-8 lg:px-12">
+          <a href="#" class="flex items-center md:gap-2">
+              <img src="public/kadea-logo.png" alt="Logo Kadea Chat" class="h-12 w-auto object-contain origin-left scale-150 mr-0 md:mr-3">
+              <span class="text-xl font-bold tracking-tight font-['artega',sans-serif]">
+                  Kadea<span class="text-brand-accent">Chat</span>
+              </span>
           </a>
-        </li>
-        <li>
-          <a class="lrow" href="https://plus.adonisjs.com" target="_blank" rel="noreferrer">
-            <span class="lrow__bullet"></span>
-            <span class="lrow__title">AdonisJS Plus</span>
-            <span class="lrow__desc">Feature packs and Flow AI</span>
-            <span class="lrow__arrow">
-              @svg('lucide:arrow-up-right', { width: 16, height: 16 })
-            </span>
-          </a>
-        </li>
-        <li>
-          <a class="lrow" href="https://discord.com/invite/vDcEjq6" target="_blank" rel="noreferrer">
-            <span class="lrow__bullet"></span>
-            <span class="lrow__title">Discord</span>
-            <span class="lrow__desc">Meet fellow AdonisJS developers</span>
-            <span class="lrow__arrow">
-              @svg('lucide:arrow-up-right', { width: 16, height: 16 })
-            </span>
-          </a>
-        </li>
-      </ul>
 
-      <div class="stack">
-        <span class="tag">Built with</span>
-        <div class="pile" role="list" aria-label="Tech stack">
-          <span class="tile" role="listitem" title="AdonisJS" style="background: #5A45FF;">
-            <svg viewBox="0 0 160 160" fill="#fff" aria-hidden="true">
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M0 80.0001C0 144.521 15.4786 160 79.9999 160 144.521 160 160 144.521 160 80.0001 160 15.4786 144.521 0 79.9999 0 15.4786 0 0 15.4786 0 80.0001zm32.2607 16.6191l25.0918-57.0266c4.2361-9.613 12.3825-14.8268 22.6474-14.8268 10.265 0 18.4113 5.2138 22.6481 14.8268l25.091 57.0266c1.141 2.77 2.118 6.3538 2.118 9.4498 0 14.175-9.939 24.114-24.114 24.114-4.828 0-8.6629-1.232-12.5444-2.479-3.9771-1.278-8.0036-2.572-13.1987-2.572-5.1349 0-9.2597 1.306-13.3154 2.589-3.9233 1.241-7.7814 2.462-12.4279 2.462-14.1752 0-24.1141-9.939-24.1141-24.114 0-3.096.9776-6.6798 2.1182-9.4498zm47.7392-47.0871L55.2344 105.581c7.332-3.422 15.8043-5.051 24.7655-5.051 8.6358 0 17.434 1.629 24.4401 5.051L79.9999 49.5321z"
-              />
-            </svg>
-          </span>
-          <span class="tile" role="listitem" title="Edge" style="background: #4F46E5;">
-            <svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
-              <path d="M6 4l6 16 6-16-3 0-3 9-3-9z" />
-            </svg>
-          </span>
-          <span class="tile" role="listitem" title="Alpine.js" style="background: #2D3748;">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M3 7l6 6-6 6h6l6-6-6-6z" fill="#77C1D2" />
-              <path d="M9 7l6 6-6 6h6l6-6-6-6z" fill="#2D3441" />
-            </svg>
-          </span>
-          <span class="tile" role="listitem" title="TypeScript" style="background: #3178C6;">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <text
-                x="12"
-                y="17"
-                text-anchor="middle"
-                font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
-                font-weight="700"
-                font-size="10"
-                fill="#fff"
-                letter-spacing="-0.5"
-              >
-                TS
-              </text>
-            </svg>
-          </span>
-          <span class="tile" role="listitem" title="Vite" style="background: #1E1B2E;">
-            <svg viewBox="0 0 410 404" aria-hidden="true">
-              <defs>
-                <linearGradient
-                  id="viteA"
-                  x1="6"
-                  y1="33"
-                  x2="235"
-                  y2="344"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stop-color="#41D1FF" />
-                  <stop offset="1" stop-color="#BD34FE" />
-                </linearGradient>
-                <linearGradient
-                  id="viteB"
-                  x1="194"
-                  y1="8"
-                  x2="236"
-                  y2="292"
-                  gradientUnits="userSpaceOnUse"
-                >
-                  <stop stop-color="#FFEA83" />
-                  <stop offset=".083" stop-color="#FFDD35" />
-                  <stop offset="1" stop-color="#FFA800" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M399.641 59.5246L215.643 388.545C211.844 395.338 202.084 395.378 198.228 388.618L10.5817 59.5563C6.38087 52.1896 12.6802 43.2665 21.0281 44.7586L205.223 77.6824C206.398 77.8924 207.601 77.8904 208.776 77.6763L389.119 44.8058C397.439 43.2894 403.768 52.1434 399.641 59.5246Z"
-                fill="url(#viteA)"
-              />
-              <path
-                d="M292.965 1.5744L156.801 28.2552C154.563 28.6937 152.906 30.5903 152.771 32.8664L144.395 174.33C144.198 177.662 147.258 180.248 150.51 179.498L188.42 170.749C191.967 169.931 195.172 173.055 194.443 176.622L183.18 231.775C182.422 235.487 185.907 238.661 189.532 237.56L212.947 230.446C216.577 229.344 220.065 232.527 219.297 236.242L201.398 322.875C200.278 328.294 207.486 331.249 210.492 326.603L212.5 323.5L323.454 102.072C325.312 98.3645 322.108 94.137 318.036 94.9233L279.014 102.452C275.347 103.159 272.227 99.7398 273.262 96.1457L298.731 7.66608C299.767 4.06956 296.642 0.649737 292.965 1.5744Z"
-                fill="url(#viteB)"
-              />
-            </svg>
-          </span>
+            <!-- Navigation desktop -->
+            <div class="hidden items-center gap-8 md:flex">
+                <a href="#fonctionnalites" class="text-sm text-white/80 transition hover:text-brand-accent">Fonctionnalités</a>
+                <a href="#comment-ca-marche" class="text-sm text-white/80 transition hover:text-brand-accent">Comment ça marche</a>
+                <a href="{{ route('login.show') }}" class="rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold transition hover:border-brand-accent hover:text-brand-accent">Se connecter</a>
+                <a href="{{ route('register.show') }}" class="rounded-xl bg-brand-accent px-5 py-2.5 text-sm font-semibold text-brand-dark transition hover:opacity-90">Créer un compte</a>
+            </div>
+
+            <!-- Navigation mobile -->
+            <div class="flex items-center gap-2 md:hidden">
+                <a href="{{ route('login.show') }}" class="rounded-lg border border-white/20 px-3 py-2 text-xs font-semibold transition hover:border-brand-accent hover:text-brand-accent">Connexion</a>
+                <a href="{{ route('register.show') }}" class="rounded-lg bg-brand-accent px-3 py-2 text-xs font-semibold text-brand-dark transition hover:opacity-90">S'inscrire</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ==========================================
+         CONTENU PRINCIPAL
+    =========================================== -->
+    <main>
+        <!-- HERO SECTION -->
+        <section class="relative flex min-h-screen items-center overflow-hidden px-5 pb-20 pt-32 sm:px-8 lg:px-12">
+            <div class="pointer-events-none absolute -right-40 top-20 h-96 w-96 rounded-full bg-brand-accent/10 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-brand-accent/10 blur-3xl"></div>
+
+            <div class="relative mx-auto grid w-full max-w-7xl items-center gap-16 lg:grid-cols-2">
+                <!-- Présentation -->
+                <div class="reveal">
+                    <span class="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-accent/30 bg-brand-accent/10 px-4 py-2 text-xs font-semibold text-brand-accent sm:text-sm">
+                        <span class="h-2 w-2 animate-pulse rounded-full bg-brand-accent"></span>
+                        Votre espace de communication
+                    </span>
+
+                    <h1 class="max-w-2xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                        Restez connectés,
+                        <span class="text-brand-accent">partagez</span>
+                        l'essentiel.
+                    </h1>
+
+                    <p class="mt-6 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
+                        Bienvenue sur Kadea Chat, votre espace de messagerie instantanée.
+                        Échangez en privé, discutez en groupe et restez proches de ceux qui comptent, où que vous soyez.
+                    </p>
+
+                    <div class="mt-9 flex flex-col gap-4 sm:flex-row">
+                        <a href="{{ route('login.show') }}" class="flex items-center justify-center gap-2 rounded-xl border border-white/20 px-7 py-4 text-sm font-semibold transition duration-300 hover:border-brand-accent hover:text-brand-accent">
+                            Se connecter <span>→</span>
+                        </a>
+                        <a href="{{ route('register.show') }}" class="flex items-center justify-center gap-2 rounded-xl bg-brand-accent px-7 py-4 text-sm font-bold text-brand-dark shadow-lg shadow-brand-accent/10 transition duration-300 hover:-translate-y-1 hover:opacity-90">
+                            Créer un compte <span>→</span>
+                        </a>
+                    </div>
+
+                    <p class="mt-8 text-xs text-white/50">Simple. Rapide. Connecté.</p>
+                </div>
+
+                <!-- Capture réelle de l'interface Kadea Chat -->
+                <div class="reveal relative mx-auto w-full max-w-[360px]">
+                    <div class="absolute -inset-5 rounded-[2rem] bg-brand-accent/10 blur-2xl"></div>
+                    <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
+                        <img
+                            src="public/clone-whatsapp.png"
+                            alt="Capture d'écran de l'interface Kadea Chat montrant la liste des utilisateurs"
+                            class="block h-auto w-full object-contain"
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FONCTIONNALITÉS -->
+        <section id="fonctionnalites" class="scroll-mt-24 bg-white/[0.03] px-5 py-24 sm:px-8 lg:px-12">
+            <div class="mx-auto max-w-7xl">
+                <div class="reveal mx-auto mb-16 max-w-2xl text-center">
+                    <span class="text-xs font-bold uppercase tracking-[0.25em] text-brand-accent">Fonctionnalités</span>
+                    <h2 class="mt-4 text-3xl font-bold sm:text-4xl">
+                        Tout pour mieux <span class="text-brand-accent">communiquer.</span>
+                    </h2>
+                    <p class="mt-4 text-sm leading-relaxed text-white/60 sm:text-base">
+                        Découvrez les outils qui rendent vos conversations plus simples, plus pratiques et plus agréables.
+                    </p>
+                </div>
+
+                <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <!-- 01 : Messages en temps réel -->
+                    <article class="feature-card reveal group rounded-2xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-2 hover:border-brand-accent/50 hover:bg-white/[0.08]">
+                        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h8m-8 4h5m-9 6 3-3h11a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold transition group-hover:text-brand-accent">01. Message en temps réel</h3>
+                        <p class="feature-description mt-3 text-sm leading-relaxed text-white/60">Envoyez et recevez vos messages instantanément. Profitez d'échanges fluides sans avoir à actualiser la page.</p>
+                    </article>
+
+                    <!-- 02 : Discussions privées et groupes -->
+                    <article class="feature-card reveal group rounded-2xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-2 hover:border-brand-accent/50 hover:bg-white/[0.08]">
+                        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m12-13a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm4 4h6m-3-3v6"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold transition group-hover:text-brand-accent">02. Discussions privées et groupes</h3>
+                        <p class="feature-description mt-3 text-sm leading-relaxed text-white/60">Discutez individuellement avec vos contacts ou créez des groupes pour partager vos idées avec plusieurs personnes.</p>
+                    </article>
+
+                    <!-- 03 : Gestion du profil -->
+                    <article class="feature-card reveal group rounded-2xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-2 hover:border-brand-accent/50 hover:bg-white/[0.08]">
+                        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold transition group-hover:text-brand-accent">03. Gestion du profil</h3>
+                        <p class="feature-description mt-3 text-sm leading-relaxed text-white/60">Personnalisez votre profil en modifiant votre nom, votre nom d'utilisateur, votre photo et votre biographie.</p>
+                    </article>
+
+                    <!-- 04 : Mode sombre et clair -->
+                    <article class="feature-card reveal group rounded-2xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-2 hover:border-brand-accent/50 hover:bg-white/[0.08]">
+                        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v2m0 14v2M3 12h2m14 0h2m-2.64-6.36-1.42 1.42M7.06 16.94l-1.42 1.42m12.72 0-1.42-1.42M7.06 7.06 5.64 5.64M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold transition group-hover:text-brand-accent">04. Mode sombre et clair</h3>
+                        <p class="feature-description mt-3 text-sm leading-relaxed text-white/60">Choisissez le thème qui vous convient. Passez du mode clair au mode sombre selon vos préférences.</p>
+                    </article>
+
+                    <!-- 05 : Réinitialisation du mot de passe -->
+                    <article class="feature-card reveal group rounded-2xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-2 hover:border-brand-accent/50 hover:bg-white/[0.08]">
+                        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 10v-2a7 7 0 0 1 14 0v2m-7-7v4m-2-2h4"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold transition group-hover:text-brand-accent">05. Réinitialisation du mot de passe</h3>
+                        <p class="feature-description mt-3 text-sm leading-relaxed text-white/60">Vous avez oublié votre mot de passe ? Retrouvez l'accès à votre compte grâce au processus de réinitialisation.</p>
+                    </article>
+
+                    <!-- 06 : Conversations favorites -->
+                    <article class="feature-card reveal group rounded-2xl border border-white/10 bg-white/5 p-6 transition duration-300 hover:-translate-y-2 hover:border-brand-accent/50 hover:bg-white/[0.08]">
+                        <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold transition group-hover:text-brand-accent">06. Mettre une conversation en favoris</h3>
+                        <p class="feature-description mt-3 text-sm leading-relaxed text-white/60">
+                            Ajoutez vos conversations importantes aux favoris pour les retrouver plus rapidement et accéder facilement à vos échanges préférés.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMMENT ÇA MARCHE -->
+        <section id="comment-ca-marche" class="scroll-mt-24 px-5 py-24 sm:px-8 lg:px-12">
+            <div class="mx-auto max-w-7xl">
+                <div class="reveal mx-auto mb-16 max-w-2xl text-center">
+                    <span class="text-xs font-bold uppercase tracking-[0.25em] text-brand-accent">Comment ça marche ?</span>
+                    <h2 class="mt-4 text-3xl font-bold sm:text-4xl">Trois étapes pour <span class="text-brand-accent">commencer.</span></h2>
+                    <p class="mt-4 text-sm leading-relaxed text-white/60 sm:text-base">Rejoignez Kadea Chat et commencez à échanger en quelques instants.</p>
+                </div>
+
+                <div class="relative grid gap-10 md:grid-cols-3">
+                    <div class="absolute left-[17%] right-[17%] top-8 hidden border-t border-dashed border-brand-accent/40 md:block"></div>
+
+                    <div class="reveal relative text-center">
+                        <div class="relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-accent/30 bg-brand-blue text-2xl font-bold text-brand-accent shadow-lg shadow-brand-accent/10">01</div>
+                        <h3 class="mt-6 text-xl font-bold">Créer un compte</h3>
+                        <p class="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/60">Inscrivez-vous gratuitement en renseignant vos informations et créez votre espace personnel.</p>
+                    </div>
+
+                    <div class="reveal relative text-center">
+                        <div class="relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-accent/30 bg-brand-blue text-2xl font-bold text-brand-accent shadow-lg shadow-brand-accent/10">02</div>
+                        <h3 class="mt-6 text-xl font-bold">Rechercher un utilisateur</h3>
+                        <p class="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/60">Retrouvez facilement les personnes avec lesquelles vous souhaitez communiquer.</p>
+                    </div>
+
+                    <div class="reveal relative text-center">
+                        <div class="relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-brand-accent/30 bg-brand-blue text-2xl font-bold text-brand-accent shadow-lg shadow-brand-accent/10">03</div>
+                        <h3 class="mt-6 text-xl font-bold">Lancer la discussion</h3>
+                        <p class="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-white/60">Envoyez votre premier message et profitez pleinement de vos conversations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- APPEL À L'ACTION FINAL -->
+        <section class="px-5 pb-24 pt-10 sm:px-8 lg:px-12">
+            <div class="reveal relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-brand-accent/20 bg-white/5 px-6 py-16 text-center sm:px-12 lg:py-20">
+                <div class="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand-accent/10 blur-3xl"></div>
+                <div class="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-brand-accent/10 blur-3xl"></div>
+
+                <div class="relative">
+                    <span class="text-xs font-bold uppercase tracking-[0.25em] text-brand-accent">À vous de jouer</span>
+                    <h2 class="mx-auto mt-5 max-w-2xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+                        Prêt à commencer <span class="text-brand-accent">la conversation ?</span>
+                    </h2>
+                    <p class="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">
+                        Rejoignez Kadea Chat dès maintenant et profitez d'une nouvelle expérience de communication.
+                    </p>
+                    <div class="mt-9 flex flex-col justify-center gap-4 sm:flex-row">
+                        <a href="{{ route('login.show') }}" class="rounded-xl border border-white/20 px-8 py-4 text-sm font-semibold transition hover:border-brand-accent hover:text-brand-accent">Se connecter</a>
+                        <a href="{{ route('register.show') }}" class="rounded-xl bg-brand-accent px-8 py-4 text-sm font-bold text-brand-dark transition hover:-translate-y-1 hover:opacity-90">Créer un compte</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 px-5 py-7 sm:px-8 lg:px-12">
+        <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
+            <span class="text-ls font-bold tracking-tight font-['artega',sans-serif]">
+                Kadea<span class="text-brand-accent">Chat</span>
+              </span>
+            <p class="text-xs text-white/40">© <span id="currentYear"></span> Christ Mindele. Tous droits réservés.</p>
         </div>
-      </div>
-    </article>
-  </div>
-@end
+    </footer>
+
+    <!-- Fichier JavaScript externe -->
+    <script src="/26-01-kd-dev-web-matin-c-mon-thu-kin-capstone-kadea-chat-christmindele99/kadea-chat-project/resources/js/home.js" defer></script>
+</body>
+</html>

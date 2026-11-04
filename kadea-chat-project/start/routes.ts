@@ -4,9 +4,10 @@ import { middleware } from '#start/kernel'
 
 transmit.registerRoutes()
 
-router.get('/', ({ response }) => {
-  return response.redirect().toRoute('register.show')
-})
+// Afficher la page d'accueil
+router.get('/', async ({ view }) => {
+  return view.render('pages/home')
+}).as('home')
 
 const ConversationsController = () => import('#controllers/conversations_controller')
 const RegistersController = () => import('#controllers/registers_controller')

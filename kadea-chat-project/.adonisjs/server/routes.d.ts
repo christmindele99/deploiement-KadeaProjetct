@@ -7,6 +7,7 @@ export type ScannedRoutes = {
     'event_stream': { paramsTuple?: []; params?: {} }
     'subscribe': { paramsTuple?: []; params?: {} }
     'unsubscribe': { paramsTuple?: []; params?: {} }
+    'home': { paramsTuple?: []; params?: {} }
     'register.show': { paramsTuple?: []; params?: {} }
     'register.store': { paramsTuple?: []; params?: {} }
     'auth.checkEmail': { paramsTuple?: []; params?: {} }
@@ -52,6 +53,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
+    'home': { paramsTuple?: []; params?: {} }
     'register.show': { paramsTuple?: []; params?: {} }
     'auth.checkEmail': { paramsTuple?: []; params?: {} }
     'verify-email.show': { paramsTuple?: []; params?: {} }
@@ -73,6 +75,7 @@ export type ScannedRoutes = {
   }
   HEAD: {
     'event_stream': { paramsTuple?: []; params?: {} }
+    'home': { paramsTuple?: []; params?: {} }
     'register.show': { paramsTuple?: []; params?: {} }
     'auth.checkEmail': { paramsTuple?: []; params?: {} }
     'verify-email.show': { paramsTuple?: []; params?: {} }
