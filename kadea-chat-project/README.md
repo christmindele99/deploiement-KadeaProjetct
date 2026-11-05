@@ -4,6 +4,12 @@ https://app.diagrams.net/#G1HJQxan5HYGVoHlKJBibMH2P5PR8NBGyl#%7B%22pageId%22%3A%
 lien draw.io du Dictionnaire des données de KADEA CHAT
 https://app.diagrams.net/#G1heFD5SRA3X-mXijEH31GXTa6JKzZV5kk#%7B%22pageId%22%3A%22PMTEyKIZkQyFq8MqI4ZY%22%7D
 
+lien du deploiement de l'application
+https://deploiement-kadeaprojetct.onrender.com
+
+lien de la maquette sur Figma
+https://www.figma.com/design/7A6nEJBCdmFBqZEPrGckJu/Sans-titre?node-id=2-2&t=hia9zpeH1xrz6M2j-0
+
 
 
 # Kadea Chat 💬
