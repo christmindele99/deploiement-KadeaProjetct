@@ -9,20 +9,13 @@ import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 
 export default class LoginsController {
-  /**
-   * Affiche la page de connexion
-   */
   async show({ view }: HttpContext) {
     return view.render('pages/auth/login')
   }
 
-  /**
-   * Traite la connexion
-   */
   async store({ request, response, session }: HttpContext) {
     // 1. Valider les données du formulaire
     const { emailOrUsername, password } = await request.validateUsing(loginValidator)
-
     const identifier = emailOrUsername.trim()
 
     // 2. Rechercher l'utilisateur par e-mail ou username
@@ -91,15 +84,12 @@ export default class LoginsController {
                   <h1 style="color: #075e8d;">
                     Confirmez votre adresse e-mail
                   </h1>
-
                   <p>Bonjour ${user.fullName},</p>
-
                   <p>
                     Votre adresse e-mail n'est pas encore confirmée.
                     Cliquez sur le bouton ci-dessous pour confirmer
                     votre compte Kadea Chat.
                   </p>
-
                   <p style="margin: 32px 0;">
                     <a
                       href="${verificationUrl}"
@@ -108,13 +98,10 @@ export default class LoginsController {
                       Confirmer mon adresse e-mail
                     </a>
                   </p>
-
                   <p>Ce lien est valable pendant 24 heures.</p>
-
                   <p>
                     Si vous n'avez pas demandé ce lien, ignorez ce message.
                   </p>
-
                   <p>L'équipe Kadea Chat</p>
                 </div>
               </body>

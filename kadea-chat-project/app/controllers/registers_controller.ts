@@ -87,15 +87,12 @@ export default class RegistersController {
           <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #000000;">
             <div style="max-width: 600px; margin: 30px auto; padding: 24px;">
               <h1 style="color: #075e8d;">Bienvenue sur Kadea Chat !</h1>
-
               <p>Bonjour ${user.fullName},</p>
-
               <p>
                 Merci pour votre inscription sur Kadea Chat.
                 Pour confirmer votre adresse e-mail et activer votre compte,
                 cliquez sur le bouton ci-dessous.
               </p>
-
               <p style="margin: 32px 0;">
                 <a
                   href="${verificationUrl}"
@@ -104,21 +101,16 @@ export default class RegistersController {
                   Confirmer mon adresse e-mail
                 </a>
               </p>
-
               <p>Ce lien est valable pendant 24 heures.</p>
-
               <p>
                 Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :
               </p>
-
               <p style="overflow-wrap: anywhere;">
                 <a href="${verificationUrl}" style="color: #075e8d;">
                   ${verificationUrl}
                 </a>
               </p>
-
               <p>Si vous n'êtes pas à l'origine de cette inscription, ignorez ce message.</p>
-
               <p style="margin-top: 32px;">
                 L'équipe Kadea Chat
               </p>
