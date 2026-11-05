@@ -17,7 +17,6 @@ export default class LoginsController {
     // 1. Valider les données du formulaire
     const { emailOrUsername, password } = await request.validateUsing(loginValidator)
     const identifier = emailOrUsername.trim()
-
     // 2. Rechercher l'utilisateur par e-mail ou username
     const user = await User.query()
       .whereRaw('LOWER(email) = LOWER(?)', [identifier])
