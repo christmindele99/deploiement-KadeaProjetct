@@ -7,9 +7,6 @@ import Group from '#models/group'
 import MessageStatusService from '#services/message_status_service'
 
 export default class ConversationsController {
-  /**
-   * Lister les conversations de l'utilisateur connecté
-   */
   async index({ session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
@@ -86,7 +83,6 @@ export default class ConversationsController {
           favorite: favoriteByConversation.get(conversation.id) ?? false,
         }
 
-        // Conversation de groupe : on renvoie les infos du groupe
         if (conversation.groupId) {
           const group = await Group.find(conversation.groupId)
 
@@ -104,7 +100,6 @@ export default class ConversationsController {
           }
         }
 
-        // Identifier l'autre participant
         const peerMembership = await Membership.query()
           .where('conversationId', conversation.id)
           .whereNot('userId', userId)
@@ -133,9 +128,6 @@ export default class ConversationsController {
     return response.ok({ data })
   }
 
-  /**
-   * Afficher une conversation précise et la marquer comme lue
-   */
   async show({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
@@ -186,9 +178,6 @@ export default class ConversationsController {
     })
   }
 
-  /**
-   * Ajouter ou retirer une conversation des favoris
-   */
   async toggleFavorite({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
@@ -221,18 +210,12 @@ export default class ConversationsController {
     return response.ok({ data: { favorite } })
   }
 
-  /**
-   * Créer une conversation
-   */
   async store({ response }: HttpContext) {
     return response.notImplemented({
       message: 'La création des conversations sera ajoutée ensuite.',
     })
   }
 
-  /**
-   * Supprimer une conversation de la liste de l'utilisateur connecté
-   */
   async destroy({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 

@@ -1,5 +1,3 @@
 import { MessageStatusSchema } from '#database/schema'
 
-export default class MessageStatus extends MessageStatusSchema {
-
-}
+export default class MessageStatus extends MessageStatusSchema {}

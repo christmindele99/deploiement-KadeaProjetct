@@ -1,4 +1,3 @@
-// Enregistrement du profil : validation, envoi au serveur et mise à jour de l'affichage
 
 export function setupProfileForm({
   profileForm,
@@ -20,9 +19,6 @@ export function setupProfileForm({
     const username = usernameInput.value.trim()
     const bio = bioInput.value.trim()
 
-    // ------------------------------------------------------------
-    // VALIDATION DU NOM
-    // ------------------------------------------------------------
 
     if (fullName.length < 2) {
       showMessage('Le nom complet doit contenir au moins 2 caractères.', 'error')
@@ -31,9 +27,6 @@ export function setupProfileForm({
       return
     }
 
-    // ------------------------------------------------------------
-    // VALIDATION DU USERNAME
-    // ------------------------------------------------------------
 
     if (username.length < 3) {
       showMessage("Le nom d'utilisateur doit contenir au moins 3 caractères.", 'error')
@@ -42,9 +35,6 @@ export function setupProfileForm({
       return
     }
 
-    // ------------------------------------------------------------
-    // BOUTON ENREGISTRER
-    // ------------------------------------------------------------
 
     const submitButton = profileForm.querySelector('button[type="submit"]')
 
@@ -55,9 +45,6 @@ export function setupProfileForm({
       submitButton.textContent = 'Enregistrement...'
     }
 
-    // ------------------------------------------------------------
-    // ENVOI AU SERVEUR
-    // ------------------------------------------------------------
 
     try {
       const csrfToken = getCsrfToken()
@@ -85,17 +72,9 @@ export function setupProfileForm({
 
       const result = await response.json()
 
-      // ----------------------------------------------------------
-      // GESTION DES ERREURS SERVEUR
-      // ----------------------------------------------------------
-
       if (!response.ok) {
         throw new Error(result.message || 'Impossible de modifier votre profil.')
       }
-
-      // ----------------------------------------------------------
-      // UTILISATEUR MIS À JOUR
-      // ----------------------------------------------------------
 
       const updatedUser = result.data
 
@@ -109,9 +88,6 @@ export function setupProfileForm({
       usernameInput.value = state.originalUsername
       bioInput.value = state.originalBio
 
-      // ----------------------------------------------------------
-      // METTRE À JOUR L'EN-TÊTE DU PROFIL
-      // ----------------------------------------------------------
 
       if (profileFullName) {
         profileFullName.textContent = updatedUser.fullName
@@ -125,15 +101,8 @@ export function setupProfileForm({
         profileBio.textContent = updatedUser.bio || 'Aucune biographie renseignée.'
       }
 
-      // ----------------------------------------------------------
-      // QUITTER LE MODE ÉDITION
-      // ----------------------------------------------------------
-
       disableEditMode(false)
 
-      // ----------------------------------------------------------
-      // MESSAGE DE SUCCÈS
-      // ----------------------------------------------------------
 
       showMessage(result.message || 'Votre profil a été mis à jour avec succès.', 'success')
     } catch (error) {

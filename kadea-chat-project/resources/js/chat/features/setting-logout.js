@@ -9,10 +9,6 @@ export function setupLogout() {
 
   let logoutModal = null
 
-  // ============================================================
-  // ENVOYER LA DEMANDE DE DÉCONNEXION
-  // ============================================================
-
   async function performLogout() {
     const originalContent = logoutButton.innerHTML
 
@@ -149,9 +145,6 @@ export function setupLogout() {
     return modal
   }
 
-  // ============================================================
-  // ÉVÉNEMENTS
-  // ============================================================
 
   logoutButton.addEventListener('click', () => {
     if (!logoutModal) {

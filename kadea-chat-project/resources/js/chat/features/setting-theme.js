@@ -1,10 +1,5 @@
-// Thème clair / sombre : mise à jour de l'interrupteur et changement de thème
-
 import { applyTheme, getTheme } from '../theme.js'
 
-// ============================================================
-// SYNCHRONISER L'INTERFACE AVEC LE THÈME
-// ============================================================
 
 export function syncThemeUI(theme) {
   const themeSwitch = document.getElementById('themeSwitch')
@@ -22,9 +17,6 @@ export function syncThemeUI(theme) {
   themeDescription.textContent = isDark ? 'Thème sombre' : 'Thème clair'
 }
 
-// ============================================================
-// INTERRUPTEUR DU THÈME
-// ============================================================
 
 export function setupTheme() {
   syncThemeUI(getTheme())

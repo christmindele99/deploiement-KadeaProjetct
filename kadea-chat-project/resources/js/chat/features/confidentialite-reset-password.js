@@ -1,5 +1,3 @@
-// Réinitialisation du mot de passe par e-mail : modale, validation et envoi au serveur
-
 import { getRequestHeaders, showPasswordMessage } from './confidentialite-utils.js'
 
 export function setupResetPassword() {
@@ -151,8 +149,6 @@ export function setupResetPassword() {
           'success'
         )
       } catch (error) {
-        console.error('Erreur de réinitialisation du mot de passe :', error)
-
         confirmButton.disabled = false
         confirmButton.innerHTML = originalContent
 

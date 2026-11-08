@@ -1,5 +1,3 @@
-// Modifier le mot de passe : modale, vérification de la confirmation et envoi au serveur
-
 import { getRequestHeaders, showPasswordMessage } from './confidentialite-utils.js'
 
 export function setupChangePassword() {

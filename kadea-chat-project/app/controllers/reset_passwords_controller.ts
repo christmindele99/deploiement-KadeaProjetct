@@ -5,9 +5,6 @@ import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 
 export default class ResetPasswordsController {
-  /**
-   * Recherche un token de réinitialisation valide
-   */
   private async findValidToken(token: string) {
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
@@ -19,9 +16,6 @@ export default class ResetPasswordsController {
       .first()
   }
 
-  /**
-   * Affiche le formulaire du nouveau mot de passe
-   */
   async show({ params, view, response, session }: HttpContext) {
     const token = params.token
 
@@ -87,7 +81,6 @@ export default class ResetPasswordsController {
       return response.redirect().back()
     }
 
-    // 4. Vérifier la robustesse du mot de passe
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
 
     if (!passwordRegex.test(password)) {
@@ -99,7 +92,6 @@ export default class ResetPasswordsController {
       return response.redirect().back()
     }
 
-    // 5. Vérifier la confirmation du mot de passe
     if (password !== passwordConfirmation) {
       session.flash('errors.form', 'Les deux mots de passe ne correspondent pas.')
 
@@ -115,7 +107,6 @@ export default class ResetPasswordsController {
       return response.redirect().toRoute('forgot-password.show')
     }
 
-    // 7. Hacher et enregistrer le nouveau mot de passe
     user.password = password
     await user.save()
 
@@ -132,7 +123,6 @@ export default class ResetPasswordsController {
         usedAt: DateTime.now(),
       })
 
-    // 10. Confirmer la réussite et rediriger vers la connexion
     session.flash(
       'success',
       'Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter.'

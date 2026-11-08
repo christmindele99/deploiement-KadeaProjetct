@@ -7,16 +7,10 @@ import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 
 export default class ForgotPasswordsController {
-  /**
-   * Affiche le formulaire de mot de passe oublié
-   */
   async show({ view }: HttpContext) {
     return view.render('pages/auth/forgot-password')
   }
 
-  /**
-   * Traite la demande de réinitialisation du mot de passe
-   */
   async store({ request, response, session }: HttpContext) {
     const wantsJson = request.header('accept')?.includes('application/json') ?? false
     const email = request.input('email')
@@ -79,7 +73,6 @@ export default class ForgotPasswordsController {
     // 6. Construire le lien de réinitialisation
     const resetUrl = `${env.get('APP_URL')}/reset-password/${token}`
 
-    // 7. Envoyer l'e-mail
     try {
       await mail.send((message) => {
         message.to(user.email).subject('Réinitialisation du mot de passe - Kadea Chat').html(`

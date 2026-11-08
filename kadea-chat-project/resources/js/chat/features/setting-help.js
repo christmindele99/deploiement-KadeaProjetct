@@ -1,5 +1,3 @@
-// Aide et commentaires : menu d'aide, chargement des rubriques, bouton retour et formulaire de commentaire
-
 import { getTheme } from '../theme.js'
 import { sendComment, showFlash } from '../comments.js'
 import { syncThemeUI } from './setting-theme.js'
@@ -27,10 +25,6 @@ export function setupHelp() {
   }
 
   const originalSettingsContent = settingsContent.innerHTML
-
-  // ============================================================
-  // AFFICHER UNE RUBRIQUE D'AIDE
-  // ============================================================
 
   async function showHelpSection(url, title) {
     try {
@@ -114,9 +108,6 @@ export function setupHelp() {
     }
   }
 
-  // ============================================================
-  // RÉAFFICHER LA LISTE DES PARAMÈTRES
-  // ============================================================
 
   function showSettingsList() {
     // Réafficher la liste des paramètres
@@ -173,9 +164,6 @@ export function setupHelp() {
     initializeHelpButton()
   }
 
-  // ============================================================
-  // BOUTON AIDE ET COMMENTAIRES
-  // ============================================================
 
   function initializeHelpButton() {
     const button = document.getElementById('helpButton')
@@ -272,9 +260,6 @@ export function setupHelp() {
     }
   }
 
-  // ============================================================
-  // FORMULAIRE DE COMMENTAIRE
-  // ============================================================
 
   function initializeCommentForm() {
     const commentForm = document.getElementById('commentForm')
@@ -330,7 +315,6 @@ export function setupHelp() {
       })
     }
 
-    // Envoi du commentaire
     commentForm.addEventListener('submit', async (event) => {
       event.preventDefault()
 
@@ -356,7 +340,6 @@ export function setupHelp() {
 
         showFlash(data.message)
       } catch (error) {
-        // En cas d'erreur, on remet le texte pour qu'il ne soit pas perdu
         commentInput.value = text
         commentCounter.textContent = `${text.length} / 1000`
         showFlash(error.message, 'error')
@@ -366,10 +349,6 @@ export function setupHelp() {
       }
     })
   }
-
-  // ============================================================
-  // DÉMARRAGE
-  // ============================================================
 
   // Initialiser le bouton Aide et commentaires
   initializeHelpButton()

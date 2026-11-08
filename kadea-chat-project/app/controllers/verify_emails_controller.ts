@@ -7,9 +7,6 @@ import User from '#models/user'
 import UserToken from '#models/user_token'
 
 export default class VerifyEmailController {
-  /**
-   * Affiche la page demandant de vérifier l'adresse e-mail.
-   */
   async show({ view, session }: HttpContext) {
     const email = session.get('verification_email')
 
@@ -18,9 +15,6 @@ export default class VerifyEmailController {
     })
   }
 
-  /**
-   * Renvoie un nouveau lien de confirmation.
-   */
   async resend({ session, response }: HttpContext) {
     const email = session.get('verification_email')
 
@@ -44,7 +38,6 @@ export default class VerifyEmailController {
       return response.redirect().toRoute('verify-email.show')
     }
 
-    // Si l'adresse est déjà confirmée, aucun nouveau lien n'est nécessaire.
     if (user.emailVerifiedAt) {
       session.flash(
         'success',
@@ -63,10 +56,8 @@ export default class VerifyEmailController {
         usedAt: DateTime.now().toSQL(),
       })
 
-    // Générer un nouveau jeton aléatoire.
     const token = crypto.randomBytes(32).toString('hex')
 
-    // Seul le hash du jeton est enregistré en base de données.
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
     await UserToken.create({
@@ -116,11 +107,7 @@ export default class VerifyEmailController {
         .update({
           usedAt: DateTime.now().toSQL(),
         })
-
-      console.error('Erreur lors du renvoi du lien de confirmation :', error)
-
       session.flash('error', 'Impossible d’envoyer l’e-mail pour le moment. Veuillez réessayer.')
-
       return response.redirect().toRoute('verify-email.show')
     }
 
@@ -132,12 +119,8 @@ export default class VerifyEmailController {
     return response.redirect().toRoute('verify-email.show')
   }
 
-  /**
-   * Confirme l'adresse e-mail à partir du jeton reçu.
-   */
   async confirm({ params, response, view }: HttpContext) {
     const { token } = params
-
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
     const userToken = await UserToken.query()

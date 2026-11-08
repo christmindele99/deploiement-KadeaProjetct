@@ -1,12 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Année automatique du copyright
   const yearElement = document.getElementById('currentYear')
 
   if (yearElement) {
     yearElement.textContent = new Date().getFullYear()
   }
 
-  // Animation d'apparition au défilement
   const revealElements = document.querySelectorAll('.reveal')
 
   // Respecter les préférences de réduction des animations

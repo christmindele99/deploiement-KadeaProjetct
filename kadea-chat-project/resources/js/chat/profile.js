@@ -7,9 +7,6 @@ import { setupEditMode } from './features/profile-edit-mode.js'
 import { setupProfileForm } from './features/profile-form.js'
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ============================================================
-  // RÉCUPÉRATION DES ÉLÉMENTS HTML
-  // ============================================================
   const profileForm = document.getElementById('profileForm')
   const fullnameInput = document.getElementById('fullnameInput')
   const usernameInput = document.getElementById('usernameInput')
@@ -40,14 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   for (const [selector, element] of requiredElements) {
     if (!element) {
-      console.error(`Erreur : ${selector} est introuvable.`)
       return
     }
   }
-
-  // ============================================================
-  // ÉTAT PARTAGÉ (mode édition + valeurs originales)
-  // ============================================================
 
   const state = {
     isEditMode: false,
@@ -56,13 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     originalBio: bioInput.value,
   }
 
-  // ============================================================
-  // TOKEN CSRF
-  // ============================================================
-
   function getCsrfToken() {
     const token = document.cookie.split('; ').find((row) => row.startsWith('XSRF-TOKEN='))
-
     if (!token) {
       return null
     }
@@ -80,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     profileMessage.textContent = message
-
     profileMessage.classList.remove(
       'hidden',
       'bg-emerald-50',
@@ -106,10 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
       profileMessage.classList.add('hidden')
     }, 4000)
   }
-
-  // ============================================================
-  // DÉMARRAGE DES FONCTIONNALITÉS
-  // ============================================================
 
   const { disableEditMode } = setupEditMode({
     fullnameInput,

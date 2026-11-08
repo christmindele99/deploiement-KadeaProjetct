@@ -44,13 +44,10 @@ export default class RegistersController {
   }
 
   async store({ request, response, session }: HttpContext) {
-    // 1. Valider les données du formulaire
     const payload = await request.validateUsing(registerValidator)
 
-    // 2. Générer un nom d'utilisateur unique
     const username = await this.generateUniqueUsername(payload.fullName)
 
-    // 5. Créer le compte utilisateur
     const user = await User.create({
       fullName: payload.fullName,
       email: payload.email,
@@ -61,7 +58,6 @@ export default class RegistersController {
     // 8. Générer un token de vérification sécurisé
     const token = crypto.randomBytes(32).toString('hex')
 
-    // 9. Enregistrer le hash du token dans la base de données
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
     await UserToken.create({
@@ -71,7 +67,6 @@ export default class RegistersController {
       expiresAt: DateTime.now().plus({ hours: 24 }),
     })
 
-    // 10. Construire le lien de vérification
     const verificationUrl = `${env.get('APP_URL')}/verify-email/${token}`
 
     // 11. Envoyer l'e-mail de vérification
@@ -123,7 +118,6 @@ export default class RegistersController {
     // 12. Conserver l'adresse e-mail pour l'écran d'attente
     session.put('verification_email', user.email)
 
-    // 13. Rediriger vers la page de vérification
     return response.redirect('/verify-email')
   }
 }

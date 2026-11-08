@@ -4,7 +4,6 @@ import { middleware } from '#start/kernel'
 
 transmit.registerRoutes()
 
-// Afficher la page d'accueil
 router
   .get('/', async ({ view }) => {
     return view.render('pages/home')
@@ -25,45 +24,32 @@ const GroupsController = () => import('#controllers/groups_controller')
 const CommentsController = () => import('#controllers/comments_controller')
 const PresenceController = () => import('#controllers/presence_controller')
 
-// Afficher le formulaire d'inscription
 router.get('/register', [RegistersController, 'show']).as('register.show')
 
-// Traiter l'inscription
 router.post('/register', [RegistersController, 'store']).as('register.store')
 
-// Vérifier si l'adresse e-mail existe déjà
 router.get('/auth/check-email', [RegistersController, 'checkEmail']).as('auth.checkEmail')
 
-// Afficher l'écran d'attente de vérification
 router.get('/verify-email', [VerifyEmailController, 'show']).as('verify-email.show')
 
-// Renvoyer un nouveau lien de confirmation
 router.post('/verify-email/resend', [VerifyEmailController, 'resend']).as('verify-email.resend')
 
-// Confirmer l'adresse e-mail à partir du token reçu
 router.get('/verify-email/:token', [VerifyEmailController, 'confirm']).as('verify-email.confirm')
 
-// Afficher le formulaire de connexion
 router.get('/login', [LoginsController, 'show']).as('login.show')
 
-// Traiter la connexion
 router.post('/login', [LoginsController, 'store']).as('login.store')
 
-// Afficher le formulaire "Mot de passe oublié"
 router.get('/forgot-password', [ForgotPasswordsController, 'show']).as('forgot-password.show')
 
-// Envoyer le lien de réinitialisation par e-mail
 router.post('/forgot-password', [ForgotPasswordsController, 'store']).as('forgot-password.store')
 
-// Afficher le formulaire de nouveau mot de passe
 router.get('/reset-password/:token', [ResetPasswordsController, 'show']).as('reset-password.show')
 
-// Enregistrer le nouveau mot de passe
 router
   .post('/reset-password/:token', [ResetPasswordsController, 'store'])
   .as('reset-password.store')
 
-// Afficher l'interface de chat
 router
   .get('/chat', async ({ view, session }) => {
     return view.render('pages/chat/index', {
@@ -79,7 +65,6 @@ router
   })
   .use(middleware.sessionAuth())
 
-// Afficher la politique de confidentialité
 router
   .get('/politique-confidentialite', async ({ view }) => {
     return view.render('pages/chat/politiqueConficdentialite')
@@ -87,7 +72,6 @@ router
   .use(middleware.sessionAuth())
   .as('politique-confidentialite.show')
 
-// Afficher le formulaire de commentaire
 router
   .get('/commentaire', async ({ view, session, response }) => {
     const userId = session.get('userId')
@@ -124,19 +108,16 @@ router
 
 router.get('/users', [UsersController, 'index']).as('users.index')
 
-// Lister les conversations
 router
   .get('/conversations', [ConversationsController, 'index'])
   .use(middleware.sessionAuth())
   .as('conversations.index')
 
-// Afficher une conversation
 router
   .get('/conversations/:id', [ConversationsController, 'show'])
   .use(middleware.sessionAuth())
   .as('conversations.show')
 
-// Créer une conversation
 router
   .post('/conversations', [ConversationsController, 'store'])
   .use(middleware.sessionAuth())
@@ -144,7 +125,6 @@ router
 
 router.patch('/conversations/:id/favorite', [ConversationsController, 'toggleFavorite'])
 
-// Supprimer une conversation
 router
   .delete('/conversations/:id', [ConversationsController, 'destroy'])
   .as('conversations.destroy')
@@ -162,10 +142,8 @@ router
 router.patch('/messages/:id', [MessagesController, 'update']).use(middleware.sessionAuth())
 router.delete('/messages/:id', [MessagesController, 'destroy']).use(middleware.sessionAuth())
 
-// Afficher le profil — accès réservé aux utilisateurs connectés
 router.get('/profile', [ProfilesController, 'show']).use(middleware.sessionAuth())
 
-// Afficher les paramètres de confidentialité
 router
   .get('/confidentialite', async ({ view }) => {
     return view.render('pages/chat/confidentialite')
@@ -173,7 +151,6 @@ router
   .use(middleware.sessionAuth())
   .as('confidentialite.show')
 
-// Modifier les informations du profil
 router.patch('/profile', [ProfilesController, 'update']).use(middleware.sessionAuth())
 
 // Modifier le mot de passe
@@ -204,7 +181,6 @@ router
   .post('/conversations/:id/typing', [PresenceController, 'typing'])
   .use(middleware.sessionAuth())
 
-// Déconnexion de l'utilisateur
 router
   .post('/logout', [LogoutsController, 'destroy'])
   .use(middleware.sessionAuth())

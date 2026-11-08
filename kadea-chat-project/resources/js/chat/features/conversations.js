@@ -356,10 +356,6 @@ function closeDeleteConfirmation() {
   }
 }
 
-// ==================================================
-// CONFIRMATION DE SUPPRESSION DES CONVERSATIONS
-// ==================================================
-
 async function confirmDeleteConversations() {
   if (state.deletingConversations || !state.pendingDeleteConversationIds.length) {
     return

@@ -1,4 +1,3 @@
 import { MembershipSchema } from '#database/schema'
 
-export default class Membership extends MembershipSchema {
-}
+export default class Membership extends MembershipSchema {}

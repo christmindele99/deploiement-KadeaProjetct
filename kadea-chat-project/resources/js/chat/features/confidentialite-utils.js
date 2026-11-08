@@ -1,8 +1,3 @@
-// Utilitaires partagés : message de retour et en-têtes de requête (jeton CSRF)
-
-// ============================================================
-// MESSAGE
-// ============================================================
 
 export function showPasswordMessage(message, type = 'success') {
   const passwordMessage = document.getElementById('passwordMessage')
@@ -27,10 +22,6 @@ export function showPasswordMessage(message, type = 'success') {
     passwordMessage.classList.add('border-red-200', 'bg-red-50', 'text-red-700')
   }
 }
-
-// ============================================================
-// TOKEN CSRF
-// ============================================================
 
 export function getRequestHeaders() {
   const csrfCookie = document.cookie.split('; ').find((cookie) => cookie.startsWith('XSRF-TOKEN='))

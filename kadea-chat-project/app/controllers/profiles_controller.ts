@@ -4,9 +4,6 @@ import hash from '@adonisjs/core/services/hash'
 import CloudinaryService from '#services/cloudinary_service'
 
 export default class ProfilesController {
-  /**
-   * Afficher le profil de l'utilisateur connecté
-   */
   async show({ session, response, view }: HttpContext) {
     const userId = session.get('userId')
 
@@ -26,9 +23,6 @@ export default class ProfilesController {
     })
   }
 
-  /**
-   * Modifier les informations du profil
-   */
   async update({ session, request, response }: HttpContext) {
     const userId = session.get('userId')
 
@@ -50,14 +44,12 @@ export default class ProfilesController {
     const username = request.input('username')
     const bio = request.input('bio')
 
-    // Vérifier le nom complet
     if (typeof fullName !== 'string' || fullName.trim().length < 2) {
       return response.badRequest({
         message: 'Le nom complet doit contenir au moins 2 caractères.',
       })
     }
 
-    // Vérifier le nom d'utilisateur
     if (typeof username !== 'string' || username.trim().length < 3) {
       return response.badRequest({
         message: "Le nom d'utilisateur doit contenir au moins 3 caractères.",
@@ -66,7 +58,6 @@ export default class ProfilesController {
 
     const cleanUsername = username.trim()
 
-    // Vérifier si le nom d'utilisateur est déjà utilisé
     const existingUser = await User.query()
       .where('username', cleanUsername)
       .whereNot('id', user.id)
@@ -78,14 +69,12 @@ export default class ProfilesController {
       })
     }
 
-    // Vérifier la biographie
     if (bio !== undefined && bio !== null && typeof bio !== 'string') {
       return response.badRequest({
         message: 'La biographie est invalide.',
       })
     }
 
-    // Mettre à jour les informations du profil
     user.fullName = fullName.trim()
     user.username = cleanUsername
     user.bio = typeof bio === 'string' ? bio.trim() : null
@@ -148,9 +137,6 @@ export default class ProfilesController {
     })
   }
 
-  /**
-   * Modifier le mot de passe de l'utilisateur connecté
-   */
   async changePassword({ session, request, response }: HttpContext) {
     const userId = session.get('userId')
 
@@ -174,7 +160,6 @@ export default class ProfilesController {
     const newPassword = request.input('newPassword')
     const confirmPassword = request.input('confirmPassword')
 
-    // Vérifier les champs obligatoires
     if (
       typeof currentPassword !== 'string' ||
       typeof newPassword !== 'string' ||
@@ -188,7 +173,6 @@ export default class ProfilesController {
       })
     }
 
-    // Vérifier la robustesse du nouveau mot de passe
     const passwordIsValid =
       newPassword.length >= 8 &&
       /[a-z]/.test(newPassword) &&
@@ -203,7 +187,6 @@ export default class ProfilesController {
       })
     }
 
-    // Vérifier la confirmation du nouveau mot de passe
     if (newPassword !== confirmPassword) {
       return response.badRequest({
         message: 'Les deux nouveaux mots de passe ne correspondent pas.',
@@ -228,11 +211,6 @@ export default class ProfilesController {
       })
     }
 
-    /*
-     * Enregistrer le nouveau mot de passe.
-     * Le mécanisme de hachage automatique doit être confirmé
-     * avant de considérer cette fonctionnalité comme terminée.
-     */
     user.password = newPassword
     await user.save()
 

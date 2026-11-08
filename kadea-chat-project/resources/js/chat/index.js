@@ -40,12 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTyping()
   setupConversations()
 
-  // Démarrage
-
   initializeLayout()
 
   setActiveNavigation('chats')
-  // Arrivée depuis une autre page (paramètres, profil) avec /chat#users
   if (window.location.hash === '#users') {
     enterUsersMode()
     setActiveNavigation('users')

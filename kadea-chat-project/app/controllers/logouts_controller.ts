@@ -5,10 +5,8 @@ export default class LogoutsController {
     // Supprimer toutes les données de la session
     session.clear()
 
-    // Régénérer l'identifiant de session pour invalider l'ancien
     session.regenerate()
 
-    // Le navigateur sera redirigé vers la page de connexion
     return response.ok({
       message: 'Déconnexion réussie.',
       redirectTo: '/login',

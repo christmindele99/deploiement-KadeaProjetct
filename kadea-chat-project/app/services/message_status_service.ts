@@ -8,7 +8,6 @@ export const MESSAGE_STATUS = { SENT: 1, RECEIVED: 2, READ: 3 } as const
 type StatusRow = { id: number; authorId: number; conversationId: number }
 
 export default class MessageStatusService {
-  // Prévient les auteurs (en temps réel) que le statut de leurs messages a changé
   private static async notifyAuthors(rows: StatusRow[], statusId: number) {
     const groups = new Map<string, { authorId: number; conversationId: number; ids: number[] }>()
 

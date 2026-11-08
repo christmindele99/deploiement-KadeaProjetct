@@ -1,8 +1,6 @@
 export function showError(input, message) {
-  // Supprime l'ancienne erreur
   removeError(input)
 
-  // Ajoute une bordure rouge
   input.classList.remove('border-white')
   input.classList.add('border-red-400')
   const error = document.createElement('p')

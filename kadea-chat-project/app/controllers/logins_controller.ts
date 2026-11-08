@@ -14,16 +14,14 @@ export default class LoginsController {
   }
 
   async store({ request, response, session }: HttpContext) {
-    // 1. Valider les données du formulaire
     const { emailOrUsername, password } = await request.validateUsing(loginValidator)
     const identifier = emailOrUsername.trim()
-    // 2. Rechercher l'utilisateur par e-mail ou username
+
     const user = await User.query()
       .whereRaw('LOWER(email) = LOWER(?)', [identifier])
       .orWhereRaw('LOWER(username) = LOWER(?)', [identifier])
       .first()
 
-    // 3. Vérifier que le compte existe
     if (!user) {
       session.flash('errors.form', 'E-mail, nom d’utilisateur ou mot de passe incorrect.')
       session.flash('emailOrUsername', identifier)
@@ -31,7 +29,6 @@ export default class LoginsController {
       return response.redirect().toRoute('login.show')
     }
 
-    // 4. Vérifier le mot de passe
     const passwordIsValid = await hash.verify(user.password, password)
 
     if (!passwordIsValid) {
@@ -52,10 +49,8 @@ export default class LoginsController {
           usedAt: DateTime.now(),
         })
 
-      // Générer un nouveau token sécurisé
       const token = crypto.randomBytes(32).toString('hex')
 
-      // Stocker uniquement le hash du token
       const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
 
       await UserToken.create({
@@ -65,10 +60,8 @@ export default class LoginsController {
         expiresAt: DateTime.now().plus({ hours: 24 }),
       })
 
-      // Construire le lien de confirmation
       const verificationUrl = `${env.get('APP_URL')}/verify-email/${token}`
 
-      // Envoyer un nouvel e-mail
       await mail.send((message) => {
         message.to(user.email).subject('Confirmez votre adresse e-mail - Kadea Chat').html(`
             <!DOCTYPE html>
@@ -108,10 +101,8 @@ export default class LoginsController {
           `)
       })
 
-      // Conserver l'e-mail pour la page de vérification
       session.put('verification_email', user.email)
 
-      // IMPORTANT : ne pas ouvrir la session utilisateur
       return response.redirect('/verify-email')
     }
 

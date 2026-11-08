@@ -11,7 +11,6 @@ export function initializeValidations({ fullName, email, password, passwordConfi
     const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/
     if (!nameRegex.test(value)) {
       showError(fullName, 'Le nom doit contenir uniquement des lettres et des espaces.')
-
       return false
     }
     removeError(fullName)

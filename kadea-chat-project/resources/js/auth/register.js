@@ -9,11 +9,7 @@ function initializeRegister() {
   const password = document.getElementById('password')
   const passwordConfirmation = document.getElementById('passwordConfirmation')
 
-  // Vérifie que tous les éléments existent.
   if (!registerForm || !fullName || !email || !password || !passwordConfirmation) {
-    console.error(
-      'Impossible d’initialiser le formulaire : un ou plusieurs éléments sont introuvables.'
-    )
     return
   }
 

@@ -18,9 +18,6 @@ import {
 } from './state.js'
 import { api, getCurrentUserId, getData, getUserInitials, isMobile } from './utils.js'
 
-// ==================================================
-// UTILISATEURS
-// ==================================================
 
 function showUsersMessage(
   message,
@@ -223,7 +220,6 @@ function exitUsersMode() {
   setActiveNavigation('chats')
 }
 
-// Branche les écouteurs d'événements de cette fonctionnalité
 export function setupUsers() {
   openNewChatButton?.addEventListener('click', openNewChatModal)
 
@@ -243,7 +239,6 @@ export function setupUsers() {
 
   // ----- Mode Utilisateurs (desktop) -----
   usersButton?.addEventListener('click', (event) => {
-    // Sur la page du chat on reste sur la page ; ailleurs le lien mène à /chat#users
     event.preventDefault()
     enterUsersMode()
   })
@@ -275,7 +270,6 @@ export function setupUsers() {
     openChatWithUser(user)
   })
 
-  // Icône Chats : revenir aux conversations sans recharger la page
   document.querySelectorAll('[data-section="chats"]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (!state.usersMode) {

@@ -12,10 +12,6 @@ import Message from '#models/message'
 import User from '#models/user'
 
 export default class MessagesController {
-  /**
-   * Publier un événement sur le canal d'une conversation.
-   * Le champ message assure la compatibilité avec le client actuel.
-   */
   private async broadcastConversation(
     conversationId: number,
     type: string,
@@ -28,11 +24,6 @@ export default class MessagesController {
     })
   }
 
-  /**
-   * Notifier les utilisateurs membres d'une conversation.
-   * Utile lorsqu'un utilisateur n'est pas encore abonné
-   * au canal de cette conversation.
-   */
   private async notifyMembers(conversationId: number, type: string, data: Record<string, any>) {
     const memberships = await Membership.query().where('conversationId', conversationId)
 
@@ -50,10 +41,6 @@ export default class MessagesController {
     )
   }
 
-  /**
-   * Publier un événement sans annuler une opération
-   * en base de données déjà validée si Transmit échoue.
-   */
   private async publish(
     conversationId: number,
     type: string,
@@ -71,10 +58,6 @@ export default class MessagesController {
     }
   }
 
-  /**
-   * Recréer la participation d'un utilisateur qui a supprimé
-   * une conversation privée de sa liste.
-   */
   private async restorePairMemberships(conversation: Conversation, trx: TransactionClientContract) {
     if (conversation.groupId || !conversation.pairKey) {
       return
@@ -105,9 +88,6 @@ export default class MessagesController {
     }
   }
 
-  /**
-   * Récupérer les messages d'une conversation.
-   */
   async index({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
     const conversationId = Number(params.id)
@@ -147,12 +127,6 @@ export default class MessagesController {
     })
   }
 
-  /**
-   * Envoyer un message.
-   *
-   * Crée une conversation privée si nécessaire,
-   * puis diffuse le message après validation de la transaction.
-   */
   async store({ params, request, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
 
@@ -327,9 +301,6 @@ export default class MessagesController {
     }
   }
 
-  /**
-   * Modifier uniquement ses propres messages.
-   */
   async update({ params, request, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
     const messageId = Number(params.id)
@@ -394,9 +365,6 @@ export default class MessagesController {
     })
   }
 
-  /**
-   * Supprimer logiquement un message.
-   */
   async destroy({ params, session, response }: HttpContext) {
     const userId = Number(session.get('userId'))
     const messageId = Number(params.id)
