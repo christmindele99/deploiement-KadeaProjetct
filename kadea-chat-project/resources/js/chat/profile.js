@@ -1,6 +1,3 @@
-// Fichier principal du profil : il récupère les éléments HTML, prépare ce qui est
-// partagé (état, message, token CSRF) puis démarre chaque fonctionnalité du dossier features.
-
 import { applyTheme, getTheme } from './theme.js'
 import { setupAvatar } from './features/profile-avatar.js'
 import { setupEditMode } from './features/profile-edit-mode.js'
@@ -20,10 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const profileFullName = document.getElementById('profileFullName')
   const profileUsername = document.getElementById('profileUsername')
   const profileBio = document.getElementById('profileBio')
-
-  // ============================================================
-  // VÉRIFICATION DES ÉLÉMENTS OBLIGATOIRES
-  // ============================================================
 
   const requiredElements = [
     ['#profileForm', profileForm],
@@ -57,9 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return decodeURIComponent(token.split('=')[1])
   }
 
-  // ============================================================
-  // AFFICHER UN MESSAGE
-  // ============================================================
 
   function showMessage(message, type = 'success') {
     if (!profileMessage) {

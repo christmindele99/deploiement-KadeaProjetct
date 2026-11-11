@@ -1,6 +1,5 @@
 function getCsrfToken() {
   const cookie = document.cookie.split('; ').find((item) => item.startsWith('XSRF-TOKEN='))
-  
   return cookie ? decodeURIComponent(cookie.substring('XSRF-TOKEN='.length)) : ''
 }
 
@@ -21,7 +20,6 @@ export async function sendComment({ rating, comment }) {
   if (!response.ok) {
     throw new Error(data.message || "Impossible d'envoyer le commentaire.")
   }
-
   return data
 }
 

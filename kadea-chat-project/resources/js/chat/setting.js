@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
   
-  setupHelp() // Aide et commentaires
-  setupLogout() // Déconnexion
-  setupTheme() // Thème clair / sombre
+  setupHelp() 
+  setupLogout() 
+  setupTheme() 
 })

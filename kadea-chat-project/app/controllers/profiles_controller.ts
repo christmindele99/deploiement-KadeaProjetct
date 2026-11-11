@@ -4,41 +4,16 @@ import hash from '@adonisjs/core/services/hash'
 import CloudinaryService from '#services/cloudinary_service'
 
 export default class ProfilesController {
-  async show({ session, response, view }: HttpContext) {
-    const userId = session.get('userId')
-
-    if (!userId) {
-      return response.redirect('/login')
-    }
-
-    const user = await User.find(userId)
-
-    if (!user) {
-      session.forget('userId')
-      return response.redirect('/login')
-    }
+  async show({ auth, view }: HttpContext) {
+    const user = auth.user!
 
     return view.render('pages/chat/profile', {
       user,
     })
   }
 
-  async update({ session, request, response }: HttpContext) {
-    const userId = session.get('userId')
-
-    if (!userId) {
-      return response.unauthorized({
-        message: 'Vous devez être connecté pour modifier votre profil.',
-      })
-    }
-
-    const user = await User.find(userId)
-
-    if (!user) {
-      return response.notFound({
-        message: 'Utilisateur introuvable.',
-      })
-    }
+  async update({ auth, request, response }: HttpContext) {
+    const user = auth.user!
 
     const fullName = request.input('fullName')
     const username = request.input('username')
@@ -62,6 +37,12 @@ export default class ProfilesController {
       .where('username', cleanUsername)
       .whereNot('id', user.id)
       .first()
+
+    if (existingUser) {
+      return response.badRequest({
+        message: "Ce nom d'utilisateur est déjà utilisé.",
+      })
+    }
 
     if (existingUser) {
       return response.badRequest({
@@ -96,22 +77,8 @@ export default class ProfilesController {
     })
   }
 
-  async updateAvatar({ request, response, session }: HttpContext) {
-    const userId = session.get('userId')
-
-    if (!userId) {
-      return response.unauthorized({
-        message: 'Vous devez être connecté pour modifier votre photo.',
-      })
-    }
-
-    const user = await User.find(userId)
-
-    if (!user) {
-      return response.notFound({
-        message: 'Utilisateur introuvable.',
-      })
-    }
+  async updateAvatar({ auth, request, response }: HttpContext) {
+    const user = auth.user!
 
     const avatar = request.file('avatar', {
       size: '5mb',
@@ -137,24 +104,8 @@ export default class ProfilesController {
     })
   }
 
-  async changePassword({ session, request, response }: HttpContext) {
-    const userId = session.get('userId')
-
-    if (!userId) {
-      return response.unauthorized({
-        message: 'Vous devez être connecté pour modifier votre mot de passe.',
-      })
-    }
-
-    const user = await User.find(userId)
-
-    if (!user) {
-      session.forget('userId')
-
-      return response.unauthorized({
-        message: 'Utilisateur introuvable. Veuillez vous reconnecter.',
-      })
-    }
+  async changePassword({ auth, request, response }: HttpContext) {
+    const user = auth.user!
 
     const currentPassword = request.input('currentPassword')
     const newPassword = request.input('newPassword')
@@ -193,7 +144,6 @@ export default class ProfilesController {
       })
     }
 
-    // Vérifier le mot de passe actuel
     const currentPasswordIsValid = await hash.verify(user.password, currentPassword)
 
     if (!currentPasswordIsValid) {
@@ -202,7 +152,6 @@ export default class ProfilesController {
       })
     }
 
-    // Empêcher de réutiliser le mot de passe actuel
     const samePassword = await hash.verify(user.password, newPassword)
 
     if (samePassword) {

@@ -51,137 +51,152 @@ router
   .as('reset-password.store')
 
 router
-  .get('/chat', async ({ view, session }) => {
+  .get('/chat', async ({ view, auth }) => {
     return view.render('pages/chat/index', {
-      currentUserId: session.get('userId') ?? null,
+      currentUserId: auth.user!.id,
     })
   })
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('chat.index')
 
 router
   .get('/settings', async ({ view }) => {
     return view.render('pages/chat/setting')
   })
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
 
 router
   .get('/politique-confidentialite', async ({ view }) => {
     return view.render('pages/chat/politiqueConficdentialite')
   })
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('politique-confidentialite.show')
 
 router
-  .get('/commentaire', async ({ view, session, response }) => {
-    const userId = session.get('userId')
-
-    if (!userId) {
-      return response.unauthorized({
-        message: 'Vous devez être connecté pour accéder à cette page.',
-      })
-    }
-
-    const User = (await import('#models/user')).default
-    const user = await User.find(userId)
-
-    if (!user) {
-      session.forget('userId')
-
-      return response.unauthorized({
-        message: 'Utilisateur introuvable. Veuillez vous reconnecter.',
-      })
-    }
+  .get('/commentaire', async ({ view, auth }) => {
+    const user = auth.user!
 
     return view.render('pages/chat/commentaire', {
       user,
     })
   })
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('commentaire.show')
 
-// Enregistrer le commentaire d'un utilisateur
 router
   .post('/comments', [CommentsController, 'store'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('comments.store')
 
-router.get('/users', [UsersController, 'index']).as('users.index')
+router
+  .get('/users', [UsersController, 'index'])
+  .use(middleware.auth({ guards: ['web'] }))
+  .as('users.index')
 
 router
   .get('/conversations', [ConversationsController, 'index'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('conversations.index')
 
 router
   .get('/conversations/:id', [ConversationsController, 'show'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('conversations.show')
 
 router
   .post('/conversations', [ConversationsController, 'store'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('conversations.store')
 
-router.patch('/conversations/:id/favorite', [ConversationsController, 'toggleFavorite'])
+router
+  .patch('/conversations/:id/favorite', [ConversationsController, 'toggleFavorite'])
+  .use(middleware.auth({ guards: ['web'] }))
 
 router
   .delete('/conversations/:id', [ConversationsController, 'destroy'])
+  .use(middleware.auth({ guards: ['web'] }))
   .as('conversations.destroy')
 
 router
   .post('/messages', [MessagesController, 'store'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('messages.store')
+
 router
   .get('/conversations/:id/messages', [MessagesController, 'index'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
+
 router
   .post('/conversations/:id/messages', [MessagesController, 'store'])
+  .use(middleware.auth({ guards: ['web'] }))
   .as('conversations.messages.store')
-router.patch('/messages/:id', [MessagesController, 'update']).use(middleware.sessionAuth())
-router.delete('/messages/:id', [MessagesController, 'destroy']).use(middleware.sessionAuth())
 
-router.get('/profile', [ProfilesController, 'show']).use(middleware.sessionAuth())
+router
+  .patch('/messages/:id', [MessagesController, 'update'])
+  .use(middleware.auth({ guards: ['web'] }))
+
+router
+  .delete('/messages/:id', [MessagesController, 'destroy'])
+  .use(middleware.auth({ guards: ['web'] }))
+
+router.get('/profile', [ProfilesController, 'show']).use(middleware.auth({ guards: ['web'] }))
 
 router
   .get('/confidentialite', async ({ view }) => {
     return view.render('pages/chat/confidentialite')
   })
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('confidentialite.show')
 
-router.patch('/profile', [ProfilesController, 'update']).use(middleware.sessionAuth())
+router.patch('/profile', [ProfilesController, 'update']).use(middleware.auth({ guards: ['web'] }))
 
-// Modifier le mot de passe
 router
   .patch('/profile/change-password', [ProfilesController, 'changePassword'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('profile.changePassword')
 
-router.patch('/profile/avatar', [ProfilesController, 'updateAvatar'])
+router
+  .patch('/profile/avatar', [ProfilesController, 'updateAvatar'])
+  .use(middleware.auth({ guards: ['web'] }))
 
-router.post('/groups', [GroupsController, 'store'])
-router.get('/conversations/:id/group', [GroupsController, 'show'])
-router.patch('/conversations/:id/group', [GroupsController, 'update'])
-router.post('/conversations/:id/group/members', [GroupsController, 'addMembers'])
+router.post('/groups', [GroupsController, 'store']).use(middleware.auth({ guards: ['web'] }))
+
+router
+  .get('/conversations/:id/group', [GroupsController, 'show'])
+  .use(middleware.auth({ guards: ['web'] }))
+
+router
+  .patch('/conversations/:id/group', [GroupsController, 'update'])
+  .use(middleware.auth({ guards: ['web'] }))
+
+router
+  .post('/conversations/:id/group/members', [GroupsController, 'addMembers'])
+  .use(middleware.auth({ guards: ['web'] }))
+
 router
   .delete('/conversations/:id/group/members', [GroupsController, 'removeMembers'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
 
-router.delete('/conversations/:id/group', [GroupsController, 'destroy']).as('groups.destroy')
+router
+  .delete('/conversations/:id/group', [GroupsController, 'destroy'])
+  .use(middleware.auth({ guards: ['web'] }))
+  .as('groups.destroy')
 
 router
   .patch('/conversations/:id/group/avatar', [GroupsController, 'updateAvatar'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
 
-router.post('/presence/ping', [PresenceController, 'ping']).use(middleware.sessionAuth())
-router.get('/presence/:id', [PresenceController, 'show']).use(middleware.sessionAuth())
+router
+  .post('/presence/ping', [PresenceController, 'ping'])
+  .use(middleware.auth({ guards: ['web'] }))
+
+router.get('/presence/:id', [PresenceController, 'show']).use(middleware.auth({ guards: ['web'] }))
+
 router
   .post('/conversations/:id/typing', [PresenceController, 'typing'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
 
 router
   .post('/logout', [LogoutsController, 'destroy'])
-  .use(middleware.sessionAuth())
+  .use(middleware.auth({ guards: ['web'] }))
   .as('logout.destroy')

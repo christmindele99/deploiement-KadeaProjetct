@@ -202,7 +202,6 @@ export function setupChangePassword() {
 
         submitButton.disabled = false
         submitButton.innerHTML = originalContent
-
         const errorMessage =
           error instanceof Error ? error.message : 'Impossible de modifier le mot de passe.'
 
@@ -213,7 +212,6 @@ export function setupChangePassword() {
             'rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700'
           form.prepend(errorElement)
         }
-
         errorElement.textContent = errorMessage
         errorElement.classList.remove('hidden')
       }

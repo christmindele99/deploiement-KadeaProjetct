@@ -19,14 +19,12 @@ export default class ResetPasswordsController {
   async show({ params, view, response, session }: HttpContext) {
     const token = params.token
 
-    // Vérifier le format du token
     if (typeof token !== 'string' || !/^[a-f0-9]{64}$/i.test(token)) {
       session.flash('errors.form', 'Ce lien de réinitialisation est invalide.')
 
       return response.redirect().toRoute('forgot-password.show')
     }
 
-    // Vérifier l'existence, l'expiration et l'utilisation du token
     const userToken = await this.findValidToken(token)
 
     if (!userToken) {
@@ -41,20 +39,15 @@ export default class ResetPasswordsController {
     return view.render('pages/auth/reset-password', { token })
   }
 
-  /**
-   * Enregistre le nouveau mot de passe
-   */
   async store({ params, request, response, session }: HttpContext) {
     const token = params.token
 
-    // 1. Vérifier le format du token
     if (typeof token !== 'string' || !/^[a-f0-9]{64}$/i.test(token)) {
       session.flash('errors.form', 'Ce lien de réinitialisation est invalide.')
 
       return response.redirect().toRoute('forgot-password.show')
     }
 
-    // 2. Vérifier que le token est valide
     const userToken = await this.findValidToken(token)
 
     if (!userToken) {
@@ -66,7 +59,6 @@ export default class ResetPasswordsController {
       return response.redirect().toRoute('forgot-password.show')
     }
 
-    // 3. Récupérer les champs du formulaire
     const password = request.input('password')
     const passwordConfirmation = request.input('passwordConfirmation')
 
@@ -98,7 +90,6 @@ export default class ResetPasswordsController {
       return response.redirect().back()
     }
 
-    // 6. Retrouver l'utilisateur associé au token
     const user = await User.find(userToken.userId)
 
     if (!user) {
@@ -110,7 +101,6 @@ export default class ResetPasswordsController {
     user.password = password
     await user.save()
 
-    // 8. Marquer le token actuel comme utilisé
     userToken.usedAt = DateTime.now()
     await userToken.save()
 

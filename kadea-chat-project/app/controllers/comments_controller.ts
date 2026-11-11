@@ -5,8 +5,8 @@ import mail from '@adonisjs/mail/services/main'
 import env from '#start/env'
 
 export default class CommentsController {
-  async store({ session, request, response }: HttpContext) {
-    const userId = session.get('userId')
+  async store({ auth, request, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.status(401).json({

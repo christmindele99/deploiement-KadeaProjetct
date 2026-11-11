@@ -13,7 +13,7 @@ export default class LoginsController {
     return view.render('pages/auth/login')
   }
 
-  async store({ request, response, session }: HttpContext) {
+  async store({ request, response, session, auth }: HttpContext) {
     const { emailOrUsername, password } = await request.validateUsing(loginValidator)
     const identifier = emailOrUsername.trim()
 
@@ -106,8 +106,8 @@ export default class LoginsController {
       return response.redirect('/verify-email')
     }
 
-    // 7. Enregistrer l'identifiant de l'utilisateur dans la session
-    session.put('userId', user.id)
+    // 7. Authentifier l'utilisateur avec le système natif d'AdonisJS
+    await auth.use('web').login(user)
 
     // 8. Rediriger vers le chat
     return response.redirect().toRoute('chat.index')

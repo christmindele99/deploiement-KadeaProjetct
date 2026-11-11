@@ -115,7 +115,6 @@ export default class RegistersController {
       `)
     })
 
-    // 12. Conserver l'adresse e-mail pour l'écran d'attente
     session.put('verification_email', user.email)
 
     return response.redirect('/verify-email')

@@ -7,8 +7,8 @@ import Group from '#models/group'
 import MessageStatusService from '#services/message_status_service'
 
 export default class ConversationsController {
-  async index({ session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async index({ auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({
@@ -128,8 +128,8 @@ export default class ConversationsController {
     return response.ok({ data })
   }
 
-  async show({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async show({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({
@@ -178,8 +178,8 @@ export default class ConversationsController {
     })
   }
 
-  async toggleFavorite({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async toggleFavorite({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
@@ -216,8 +216,8 @@ export default class ConversationsController {
     })
   }
 
-  async destroy({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async destroy({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({

@@ -21,5 +21,4 @@ router.use([
 export const middleware = router.named({
   guest: () => import('#middleware/guest_middleware'),
   auth: () => import('#middleware/auth_middleware'),
-  sessionAuth: () => import('#middleware/session_auth_middleware'),
 })

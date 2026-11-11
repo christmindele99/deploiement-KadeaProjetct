@@ -9,8 +9,8 @@ import Membership from '#models/membership'
 import CloudinaryService from '#services/cloudinary_service'
 
 export default class GroupsController {
-  async store({ session, request, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async store({ auth, request, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({
@@ -86,7 +86,6 @@ export default class GroupsController {
       return newConversation
     })
 
-    // Prévenir les membres en temps réel pour que le groupe apparaisse chez eux
     for (const id of memberIds) {
       transmit.broadcast(`users/${id}`, {
         event: 'user.notification',
@@ -100,8 +99,8 @@ export default class GroupsController {
     })
   }
 
-  async show({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async show({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
@@ -177,8 +176,8 @@ export default class GroupsController {
     })
   }
 
-  async update({ params, session, request, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async update({ params, auth, request, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
@@ -262,8 +261,8 @@ export default class GroupsController {
     })
   }
 
-  async addMembers({ params, session, request, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async addMembers({ params, auth, request, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
@@ -311,7 +310,6 @@ export default class GroupsController {
       return response.badRequest({ message: 'Sélectionne au moins un utilisateur.' })
     }
 
-    // On ignore ceux qui sont déjà membres du groupe
     const currentMemberships = await Membership.query().where('conversationId', conversationId)
     const currentMemberIds = new Set(currentMemberships.map((membership) => membership.userId))
     const newMemberIds = memberIds.filter((id) => !currentMemberIds.has(id))
@@ -342,7 +340,6 @@ export default class GroupsController {
       }))
     )
 
-    // Prévenir les anciens et les nouveaux membres en temps réel
     for (const id of [...currentMemberIds, ...newMemberIds]) {
       transmit.broadcast(`users/${id}`, {
         event: 'user.notification',
@@ -356,8 +353,8 @@ export default class GroupsController {
     })
   }
 
-  async removeMembers({ params, session, request, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async removeMembers({ params, auth, request, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({
@@ -373,7 +370,6 @@ export default class GroupsController {
       })
     }
 
-    // Vérifier que l'utilisateur connecté est membre du groupe
     const myMembership = await Membership.query()
       .where('userId', userId)
       .where('conversationId', conversationId)
@@ -385,14 +381,12 @@ export default class GroupsController {
       })
     }
 
-    // Seuls les administrateurs peuvent retirer des membres
     if (myMembership.roleId !== 1) {
       return response.forbidden({
         message: 'Seuls les admins peuvent retirer des membres.',
       })
     }
 
-    // Vérifier que la conversation est bien un groupe
     const conversation = await Conversation.find(conversationId)
 
     if (!conversation || !conversation.groupId) {
@@ -419,15 +413,12 @@ export default class GroupsController {
       })
     }
 
-    // Empêcher l'administrateur de se retirer lui-même
     if (memberIds.includes(userId)) {
       return response.badRequest({
         message: 'Tu ne peux pas te retirer toi-même du groupe.',
       })
     }
 
-    // Vérifier que tous les utilisateurs sélectionnés
-    // sont bien des membres classiques de ce groupe
     const memberships = await Membership.query()
       .where('conversationId', conversationId)
       .whereIn('userId', memberIds)
@@ -439,14 +430,12 @@ export default class GroupsController {
       })
     }
 
-    // Supprimer uniquement les appartenances au groupe
     await Membership.query()
       .where('conversationId', conversationId)
       .whereIn('userId', memberIds)
       .where('roleId', 2)
       .delete()
 
-    // Actualiser la liste de conversations des utilisateurs retirés
     for (const id of memberIds) {
       transmit.broadcast(`users/${id}`, {
         event: 'user.notification',
@@ -454,9 +443,7 @@ export default class GroupsController {
       })
     }
 
-    // Actualiser les informations chez les membres restants
     const remainingMemberships = await Membership.query().where('conversationId', conversationId)
-
     for (const membership of remainingMemberships) {
       transmit.broadcast(`users/${membership.userId}`, {
         event: 'user.notification',
@@ -472,8 +459,8 @@ export default class GroupsController {
     })
   }
 
-  async destroy({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async destroy({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
     if (!userId) {
       return response.unauthorized({
         message: 'Vous devez être connecté.',
@@ -485,7 +472,6 @@ export default class GroupsController {
         message: 'Identifiant de conversation invalide.',
       })
     }
-    // Vérifier que l'utilisateur est membre du groupe
     const myMembership = await Membership.query()
       .where('userId', userId)
       .where('conversationId', conversationId)
@@ -495,7 +481,6 @@ export default class GroupsController {
         message: 'Groupe introuvable.',
       })
     }
-    // Seul l'administrateur peut supprimer le groupe
     if (myMembership.roleId !== 1) {
       return response.forbidden({
         message: 'Seul l’administrateur peut supprimer ce groupe.',
@@ -503,7 +488,6 @@ export default class GroupsController {
     }
 
     const conversation = await Conversation.find(conversationId)
-
     if (!conversation || !conversation.groupId) {
       return response.notFound({
         message: 'Groupe introuvable.',
@@ -515,22 +499,14 @@ export default class GroupsController {
         message: 'Groupe introuvable.',
       })
     }
-    // Récupérer les membres avant la suppression
     const memberships = await Membership.query().where('conversationId', conversationId)
-
     const memberIds = [...new Set(memberships.map((membership) => membership.userId))]
-    // Suppression complète dans une transaction
     await db.transaction(async (trx) => {
-      // Supprimer les messages de la conversation
       await trx.from('messages').where('conversation_id', conversationId).delete()
-      // Supprimer les appartenances des membres
       await trx.from('memberships').where('conversation_id', conversationId).delete()
-      // Supprimer la conversation
       await Conversation.query({ client: trx }).where('id', conversationId).delete()
-      // Supprimer le groupe
       await Group.query({ client: trx }).where('id', group.id).delete()
     })
-    // Informer tous les anciens membres
     for (const id of memberIds) {
       transmit.broadcast(`users/${id}`, {
         event: 'user.notification',
@@ -542,8 +518,8 @@ export default class GroupsController {
     })
   }
 
-  async updateAvatar({ params, session, request, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async updateAvatar({ params, auth, request, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
@@ -601,7 +577,6 @@ export default class GroupsController {
     group.avatarUrl = result.secure_url
     await group.save()
 
-    // Prévenir tous les membres pour que leur liste se mette à jour
     const memberships = await Membership.query().where('conversationId', conversationId)
 
     for (const membership of memberships) {

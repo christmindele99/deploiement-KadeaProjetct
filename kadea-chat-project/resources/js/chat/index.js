@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return
   }
 
-  // Écouteurs d'événements (un appel par fonctionnalité)
   setupUsers()
   setupGroups()
   setupMessages()

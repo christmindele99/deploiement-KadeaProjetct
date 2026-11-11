@@ -88,8 +88,8 @@ export default class MessagesController {
     }
   }
 
-  async index({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async index({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
     const conversationId = Number(params.id)
 
     if (!userId) {
@@ -127,8 +127,8 @@ export default class MessagesController {
     })
   }
 
-  async store({ params, request, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async store({ params, request, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
 
     if (!userId) {
       return response.unauthorized({
@@ -301,8 +301,8 @@ export default class MessagesController {
     }
   }
 
-  async update({ params, request, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async update({ params, request, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
     const messageId = Number(params.id)
 
     if (!userId) {
@@ -365,8 +365,8 @@ export default class MessagesController {
     })
   }
 
-  async destroy({ params, session, response }: HttpContext) {
-    const userId = Number(session.get('userId'))
+  async destroy({ params, auth, response }: HttpContext) {
+    const userId = Number(auth.user!.id)
     const messageId = Number(params.id)
 
     if (!userId) {

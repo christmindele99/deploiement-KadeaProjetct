@@ -1,14 +1,12 @@
+
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import User from '#models/user'
 
 export default class ShareUserMiddleware {
-  async handle(ctx: HttpContext, next: NextFn) {
-    const userId = ctx.session.get('userId')
+  async handle({ auth, view }: HttpContext, next: NextFn) {
+    const user = auth.user ?? null
 
-    const user = userId ? await User.find(userId) : null
-
-    ctx.view.share({ user })
+    view.share({ user })
 
     return next()
   }
