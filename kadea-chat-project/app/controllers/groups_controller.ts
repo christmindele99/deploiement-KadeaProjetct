@@ -11,7 +11,6 @@ import CloudinaryService from '#services/cloudinary_service'
 export default class GroupsController {
   async store({ auth, request, response }: HttpContext) {
     const userId = Number(auth.user!.id)
-
     if (!userId) {
       return response.unauthorized({
         message: 'Vous devez être connecté pour créer un groupe.',
@@ -23,7 +22,6 @@ export default class GroupsController {
     const description =
       typeof rawDescription === 'string' && rawDescription.trim() ? rawDescription.trim() : null
     const rawMemberIds = request.input('memberIds')
-
     if (name.length < 2 || name.length > 100) {
       return response.badRequest({
         message: 'Le nom du groupe doit contenir entre 2 et 100 caractères.',
@@ -33,7 +31,6 @@ export default class GroupsController {
     if (!Array.isArray(rawMemberIds)) {
       return response.badRequest({ message: 'La liste des membres est invalide.' })
     }
-
     const memberIds = [
       ...new Set(
         rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0 && id !== userId)
@@ -47,7 +44,6 @@ export default class GroupsController {
     }
 
     const existingUsers = await User.query().whereIn('id', memberIds)
-
     if (existingUsers.length !== memberIds.length) {
       return response.badRequest({
         message: 'Certains utilisateurs sélectionnés sont introuvables.',
@@ -56,14 +52,10 @@ export default class GroupsController {
 
     const conversation = await db.transaction(async (trx) => {
       const group = await Group.create({ name, description }, { client: trx })
-
       const newConversation = await Conversation.create({ groupId: group.id }, { client: trx })
-
       const now = DateTime.now()
-
       await Membership.createMany(
         [
-          // Le créateur est admin (role 1)
           {
             userId,
             conversationId: newConversation.id,
@@ -71,7 +63,6 @@ export default class GroupsController {
             joinedAt: now,
             isFavorite: false,
           },
-          // Les autres sont member (role 2)
           ...memberIds.map((id) => ({
             userId: id,
             conversationId: newConversation.id,
@@ -107,12 +98,10 @@ export default class GroupsController {
     }
 
     const conversationId = Number(params.id)
-
     if (!Number.isInteger(conversationId) || conversationId <= 0) {
       return response.badRequest({ message: 'Identifiant de conversation invalide.' })
     }
 
-    // Seuls les membres du groupe peuvent voir ses infos
     const myMembership = await Membership.query()
       .where('userId', userId)
       .where('conversationId', conversationId)
@@ -129,13 +118,10 @@ export default class GroupsController {
     }
 
     const group = await Group.find(conversation.groupId)
-
     if (!group) {
       return response.notFound({ message: 'Groupe introuvable.' })
     }
-
     const memberships = await Membership.query().where('conversationId', conversationId)
-
     const users = await User.query().whereIn(
       'id',
       memberships.map((membership) => membership.userId)
@@ -178,13 +164,10 @@ export default class GroupsController {
 
   async update({ params, auth, request, response }: HttpContext) {
     const userId = Number(auth.user!.id)
-
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
     }
-
     const conversationId = Number(params.id)
-
     if (!Number.isInteger(conversationId) || conversationId <= 0) {
       return response.badRequest({ message: 'Identifiant de conversation invalide.' })
     }
@@ -198,7 +181,6 @@ export default class GroupsController {
       return response.notFound({ message: 'Groupe introuvable.' })
     }
 
-    // Seuls les admins (roleId 1) peuvent modifier le groupe
     if (myMembership.roleId !== 1) {
       return response.forbidden({
         message: 'Seuls les admins peuvent modifier le groupe.',
@@ -238,7 +220,6 @@ export default class GroupsController {
     group.description = description
     await group.save()
 
-    // Prévenir tous les membres pour que leur liste se mette à jour
     const memberships = await Membership.query().where('conversationId', conversationId)
 
     for (const membership of memberships) {
@@ -305,11 +286,9 @@ export default class GroupsController {
     const memberIds = [
       ...new Set(rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)),
     ]
-
     if (memberIds.length < 1) {
       return response.badRequest({ message: 'Sélectionne au moins un utilisateur.' })
     }
-
     const currentMemberships = await Membership.query().where('conversationId', conversationId)
     const currentMemberIds = new Set(currentMemberships.map((membership) => membership.userId))
     const newMemberIds = memberIds.filter((id) => !currentMemberIds.has(id))
@@ -321,7 +300,6 @@ export default class GroupsController {
     }
 
     const existingUsers = await User.query().whereIn('id', newMemberIds)
-
     if (existingUsers.length !== newMemberIds.length) {
       return response.badRequest({
         message: 'Certains utilisateurs sélectionnés sont introuvables.',
@@ -355,7 +333,6 @@ export default class GroupsController {
 
   async removeMembers({ params, auth, request, response }: HttpContext) {
     const userId = Number(auth.user!.id)
-
     if (!userId) {
       return response.unauthorized({
         message: 'Vous devez être connecté.',
@@ -380,7 +357,6 @@ export default class GroupsController {
         message: 'Groupe introuvable.',
       })
     }
-
     if (myMembership.roleId !== 1) {
       return response.forbidden({
         message: 'Seuls les admins peuvent retirer des membres.',
@@ -388,7 +364,6 @@ export default class GroupsController {
     }
 
     const conversation = await Conversation.find(conversationId)
-
     if (!conversation || !conversation.groupId) {
       return response.notFound({
         message: 'Groupe introuvable.',
@@ -396,7 +371,6 @@ export default class GroupsController {
     }
 
     const rawMemberIds = request.input('memberIds')
-
     if (!Array.isArray(rawMemberIds)) {
       return response.badRequest({
         message: 'La liste des membres est invalide.',
@@ -406,13 +380,11 @@ export default class GroupsController {
     const memberIds = [
       ...new Set(rawMemberIds.map(Number).filter((id) => Number.isInteger(id) && id > 0)),
     ]
-
     if (memberIds.length < 1) {
       return response.badRequest({
         message: 'Sélectionne au moins un membre.',
       })
     }
-
     if (memberIds.includes(userId)) {
       return response.badRequest({
         message: 'Tu ne peux pas te retirer toi-même du groupe.',
@@ -435,7 +407,6 @@ export default class GroupsController {
       .whereIn('userId', memberIds)
       .where('roleId', 2)
       .delete()
-
     for (const id of memberIds) {
       transmit.broadcast(`users/${id}`, {
         event: 'user.notification',
@@ -450,7 +421,6 @@ export default class GroupsController {
         data: { conversationId },
       })
     }
-
     return response.ok({
       message: 'Membres retirés du groupe avec succès.',
       data: {
@@ -524,9 +494,7 @@ export default class GroupsController {
     if (!userId) {
       return response.unauthorized({ message: 'Vous devez être connecté.' })
     }
-
     const conversationId = Number(params.id)
-
     if (!Number.isInteger(conversationId) || conversationId <= 0) {
       return response.badRequest({ message: 'Identifiant de conversation invalide.' })
     }
@@ -540,7 +508,6 @@ export default class GroupsController {
       return response.notFound({ message: 'Groupe introuvable.' })
     }
 
-    // Seuls les admins (roleId 1) peuvent changer la photo du groupe
     if (myMembership.roleId !== 1) {
       return response.forbidden({
         message: 'Seuls les admins peuvent modifier la photo du groupe.',
@@ -554,11 +521,9 @@ export default class GroupsController {
     }
 
     const group = await Group.find(conversation.groupId)
-
     if (!group) {
       return response.notFound({ message: 'Groupe introuvable.' })
     }
-
     const avatar = request.file('avatar', {
       size: '5mb',
       extnames: ['jpg', 'jpeg', 'png', 'webp'],
@@ -573,12 +538,9 @@ export default class GroupsController {
     }
 
     const result = await CloudinaryService.uploadGroupAvatar(avatar.tmpPath!, group.id)
-
     group.avatarUrl = result.secure_url
     await group.save()
-
     const memberships = await Membership.query().where('conversationId', conversationId)
-
     for (const membership of memberships) {
       transmit.broadcast(`users/${membership.userId}`, {
         event: 'user.notification',

@@ -47,7 +47,15 @@ export class GroupSchema extends BaseModel {
 }
 
 export class MembershipSchema extends BaseModel {
-  static $columns = ['clearedAt', 'conversationId', 'isFavorite', 'joinedAt', 'lastReadAt', 'roleId', 'userId'] as const
+  static $columns = [
+    'clearedAt',
+    'conversationId',
+    'isFavorite',
+    'joinedAt',
+    'lastReadAt',
+    'roleId',
+    'userId',
+  ] as const
   $columns = MembershipSchema.$columns
   @column.dateTime()
   declare clearedAt: DateTime | null
@@ -75,7 +83,16 @@ export class MessageStatusSchema extends BaseModel {
 }
 
 export class MessageSchema extends BaseModel {
-  static $columns = ['authorId', 'content', 'conversationId', 'createdAt', 'deletedAt', 'editedAt', 'id', 'messageStatusId'] as const
+  static $columns = [
+    'authorId',
+    'content',
+    'conversationId',
+    'createdAt',
+    'deletedAt',
+    'editedAt',
+    'id',
+    'messageStatusId',
+  ] as const
   $columns = MessageSchema.$columns
   @column()
   declare authorId: number
@@ -105,7 +122,15 @@ export class RoleSchema extends BaseModel {
 }
 
 export class UserTokenSchema extends BaseModel {
-  static $columns = ['createdAt', 'expiresAt', 'id', 'tokenHash', 'type', 'usedAt', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'expiresAt',
+    'id',
+    'tokenHash',
+    'type',
+    'usedAt',
+    'userId',
+  ] as const
   $columns = UserTokenSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -124,7 +149,18 @@ export class UserTokenSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatar', 'bio', 'createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'password', 'updatedAt', 'username'] as const
+  static $columns = [
+    'avatar',
+    'bio',
+    'createdAt',
+    'email',
+    'emailVerifiedAt',
+    'fullName',
+    'id',
+    'password',
+    'updatedAt',
+    'username',
+  ] as const
   $columns = UserSchema.$columns
   @column()
   declare avatar: string | null

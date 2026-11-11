@@ -139,7 +139,6 @@ export default class MessagesController {
     const content = request.input('content')
     const recipientId = Number(request.input('recipientId'))
     const conversationId = Number(params.id ?? request.input('conversationId') ?? 0)
-
     if (typeof content !== 'string' || !content.trim()) {
       return response.badRequest({
         message: 'Le message ne peut pas être vide.',
@@ -181,7 +180,6 @@ export default class MessagesController {
           if (!Number.isInteger(recipientId) || recipientId <= 0 || recipientId === userId) {
             throw new Error('INVALID_RECIPIENT')
           }
-
           const recipient = await User.find(recipientId, {
             client: trx,
           })
@@ -189,9 +187,7 @@ export default class MessagesController {
           if (!recipient || !recipient.emailVerifiedAt) {
             throw new Error('RECIPIENT_NOT_FOUND')
           }
-
           const pairKey = [userId, recipientId].sort((a, b) => a - b).join(':')
-
           const existingConversation = await Conversation.query({
             client: trx,
           })
@@ -200,7 +196,6 @@ export default class MessagesController {
 
           if (existingConversation) {
             conversation = existingConversation
-
             for (const memberId of [userId, recipientId]) {
               const membership = await Membership.query({
                 client: trx,
@@ -272,9 +267,7 @@ export default class MessagesController {
       })
 
       const data = message.serialize()
-
       await this.publish(Number(message.conversationId), 'message.created', data)
-
       return response.created({
         data,
       })
@@ -290,13 +283,11 @@ export default class MessagesController {
           message: 'Le destinataire est invalide.',
         })
       }
-
       if (error instanceof Error && error.message === 'RECIPIENT_NOT_FOUND') {
         return response.notFound({
           message: 'Destinataire introuvable ou non vérifié.',
         })
       }
-
       throw error
     }
   }
@@ -310,7 +301,6 @@ export default class MessagesController {
         message: 'Vous devez être connecté.',
       })
     }
-
     if (!Number.isInteger(messageId) || messageId <= 0) {
       return response.badRequest({
         message: 'Identifiant de message invalide.',
@@ -318,7 +308,6 @@ export default class MessagesController {
     }
 
     const content = request.input('content')
-
     if (typeof content !== 'string' || !content.trim()) {
       return response.badRequest({
         message: 'Le message ne peut pas être vide.',
@@ -341,7 +330,6 @@ export default class MessagesController {
     message.editedAt = DateTime.now()
     await message.save()
 
-    // Si le destinataire est déjà en ligne, le message est directement "Reçu"
     const sentConversation = await Conversation.find(message.conversationId)
 
     if (sentConversation && !sentConversation.groupId && sentConversation.pairKey) {
@@ -357,9 +345,7 @@ export default class MessagesController {
     }
 
     const data = message.serialize()
-
     await this.publish(Number(message.conversationId), 'message.updated', data)
-
     return response.ok({
       data,
     })

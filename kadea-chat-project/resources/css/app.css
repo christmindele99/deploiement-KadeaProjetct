@@ -1,9 +1,5 @@
-/* ==========================================================================
-   AdonisJS Starter Kit
-   Tokens are the only thing you need to touch to re-theme.
-   ========================================================================== */
 
-  @import 'tailwindcss';
+@import 'tailwindcss';
 
 :root {
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
